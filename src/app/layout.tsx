@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Cabsy",
   description: "Cabsy - Book affordable rides anytime, anywhere. Reliable cabs with quick pickup and secure travel",
+  icons: {
+    icon: "cabsy/cabsy.png",
+    shortcut: "cabsy/cabsy.png",
+    apple: "cabsy/cabsy.png",
+  }
 };
 
 export default function RootLayout({
