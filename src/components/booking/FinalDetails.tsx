@@ -49,25 +49,22 @@ const FinalDetails = () => {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-medium text-gray-800 mb-2">
-          Your total is <span className="text-yellow-600 font-semibold">$124.50</span>
-        </h1>
-        <p className="text-gray-600">
-          Please{' '}
-          <span className="font-medium text-gray-800">Log In</span>
-          {' '}to your account or{' '}
-          <span className="font-medium text-gray-800">continue as guest</span>
-          {' '}to book your reservation.
-        </p>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex justify-between gap-4">
+    <div>
+      <div className="px-14 py-4">
+          <h1 className="text-2xl font-medium text-gray-800 mb-2">
+            Your total is <span className="text-yellow-600 font-semibold">$124.50</span>
+          </h1>
+          <p className="text-gray-600">
+            Please{' '}
+            <span className="font-medium text-gray-800">Log In</span>
+            {' '}to your account or{' '}
+            <span className="font-medium text-gray-800">continue as guest</span>
+            {' '}to book your reservation.
+          </p>
+        </div>
+      <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
-        <div>
+        <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Log In to your account</h2>
           </div>
@@ -136,9 +133,12 @@ const FinalDetails = () => {
             </form>
           </div>
         </div>
-        <div className='h-100 bg-gray-500/30 w-0.5' />
-        {/* Guest Checkout Section */}
-        <div className="">
+        {/* Vertical Divider */}
+        <div className="hidden md:flex items-stretch">
+          <div className="w-px bg-gray-300 mx-0 h-full" />
+        </div>
+        {/* Guest Section */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center px-6 py-8">
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Continue as guest</h2>
           </div>

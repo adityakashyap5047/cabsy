@@ -13,6 +13,8 @@ const RidePage = () => {
       <SelectVehicle />
       <p className="bg-gray-500 px-4 py-1 mx-6">Step 3: Final Details</p>
       <FinalDetails />
+      <p className="bg-gray-500 px-4 py-1 mx-6">Step 4: Checkout</p>
+      <FinalDetails />
     </div>
   );
 }
