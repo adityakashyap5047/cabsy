@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Trash2, } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,19 @@ export default function AddDetails() {
   });
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
+  const [stops, setStops] = React.useState<string[]>([]);
+
+  const handleAddStop = () => {
+    setStops(prev => [...prev, '']);
+  }
+
+  const handleRemoveStop = (index: number) => {
+    setStops(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const handleStopChange = (index: number, value: string) => {
+    setStops(prev => prev.map((stop, i) => i === index ? value : stop));
+  }
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-md space-y-6">
       <h1 className="text-xl font-semibold text-gray-800">Add Ride Details</h1>
@@ -88,8 +101,8 @@ export default function AddDetails() {
                   }}
                   startMonth={new Date()}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  fromDate={new Date()} // Disable navigation to previous months/years
-                  toDate={new Date(new Date().getFullYear() + 2, 11, 31)} // Allow up to 2 years in future
+                  fromDate={new Date()}
+                  toDate={new Date(new Date().getFullYear() + 2, 11, 31)}
                   captionLayout="label"
                   initialFocus
                   required
@@ -111,18 +124,18 @@ export default function AddDetails() {
                   {time}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-4" align="start">
+                <PopoverContent className="w-auto p-0" >
                 <TimeKeeper
                   time={time}
                   onChange={(newTime) => {
-                    const timeWithUpperCase = newTime.formatted12.replace(/am|pm/gi, (match) => match.toUpperCase());
-                    setTime(timeWithUpperCase);
+                  const timeWithUpperCase = newTime.formatted12.replace(/am|pm/gi, (match) => match.toUpperCase());
+                  setTime(timeWithUpperCase);
                   }}
-                  onDoneClick={() => setShowTimePicker(false)} // Close on done
                   switchToMinuteOnHourSelect
                   closeOnMinuteSelect
+                  doneButton={null}
                 />
-              </PopoverContent>
+                </PopoverContent>
             </Popover>
           </div>
         </div>
@@ -131,6 +144,54 @@ export default function AddDetails() {
         <div className="space-y-2">
           <Label htmlFor="pickup">Pick-Up Location</Label>
           <Input id="pickup" placeholder="Your pick-up location" />
+          <Button type="button" variant={"primary"} className="flex gap-1 ml-4 cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
+            <Plus className="h-4" />
+            <span className="hover:underline">Add Stop</span>
+          </Button>
+          {stops.length > 0 && (
+            <div className="space-y-3 px-6">
+              <div className="space-y-3">
+                {stops.map((stop, index) => (
+                  <div key={index} className="flex items-center">
+                    <div className="flex items-center text-xs text-gray-500">
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className={"h-5 w-5 text-gray-600"}
+                        >
+                          <rect x="10" y="0" width="4" height="6" rx="0.5" />
+                          <rect x="10" y="10" width="4" height="4" rx="0.5" />
+                          <rect x="10" y="18" width="4" height="6" rx="0.5" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        value={stop}
+                        onChange={(e) => handleStopChange(index, e.target.value)}
+                        placeholder="Add Your Stop"
+                        className="w-full"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleRemoveStop(index)}
+                      className="px-2 py-1 hover:text-[#AE9409]"
+                    >
+                      <Trash2 className="bg-white"/>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-gray-600 mt-2 p-2 bg-white rounded border border-yellow-300">
+                <strong>Route:</strong> Pickup → {stops.map((_, index) => `Stop ${index + 1}`).join(' → ')} → Dropoff
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Dropoff Location */}
