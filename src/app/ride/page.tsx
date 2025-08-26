@@ -1,4 +1,5 @@
 import AddDetails from "@/components/booking/AddDetails";
+import Checkout from "@/components/booking/Checkout";
 import FinalDetails from "@/components/booking/FinalDetails";
 import SelectVehicle from "@/components/booking/SelectVehicle";
 
@@ -14,7 +15,7 @@ const RidePage = () => {
       <p className="bg-gray-500 px-4 py-1 mx-6">Step 3: Final Details</p>
       <FinalDetails />
       <p className="bg-gray-500 px-4 py-1 mx-6">Step 4: Checkout</p>
-      <FinalDetails />
+      <Checkout />
     </div>
   );
 }
