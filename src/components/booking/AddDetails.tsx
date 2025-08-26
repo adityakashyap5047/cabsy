@@ -38,23 +38,55 @@ export default function AddDetails() {
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [stops, setStops] = React.useState<string[]>([]);
+  const [stopError, setStopError] = React.useState<number | null>(null); // Track which stop has error
+  const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
+  const [pickupLocation, setPickupLocation] = React.useState<string>("");
+  const [dropoffLocation, setDropoffLocation] = React.useState<string>("");
+
+  // Auto-focus newly added stop
+  React.useEffect(() => {
+    if (justAddedStop && stops.length > 0) {
+      const timer = setTimeout(() => {
+        const newInputs = document.querySelectorAll('input[placeholder="Add Your Stop"]');
+        const lastInput = newInputs[newInputs.length - 1] as HTMLInputElement;
+        if (lastInput) {
+          lastInput.focus();
+        }
+        setJustAddedStop(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [stops.length, justAddedStop]);
 
   const handleAddStop = () => {
-    setStops(prev => [...prev, '']);
+    if (stops.length > 0 && stops[stops.length - 1].trim() === "") {
+      setStopError(stops.length - 1); // Set error for the last stop
+      return;
+    }
+
+    setStops(prev => [...prev, ""]);
+    setStopError(null);
+    setJustAddedStop(true); // Trigger auto-focus
   }
 
   const handleRemoveStop = (index: number) => {
     setStops(prev => prev.filter((_, i) => i !== index));
+    setStopError(null); // Clear any errors when removing a stop
   }
 
   const handleStopChange = (index: number, value: string) => {
     setStops(prev => prev.map((stop, i) => i === index ? value : stop));
+    
+    // Clear error if user starts typing in the error field
+    if (stopError === index && value.trim() !== "") {
+      setStopError(null);
+    }
   }
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-md space-y-6">
       <h1 className="text-xl font-semibold text-gray-800">Add Ride Details</h1>
 
-      <form className="space-y-6">
+      <form className="space-y-4">
         {/* Service Type */}
         <div className="space-y-2">
           <Label htmlFor="service">Select Service Type</Label>
@@ -141,55 +173,75 @@ export default function AddDetails() {
         </div>
 
         {/* Pickup Location */}
-        <div className="space-y-2">
-          <Label htmlFor="pickup">Pick-Up Location</Label>
-          <Input id="pickup" placeholder="Your pick-up location" />
+        <div>
+          <Label htmlFor="pickup" className="mb-2">Pick-Up Location</Label>
+          <Input 
+            id="pickup" 
+            placeholder="Your pick-up location" 
+            value={pickupLocation}
+            onChange={(e) => setPickupLocation(e.target.value)}
+            className={cn(
+              "transition-colors duration-200",
+              pickupLocation.trim() 
+                ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
+                : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
+            )}
+          />
           <Button type="button" variant={"primary"} className="flex gap-1 ml-4 cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
             <Plus className="h-4" />
             <span className="hover:underline">Add Stop</span>
           </Button>
           {stops.length > 0 && (
             <div className="space-y-3 px-6">
-              <div className="space-y-3">
-                {stops.map((stop, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="flex items-center text-xs text-gray-500">
-                      <div>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className={"h-5 w-5 text-gray-600"}
-                        >
-                          <rect x="10" y="0" width="4" height="6" rx="0.5" />
-                          <rect x="10" y="10" width="4" height="4" rx="0.5" />
-                          <rect x="10" y="18" width="4" height="6" rx="0.5" />
-                        </svg>
-                      </div>
+              {stops.map((stop, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="flex items-center text-xs text-gray-500">
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className={"h-5 w-5 text-gray-600"}
+                      >
+                        <rect x="10" y="0" width="4" height="6" rx="0.5" />
+                        <rect x="10" y="10" width="4" height="4" rx="0.5" />
+                        <rect x="10" y="18" width="4" height="6" rx="0.5" />
+                      </svg>
                     </div>
-                    <div className="flex-1">
-                      <Input
-                        value={stop}
-                        onChange={(e) => handleStopChange(index, e.target.value)}
-                        placeholder="Add Your Stop"
-                        className="w-full"
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="primary"
-                      size="sm"
-                      onClick={() => handleRemoveStop(index)}
-                      className="px-2 py-1 hover:text-[#AE9409]"
-                    >
-                      <Trash2 className="bg-white"/>
-                    </Button>
                   </div>
-                ))}
-              </div>
-              <div className="text-xs text-gray-600 mt-2 p-2 bg-white rounded border border-yellow-300">
-                <strong>Route:</strong> Pickup → {stops.map((_, index) => `Stop ${index + 1}`).join(' → ')} → Dropoff
-              </div>
+                  <div className="flex-1">
+                    <Input
+                      value={stop}
+                      onChange={(e) => handleStopChange(index, e.target.value)}
+                      placeholder="Add Your Stop"
+                      className={cn(
+                        "w-full transition-colors duration-200",
+                        // Error state - red border
+                        stopError === index 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
+                          : // Normal state - only show colored border when there's text
+                            stop.trim() 
+                              ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
+                              : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
+                      )}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleRemoveStop(index)}
+                    className="px-2 py-1 hover:text-[#AE9409]"
+                    >
+                    <Trash2 className="bg-white"/>
+                  </Button>
+                </div>
+              ))}
+              {stopError !== null && (
+                <p className="text-red-500 text-sm pl-6 font-semibold -mt-2">
+                  Stop location is required
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -197,7 +249,18 @@ export default function AddDetails() {
         {/* Dropoff Location */}
         <div className="space-y-2">
           <Label htmlFor="dropoff">Drop-Off Location</Label>
-          <Input id="dropoff" placeholder="Your drop-off location" />
+          <Input 
+            id="dropoff" 
+            placeholder="Your drop-off location" 
+            value={dropoffLocation}
+            onChange={(e) => setDropoffLocation(e.target.value)}
+            className={cn(
+              "transition-colors duration-200",
+              dropoffLocation.trim() 
+                ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
+                : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
+            )}
+          />
         </div>
 
         {/* Passengers & Luggage */}
