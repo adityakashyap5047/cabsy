@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Minus, Plus, Trash2, } from "lucide-react";
+import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Minus, Plus, Trash2, Users, } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -268,16 +268,7 @@ export default function AddDetails() {
                 <Label htmlFor="passengers">Number of Passengers</Label>
                 <div className="flex items-center">
                   <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="200" height="200" fill="black">
-                      <circle cx="32" cy="18" r="10"/>
-                      <path d="M16 54c0-10 7-18 16-18s16 8 16 18H16z"/>
-                      
-                      <circle cx="14" cy="26" r="7"/>
-                      <path d="M2 54c0-8 5-14 12-14s12 6 12 14H2z"/>
-
-                      <circle cx="50" cy="26" r="7"/>
-                      <path d="M38 54c0-8 5-14 12-14s12 6 12 14H38z"/>
-                    </svg>
+                    <Users className="w-4 h-4"/>
                   </Button>
                   <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(Math.max(1, passenger - 1))}>
                     <Minus />
@@ -328,16 +319,7 @@ export default function AddDetails() {
             <Label htmlFor="passengers">Number of Passengers</Label>
             <div className="flex items-center">
               <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="200" height="200" fill="black">
-                  <circle cx="32" cy="18" r="10"/>
-                  <path d="M16 54c0-10 7-18 16-18s16 8 16 18H16z"/>
-                  
-                  <circle cx="14" cy="26" r="7"/>
-                  <path d="M2 54c0-8 5-14 12-14s12 6 12 14H2z"/>
-
-                  <circle cx="50" cy="26" r="7"/>
-                  <path d="M38 54c0-8 5-14 12-14s12 6 12 14H38z"/>
-                </svg>
+                <Users className="w-4 h-4 mr-1"/>
               </Button>
               <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(Math.max(1, passenger - 1))}>
                 <Minus />
