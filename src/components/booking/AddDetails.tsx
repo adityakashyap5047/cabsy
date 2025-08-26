@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Minus, Plus, Trash2, } from "lucide-react";
+import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Minus, Plus, Trash2, } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,7 @@ export default function AddDetails() {
   const [pickupLocation, setPickupLocation] = React.useState<string>("");
   const [dropoffLocation, setDropoffLocation] = React.useState<string>("");
   const [passenger, setPassenger] = React.useState<number>(1);
+  const [luggage, setLuggage] = React.useState<number>(0);
 
   // Auto-focus newly added stop
   React.useEffect(() => {
@@ -77,14 +78,12 @@ export default function AddDetails() {
 
   const handleStopChange = (index: number, value: string) => {
     setStops(prev => prev.map((stop, i) => i === index ? value : stop));
-    
-    // Clear error if user starts typing in the error field
     if (stopError === index && value.trim() !== "") {
       setStopError(null);
     }
   }
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-md space-y-6">
+    <div className="max-w-xl p-6 space-y-6">
       <h1 className="text-xl font-semibold text-gray-800">Add Ride Details</h1>
 
       <form className="space-y-4">
@@ -265,11 +264,11 @@ export default function AddDetails() {
         </div>
 
         {/* Passengers & Luggage */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="passengers">Number of Passengers</Label>
             <div className="flex items-center">
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
+              <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="200" height="200" fill="black">
                   <circle cx="32" cy="18" r="10"/>
                   <path d="M16 54c0-10 7-18 16-18s16 8 16 18H16z"/>
@@ -281,13 +280,18 @@ export default function AddDetails() {
                   <path d="M38 54c0-8 5-14 12-14s12 6 12 14H38z"/>
                 </svg>
               </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
+              <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(Math.max(1, passenger - 1))}>
                 <Minus />
               </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
-                <span className="px-8">{passenger}</span>
-              </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
+              <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={passenger} onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setPassenger(1);
+                } else {
+                  setPassenger(Number(value) || passenger);
+                }
+                }} />
+              <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(passenger + 1)}>
                 <Plus />
               </Button>
             </div>
@@ -295,40 +299,24 @@ export default function AddDetails() {
           <div className="space-y-2">
             <Label htmlFor="luggage">Luggage Count</Label>
             <div className="flex items-center">
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="200" height="200" fill="black">
-                  <circle cx="32" cy="18" r="10"/>
-                  <path d="M16 54c0-10 7-18 16-18s16 8 16 18H16z"/>
-                  
-                  <circle cx="14" cy="26" r="7"/>
-                  <path d="M2 54c0-8 5-14 12-14s12 6 12 14H2z"/>
-
-                  <circle cx="50" cy="26" r="7"/>
-                  <path d="M38 54c0-8 5-14 12-14s12 6 12 14H38z"/>
-                </svg>
+              <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
+                <BriefcaseBusinessIcon />
               </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
+                <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(Math.max(0, luggage - 1))}>
                 <Minus />
-              </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
-                <span className="px-8">{passenger}</span>
-              </Button>
-              <Button type="button" variant={"primary"} className="border rounded-none border-gray-400">
+                </Button>
+                <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={luggage} onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setLuggage(0);
+                } else {
+                  setLuggage(Number(value) || luggage);
+                }
+                }} />
+              <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(luggage + 1)}>
                 <Plus />
               </Button>
             </div>
-          </div>
-        </div>
-
-        {/* Return Trip */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="returnTrip"
-              className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
-            />
-            <Label htmlFor="returnTrip">Return Trip Required</Label>
           </div>
         </div>
 
