@@ -58,7 +58,6 @@ export default function AddDetails() {
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex w-full gap-2">
           {/* Pick-up Date */}
           <div className="space-y-2 w-1/2">
@@ -87,9 +86,11 @@ export default function AddDetails() {
                       setShowDatePicker(false);
                     }
                   }}
+                  startMonth={new Date()}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   fromDate={new Date()} // Disable navigation to previous months/years
                   toDate={new Date(new Date().getFullYear() + 2, 11, 31)} // Allow up to 2 years in future
+                  captionLayout="label"
                   initialFocus
                   required
                 />
