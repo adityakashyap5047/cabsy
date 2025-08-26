@@ -91,7 +91,7 @@ export default function AddDetails() {
         <div className="space-y-2">
           <Label htmlFor="service">Select Service Type</Label>
           <Select>
-            <SelectTrigger className="w-full" id="service">
+            <SelectTrigger className="w-full rounded-none" id="service">
               <SelectValue placeholder="Choose a service type" />
             </SelectTrigger>
             <SelectContent>
@@ -110,9 +110,9 @@ export default function AddDetails() {
             <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="primary"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start border rounded-none text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
                   onClick={() => setShowDatePicker(true)}
@@ -148,8 +148,8 @@ export default function AddDetails() {
             <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  variant="primary"
+                  className="w-full border rounded-none cursor-pointer justify-start text-left font-normal"
                   onClick={() => setShowTimePicker(true)}
                 >
                   <span className="mr-2">🕐</span>
