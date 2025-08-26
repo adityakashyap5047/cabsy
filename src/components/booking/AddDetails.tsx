@@ -21,13 +21,22 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import TimePicker from "./TimePicker";
+import TimeKeeper from "react-timekeeper";
 
-export default function RidePage() {
-  const [date, setDate] = React.useState<Date>();
-  const [time, setTime] = React.useState<string>("");
-
-  console.log("Selected Date:", time);
+export default function AddDetails() {
+  const [date, setDate] = React.useState<Date>(new Date());
+  const [time, setTime] = React.useState<string>(() => {
+    // Set current time as default
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? ' PM' : ' AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    return `${displayHours}:${displayMinutes}${ampm}`;
+  });
+  const [showTimePicker, setShowTimePicker] = React.useState(false);
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-md space-y-6">
       <h1 className="text-xl font-semibold text-gray-800">Add Ride Details</h1>
@@ -37,7 +46,7 @@ export default function RidePage() {
         <div className="space-y-2">
           <Label htmlFor="service">Select Service Type</Label>
           <Select>
-            <SelectTrigger id="service">
+            <SelectTrigger className="w-full" id="service">
               <SelectValue placeholder="Choose a service type" />
             </SelectTrigger>
             <SelectContent>
@@ -50,54 +59,71 @@ export default function RidePage() {
           </Select>
         </div>
 
-        {/* Pick-up Date */}
-        <div className="space-y-2">
-          <Label>Pick-Up Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "MM/dd/yyyy") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-              
-        <TimePicker />
-        {/* Pick-up Time */}
-        <div className="space-y-2">
-          <Label>Pick-Up Time</Label>
-          <Select onValueChange={setTime}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select time" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 24 * 2 }).map((_, i) => {
-                const hour = Math.floor(i / 2);
-                const minute = i % 2 === 0 ? "00" : "30";
-                const label = `${String(hour).padStart(2, "0")}:${minute}`;
-                return (
-                  <SelectItem key={label} value={label}>
-                    {label}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+        <div className="flex w-full gap-2">
+          {/* Pick-up Date */}
+          <div className="space-y-2 w-1/2">
+            <Label>Pick-Up Date</Label>
+            <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                  onClick={() => setShowDatePicker(true)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "MM/dd/yyyy") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(newDate) => {
+                    if (newDate) {
+                      setDate(newDate);
+                      setShowDatePicker(false);
+                    }
+                  }}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  fromDate={new Date()} // Disable navigation to previous months/years
+                  toDate={new Date(new Date().getFullYear() + 2, 11, 31)} // Allow up to 2 years in future
+                  initialFocus
+                  required
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          {/* Pick-up Time */}
+          <div className="space-y-2 w-1/2">
+            <Label>Pick-Up Time</Label>
+            <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  onClick={() => setShowTimePicker(true)}
+                >
+                  <span className="mr-2">🕐</span>
+                  {time}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-4" align="start">
+                <TimeKeeper
+                  time={time}
+                  onChange={(newTime) => {
+                    const timeWithUpperCase = newTime.formatted12.replace(/am|pm/gi, (match) => match.toUpperCase());
+                    setTime(timeWithUpperCase);
+                  }}
+                  onDoneClick={() => setShowTimePicker(false)} // Close on done
+                  switchToMinuteOnHourSelect
+                  closeOnMinuteSelect
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         {/* Pickup Location */}
@@ -124,8 +150,23 @@ export default function RidePage() {
           </div>
         </div>
 
+        {/* Return Trip */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="returnTrip"
+              className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+            />
+            <Label htmlFor="returnTrip">Return Trip Required</Label>
+          </div>
+        </div>
+
         {/* Submit */}
-        <Button type="submit" className="w-full">
+        <Button 
+          type="submit" 
+          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+        >
           Select Vehicle
         </Button>
       </form>
