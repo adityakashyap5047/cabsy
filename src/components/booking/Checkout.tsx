@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Minus, Plus } from 'lucide-react';
+import { Minus, PenBox, Plus, Trash2 } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 
 const Checkout = () => {
@@ -318,7 +318,7 @@ const Checkout = () => {
                             onClick={handleAddPassenger}
                             className="rounded-none cursor-pointer border border-[#AE9409] text-[#AE9409] hover:text-white hover:bg-[#AE9409] font-medium py-2 px-6 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                         >
-                            Add
+                          Add
                         </Button>
                         </div>
                     </div>
@@ -326,20 +326,22 @@ const Checkout = () => {
 
                 {/* Passenger List */}
                 {passengers.length > 0 && (
-                    <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-gray-700">Additional Passengers:</h3>
+                    <div className="space-y-3 mb-4">
+                    <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
+                      <h2 className="text-lg font-medium text-gray-800">Additional Passenger</h2>
+                  </div>
                     {passengers.map((passenger) => (
-                        <div key={passenger.id} className="bg-gray-50 p-3 rounded-md border">
+                        <div key={passenger.id} className="p-3 border-b">
                         <div className="flex justify-between items-start">
-                            <div>
+                          <div>
                             <p className="font-medium text-gray-800">
                                 {passenger.firstName} {passenger.lastName}
                             </p>
                             {passenger.phoneNumber && (
-                                <p className="text-sm text-gray-600">{passenger.phoneNumber}</p>
+                                <p className="text-sm font-semibold text-gray-400">{passenger.phoneNumber}</p>
                             )}
                             {passenger.email && (
-                                <p className="text-sm text-gray-600">{passenger.email}</p>
+                                <p className="text-sm font-semibold text-gray-400">{passenger.email}</p>
                             )}
                             </div>
                             <button
@@ -347,9 +349,16 @@ const Checkout = () => {
                             onClick={() => handleRemovePassenger(passenger.id)}
                             className="text-red-500 hover:text-red-700 text-sm"
                             >
-                            Remove
+                              <Trash2 />
                             </button>
-                        </div>
+                            <button
+                            type="button"
+                            onClick={() => handleRemovePassenger(passenger.id)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                              <PenBox />
+                            </button>
+                          </div>
                         </div>
                     ))}
                     </div>
