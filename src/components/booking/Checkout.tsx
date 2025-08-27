@@ -584,87 +584,23 @@ const Checkout = () => {
               No
             </Button>
           </div>
+          <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-800">Promo Code</h2>
+          </div>
           <div className="p-6">
-            <form onSubmit={handleGuestSubmit} className="space-y-6">
-              {/* Name Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="guest-firstname" className="text-gray-700 font-medium">
-                    First Name
-                  </Label>
                   <Input
-                    id="guest-firstname"
-                    name="firstName"
+                    name="promoCode"
                     type="text"
-                    placeholder="First Name"
-                    value={guestData.firstName}
-                    onChange={handleGuestChange}
+                    placeholder="Enter Promo Code"
                     className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
                     required
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="guest-lastname" className="text-gray-700 font-medium">
-                    Last Name
-                  </Label>
-                  <Input
-                    id="guest-lastname"
-                    name="lastName"
-                    type="text"
-                    placeholder="Last Name"
-                    value={guestData.lastName}
-                    onChange={handleGuestChange}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Phone Number */}
-              <div className="space-y-2">
-                <Label htmlFor="guest-phone" className="text-gray-700 font-medium">
-                  Phone Number
-                </Label>
-                <Input
-                  id="guest-phone"
-                  name="phoneNumber"
-                  type="tel"
-                  placeholder="(555) 555-5555"
-                  value={guestData.phoneNumber}
-                  onChange={handleGuestChange}
-                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  required
-                />
-              </div>
-
-              {/* Email Address */}
-              <div className="space-y-2">
-                <Label htmlFor="guest-email" className="text-gray-700 font-medium">
-                  Email Address
-                </Label>
-                <Input
-                  id="guest-email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={guestData.email}
-                  onChange={handleGuestChange}
-                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-center">
-                <Button
-                  type="submit"
-                  className={`bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-3 px-8 rounded-none transition-colors duration-200 ${
-                    editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  disabled={editingPassengerId !== null}
-                >
-                  Continue as guest
-                </Button>
+                <Button type='button' variant={"primary"} className='border border-[#AE9404] text-[#AE9404] rounded-none hover:text-white hover:bg-[#AE9404]'>Apply Promo Code</Button>
               </div>
             </form>
           </div>
