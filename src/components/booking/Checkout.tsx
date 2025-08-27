@@ -25,6 +25,7 @@ const Checkout = () => {
     }>>([]);
   
     const [showAddPassenger, setShowAddPassenger] = useState(false);
+    const [editingPassengerId, setEditingPassengerId] = useState<number | null>(null);
     const [newPassenger, setNewPassenger] = useState({
         firstName: '',
         lastName: '',
@@ -101,6 +102,57 @@ const Checkout = () => {
     
       const handleRemovePassenger = (id: number) => {
         setPassengers(prev => prev.filter(p => p.id !== id));
+      };
+
+      const handleEditPassenger = (passenger: typeof passengers[0]) => {
+        setEditingPassengerId(passenger.id);
+        setNewPassenger({
+          firstName: passenger.firstName,
+          lastName: passenger.lastName,
+          phoneNumber: passenger.phoneNumber,
+          email: passenger.email
+        });
+        setPassengerErrors({
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+          email: ''
+        });
+      };
+
+      const handleUpdatePassenger = () => {
+        if (validatePassenger() && editingPassengerId !== null) {
+          setPassengers(prev => 
+            prev.map(p => 
+              p.id === editingPassengerId 
+                ? { ...p, ...newPassenger }
+                : p
+            )
+          );
+          setEditingPassengerId(null);
+          setNewPassenger({
+            firstName: '',
+            lastName: '',
+            phoneNumber: '',
+            email: ''
+          });
+        }
+      };
+
+      const handleCancelEdit = () => {
+        setEditingPassengerId(null);
+        setNewPassenger({
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+          email: ''
+        });
+        setPassengerErrors({
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+          email: ''
+        });
       };
 
   const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,8 +256,11 @@ const Checkout = () => {
                   <Button 
                     type="button" 
                     variant={"primary"} 
-                    className={`flex gap-2 ml-4 cursor-pointer items-center font-semibold text-xs transition-all duration-300 transform hover:scale-105 text-[#AE9409]`}
-                    onClick={() => setShowAddPassenger(!showAddPassenger)}
+                    className={`flex gap-2 ml-4 cursor-pointer items-center font-semibold text-xs transition-all duration-300 transform hover:scale-105 text-[#AE9409] ${
+                      editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    onClick={() => editingPassengerId === null && setShowAddPassenger(!showAddPassenger)}
+                    disabled={editingPassengerId !== null}
                   >
                     <div className={`transition-transform duration-300 ${showAddPassenger ? 'rotate-180' : 'rotate-0'}`}>
                       {showAddPassenger ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -316,7 +371,10 @@ const Checkout = () => {
                             type="button"
                             variant={"primary"}
                             onClick={handleAddPassenger}
-                            className="rounded-none cursor-pointer border border-[#AE9409] text-[#AE9409] hover:text-white hover:bg-[#AE9409] font-medium py-2 px-6 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                            className={`rounded-none cursor-pointer border border-[#AE9409] text-[#AE9409] hover:text-white hover:bg-[#AE9409] font-medium py-2 px-6 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+                              editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            disabled={editingPassengerId !== null}
                         >
                           Add
                         </Button>
@@ -345,10 +403,24 @@ const Checkout = () => {
                               )}
                             </div>
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              <Button variant={"primary"} className='hover:text-[#AE9409]'>
+                              <Button 
+                                variant={"primary"} 
+                                className={`hover:text-[#AE9409] ${
+                                  editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                onClick={() => editingPassengerId === null && handleEditPassenger(passenger)}
+                                disabled={editingPassengerId !== null}
+                              >
                                 <PenBox />
                               </Button>
-                              <Button onClick={() => handleRemovePassenger(passenger.id)} className='hover:text-[#AE9409] -ml-3' variant={"primary"}>
+                              <Button 
+                                onClick={() => editingPassengerId === null && handleRemovePassenger(passenger.id)} 
+                                className={`hover:text-[#AE9409] -ml-3 ${
+                                  editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+                                }`} 
+                                variant={"primary"}
+                                disabled={editingPassengerId !== null}
+                              >
                                 <Trash2 />
                               </Button>
                             </div>
@@ -357,6 +429,122 @@ const Checkout = () => {
                     ))}
                     </div>
                 )}
+
+                {/* Edit Passenger Form */}
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  editingPassengerId !== null 
+                    ? 'max-h-[600px] opacity-100 transform translate-y-0 mb-4' 
+                    : 'max-h-0 opacity-0 transform -translate-y-4'
+                }`}>
+                  {editingPassengerId !== null && (
+                    <div className="p-4 space-y-4 transform transition-all duration-300">
+                        <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
+                          <h2 className="text-lg font-medium text-gray-800">Edit Passenger Information</h2>
+                      </div>
+                        
+                        {/* Name Fields */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="edit-passenger-first-name" className="text-gray-700 font-medium">
+                            First Name
+                            </Label>
+                            <Input
+                            id="edit-passenger-first-name"
+                            name="firstName"
+                            placeholder="First Name"
+                            value={newPassenger.firstName}
+                            onChange={handlePassengerChange}
+                            className={`w-full px-4 py-3 border focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 transition-all duration-200 ${
+                                passengerErrors.firstName ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                            />
+                            {passengerErrors.firstName && (
+                            <p className="text-red-500 text-xs mt-1 animate-pulse">{passengerErrors.firstName}</p>
+                            )}
+                        </div>
+                        
+                        <div className="space-y-1">
+                            <Label htmlFor="edit-passenger-last-name" className="text-gray-700 font-medium">
+                            Last Name
+                            </Label>
+                            <Input
+                            id="edit-passenger-last-name"
+                            name="lastName"
+                            placeholder="Last Name"
+                            value={newPassenger.lastName}
+                            onChange={handlePassengerChange}
+                            className={`w-full px-4 py-3 border focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 transition-all duration-200 ${
+                                passengerErrors.lastName ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                            />
+                            {passengerErrors.lastName && (
+                            <p className="text-red-500 text-xs mt-1 animate-pulse">{passengerErrors.lastName}</p>
+                            )}
+                        </div>
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="space-y-1">
+                        <Label htmlFor="edit-passenger-phone" className="text-gray-700 font-medium">
+                            Phone Number (Optional)
+                        </Label>
+                        <Input
+                            id="edit-passenger-phone"
+                            name="phoneNumber"
+                            placeholder="(555) 555-5555"
+                            value={newPassenger.phoneNumber}
+                            onChange={handlePassengerChange}
+                            className={`w-full px-4 py-3 border focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 transition-all duration-200 ${
+                            passengerErrors.phoneNumber ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                        />
+                        <p className="text-xs text-gray-500">International must have preceding + sign and country code</p>
+                        {passengerErrors.phoneNumber && (
+                            <p className="text-red-500 text-xs mt-1 animate-pulse">{passengerErrors.phoneNumber}</p>
+                        )}
+                        </div>
+
+                        {/* Email Address */}
+                        <div className="space-y-1">
+                        <Label htmlFor="edit-passenger-email" className="text-gray-700 font-medium">
+                            Email Address (Optional)
+                        </Label>
+                        <Input
+                            id="edit-passenger-email"
+                            name="email"
+                            type="email"
+                            placeholder=""
+                            value={newPassenger.email}
+                            onChange={handlePassengerChange}
+                            className={`w-full px-4 py-3 border focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 transition-all duration-200 ${
+                            passengerErrors.email ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-blue-500'
+                            }`}
+                        />
+                        {passengerErrors.email && (
+                            <p className="text-red-500 text-xs mt-1 animate-pulse">{passengerErrors.email}</p>
+                        )}
+                        </div>
+
+                        {/* Update/Cancel Buttons */}
+                        <div className="flex justify-end space-x-3">
+                        <Button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleUpdatePassenger}
+                            className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Update
+                        </Button>
+                        </div>
+                    </div>
+                  )}
+                </div>
             </div>
             {/* </div> */}
             <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
@@ -377,8 +565,24 @@ const Checkout = () => {
           </div>
           <div className='flex items-center px-4 mt-2'>
             <p>Would you like to book return service?</p>
-            <Button variant={"primary"} className='bg-red-500 rounded-none ml-4'>Yes</Button>
-            <Button variant={"primary"} className='bg-slate-700 rounded-none'>No</Button>
+            <Button 
+              variant={"primary"} 
+              className={`bg-red-500 rounded-none ml-4 ${
+                editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={editingPassengerId !== null}
+            >
+              Yes
+            </Button>
+            <Button 
+              variant={"primary"} 
+              className={`bg-slate-700 rounded-none ${
+                editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={editingPassengerId !== null}
+            >
+              No
+            </Button>
           </div>
           <div className="p-6">
             <form onSubmit={handleGuestSubmit} className="space-y-6">
@@ -454,7 +658,10 @@ const Checkout = () => {
               <div className="flex justify-center">
                 <Button
                   type="submit"
-                  className="bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-3 px-8 rounded-none transition-colors duration-200"
+                  className={`bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-3 px-8 rounded-none transition-colors duration-200 ${
+                    editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  disabled={editingPassengerId !== null}
                 >
                   Continue as guest
                 </Button>
