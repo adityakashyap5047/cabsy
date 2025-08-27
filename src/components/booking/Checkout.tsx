@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Minus, PenBox, Plus, Trash2 } from 'lucide-react';
+import { Minus, PenBox, Plus, Trash2, LockKeyhole } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 
 const Checkout = () => {
@@ -603,6 +603,197 @@ const Checkout = () => {
                 <Button type='button' variant={"primary"} className='border border-[#AE9404] text-[#AE9404] rounded-none hover:text-white hover:bg-[#AE9404]'>Apply Promo Code</Button>
               </div>
             </form>
+          </div>
+          <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-800">Pricing</h2>
+          </div>
+          <div>
+            <div className="bg-gray-50 flex justify-between mt-4 px-12 py-1 border-b border-gray-100">
+              <p className='font-semibold text-gray-500'>Base Fare</p>
+              <p className='font-semibold text-gray-500'>$6719.39</p>
+            </div>
+          </div>
+          <div>
+            <div className="bg-slate-800 rounded-sm flex justify-between mt-4 px-12 py-4 border-b border-gray-100">
+              <p className='text-xl font-semibold text-gray-400'>Total</p>
+              <p className='text-xl font-semibold text-gray-400'>$6719.39</p>
+            </div>
+          </div>
+          <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-800">Payment Information</h2>
+          </div>
+          <p className='flex items-center mt-4 px-4 gap-2 text-sm text-gray-600'><LockKeyhole className='h-4' /> All transactions are safe and secure.</p>
+          
+          {/* Payment Form */}
+          <div className="p-6 space-y-6">
+            {/* Credit Card Section */}
+            <div className="space-y-4">
+              {/* Credit Card Number */}
+              <div className="space-y-2">
+                <Input
+                  placeholder="Credit Card"
+                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                />
+              </div>
+
+              {/* Card Details Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="CVV"
+                    maxLength={4}
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
+                    <option value="">MM</option>
+                    {Array.from({length: 12}, (_, i) => (
+                      <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
+                        {String(i + 1).padStart(2, '0')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
+                    <option value="">YYYY</option>
+                    {Array.from({length: 10}, (_, i) => (
+                      <option key={2024 + i} value={2024 + i}>
+                        {2024 + i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Input
+                    placeholder="ZIP/Postal Code"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+              </div>
+
+              {/* Name on Card */}
+              <div className="space-y-2">
+                <Input
+                  placeholder="Name on Card"
+                  className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                />
+                <p className="text-red-500 text-sm">Name on Card not provided</p>
+              </div>
+            </div>
+
+            {/* Billing Information */}
+            <div className="space-y-4">
+              <div className="bg-gray-100 px-4 py-2 rounded">
+                <h3 className="text-base font-medium text-gray-700">Billing Information</h3>
+              </div>
+
+              {/* Address Line 1 */}
+              <div className="space-y-2">
+                <Input
+                  placeholder="Address Line 1"
+                  className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                />
+                <p className="text-red-500 text-sm">Billing address not provided</p>
+              </div>
+
+              {/* Address Line 2 and ZIP */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Address Line 2"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Input
+                    placeholder="ZIP/Postal Code"
+                    className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                  />
+                  <p className="text-red-500 text-sm">Billing zip not provided</p>
+                </div>
+              </div>
+
+              {/* City, Country, State */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="City"
+                    className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                  />
+                  <p className="text-red-500 text-sm">Billing city not provided</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
+                    <option value="US">United States of America</option>
+                    <option value="CA">Canada</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <select className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900 rounded-md">
+                    <option value="">State</option>
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="AR">Arkansas</option>
+                    <option value="CA">California</option>
+                    <option value="CO">Colorado</option>
+                    <option value="CT">Connecticut</option>
+                    <option value="DE">Delaware</option>
+                    <option value="FL">Florida</option>
+                    <option value="GA">Georgia</option>
+                  </select>
+                  <p className="text-red-500 text-sm">Billing state not provided</p>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Cardholder Email"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Input
+                    type="tel"
+                    placeholder="Cardholder Phone"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Terms and Conditions */}
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                By clicking the button below, you agree to our{' '}
+                <span className="text-yellow-600 hover:text-yellow-700 cursor-pointer underline">privacy policy</span>
+                {' '}and{' '}
+                <span className="text-yellow-600 hover:text-yellow-700 cursor-pointer underline">terms and conditions</span>.
+              </p>
+
+              {/* Book Now Button */}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-bold py-4 px-8 rounded-none shadow-lg cursor-pointer"
+                disabled={editingPassengerId !== null}
+              >
+                Book Now
+              </Button>
+            </div>
           </div>
         </div>
       </div>
