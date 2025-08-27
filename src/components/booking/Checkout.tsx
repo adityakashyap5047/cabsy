@@ -629,15 +629,23 @@ const Checkout = () => {
             {/* Credit Card Section */}
             <div className="space-y-4">
               {/* Credit Card Number */}
-              <div className="space-y-2">
+              <div className="grid grid-cols-4 lg:grid-cols-6 gap-2">
                 <Input
                   placeholder="Credit Card"
-                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  className="lg:col-span-4 max-lg:col-span-4 px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                />
+                <Input
+                  placeholder="MM"
+                  className="px-4 max-lg:col-span-2 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                />
+                <Input
+                  placeholder="YY"
+                  className="px-4 py-3 max-lg:col-span-2 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
                 />
               </div>
 
               {/* Card Details Row */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
                 <div className="space-y-2">
                   <Input
                     placeholder="CVV"
@@ -645,29 +653,7 @@ const Checkout = () => {
                     className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
-                    <option value="">MM</option>
-                    {Array.from({length: 12}, (_, i) => (
-                      <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
-                        {String(i + 1).padStart(2, '0')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="space-y-2">
-                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
-                    <option value="">YYYY</option>
-                    {Array.from({length: 10}, (_, i) => (
-                      <option key={2024 + i} value={2024 + i}>
-                        {2024 + i}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
+
                 <div className="space-y-2">
                   <Input
                     placeholder="ZIP/Postal Code"
@@ -680,9 +666,9 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Input
                   placeholder="Name on Card"
-                  className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                  className="w-full px-4 py-3 border focus:ring-2 bg-white text-gray-900"
                 />
-                <p className="text-red-500 text-sm">Name on Card not provided</p>
+                {/* <p className="text-red-500 text-sm">Name on Card not provided</p> */}
               </div>
             </div>
 
@@ -696,68 +682,52 @@ const Checkout = () => {
               <div className="space-y-2">
                 <Input
                   placeholder="Address Line 1"
-                  className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                  className="w-full px-4 py-3 borderfocus:ring-2 bg-white text-gray-900"
                 />
-                <p className="text-red-500 text-sm">Billing address not provided</p>
+                {/* <p className="text-red-500 text-sm">Billing address not provided</p> */}
               </div>
 
               {/* Address Line 2 and ZIP */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Address Line 2"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Input
-                    placeholder="ZIP/Postal Code"
-                    className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-                  />
-                  <p className="text-red-500 text-sm">Billing zip not provided</p>
-                </div>
+              <div className="space-y-2">
+                <Input
+                  placeholder="Address Line 2"
+                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                />
               </div>
-
-              {/* City, Country, State */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
                 <div className="space-y-2">
                   <Input
                     placeholder="City"
-                    className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
                   />
-                  <p className="text-red-500 text-sm">Billing city not provided</p>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <select className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 rounded-md">
-                    <option value="US">United States of America</option>
-                    <option value="CA">Canada</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                  </select>
+                  <Input
+                    placeholder="ZIP/Postal Code"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
                 </div>
-                
+              </div>
+              
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
                 <div className="space-y-2">
-                  <select className="w-full px-4 py-3 border border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900 rounded-md">
-                    <option value="">State</option>
-                    <option value="AL">Alabama</option>
-                    <option value="AK">Alaska</option>
-                    <option value="AZ">Arizona</option>
-                    <option value="AR">Arkansas</option>
-                    <option value="CA">California</option>
-                    <option value="CO">Colorado</option>
-                    <option value="CT">Connecticut</option>
-                    <option value="DE">Delaware</option>
-                    <option value="FL">Florida</option>
-                    <option value="GA">Georgia</option>
-                  </select>
-                  <p className="text-red-500 text-sm">Billing state not provided</p>
+                  <Input
+                    placeholder="Country"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Input
+                    placeholder="State"
+                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                  />
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2">
                 <div className="space-y-2">
                   <Input
                     type="email"
