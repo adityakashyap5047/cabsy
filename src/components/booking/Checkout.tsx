@@ -332,32 +332,26 @@ const Checkout = () => {
                   </div>
                     {passengers.map((passenger) => (
                         <div key={passenger.id} className="p-3 border-b">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-gray-800">
+                          <div className="group flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-gray-800">
                                 {passenger.firstName} {passenger.lastName}
-                            </p>
-                            {passenger.phoneNumber && (
+                              </p>
+                              {passenger.phoneNumber && (
                                 <p className="text-sm font-semibold text-gray-400">{passenger.phoneNumber}</p>
-                            )}
-                            {passenger.email && (
+                              )}
+                              {passenger.email && (
                                 <p className="text-sm font-semibold text-gray-400">{passenger.email}</p>
-                            )}
+                              )}
                             </div>
-                            <button
-                            type="button"
-                            onClick={() => handleRemovePassenger(passenger.id)}
-                            className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                              <Trash2 />
-                            </button>
-                            <button
-                            type="button"
-                            onClick={() => handleRemovePassenger(passenger.id)}
-                            className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                              <PenBox />
-                            </button>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <Button variant={"primary"} className='hover:text-[#AE9409]'>
+                                <PenBox />
+                              </Button>
+                              <Button onClick={() => handleRemovePassenger(passenger.id)} className='hover:text-[#AE9409] -ml-3' variant={"primary"}>
+                                <Trash2 />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                     ))}
