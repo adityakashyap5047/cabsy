@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { Textarea } from '../ui/textarea';
 import StripePayment from '../payment/StripePayment';
 
 const Checkout = () => {
+  const router = useRouter();
 
     const [guestData, setGuestData] = useState({
         firstName: 'Aditya',
@@ -629,8 +631,13 @@ const Checkout = () => {
               amount={299.99} // Replace with actual ride amount
               onPaymentSuccess={(paymentMethod) => {
                 console.log('Payment successful:', paymentMethod);
-                // Handle successful payment - redirect to confirmation page
-                alert('Payment successful! Booking confirmed.');
+                // Redirect to confirmation page with payment details
+                const queryParams = new URLSearchParams({
+                  payment_intent: paymentMethod.id || 'success',
+                  amount: '299.99',
+                  status: 'success'
+                });
+                router.push(`/confirmation?${queryParams.toString()}`);
               }}
               onPaymentError={(error) => {
                 console.error('Payment error:', error);
