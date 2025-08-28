@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Minus, PenBox, Plus, Trash2, LockKeyhole } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
+import StripePayment from '../payment/StripePayment';
 
 const Checkout = () => {
 
@@ -623,145 +624,20 @@ const Checkout = () => {
           <p className='flex items-center mt-4 px-4 gap-2 text-sm text-gray-600'><LockKeyhole className='h-4' /> All transactions are safe and secure.</p>
           
           {/* Payment Form */}
-          <div className="p-6 space-y-6">
-            {/* Credit Card Section */}
-            <div className="space-y-4">
-              {/* Credit Card Number */}
-              <div className="grid grid-cols-4 lg:grid-cols-6 gap-2">
-                <Input
-                  placeholder="Credit Card"
-                  className="lg:col-span-4 max-lg:col-span-4 px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                />
-                <Input
-                  placeholder="MM"
-                  className="px-4 max-lg:col-span-2 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                />
-                <Input
-                  placeholder="YY"
-                  className="px-4 py-3 max-lg:col-span-2 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                />
-              </div>
-
-              {/* Card Details Row */}
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="CVV"
-                    maxLength={4}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Input
-                    placeholder="ZIP/Postal Code"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-              </div>
-
-              {/* Name on Card */}
-              <div className="space-y-2">
-                <Input
-                  placeholder="Name on Card"
-                  className="w-full px-4 py-3 border focus:ring-2 bg-white text-gray-900"
-                />
-                {/* <p className="text-red-500 text-sm">Name on Card not provided</p> */}
-              </div>
-            </div>
-
-            {/* Billing Information */}
-            <div className="space-y-4">
-              <div className="bg-gray-100 px-4 py-2 rounded">
-                <h3 className="text-base font-medium text-gray-700">Billing Information</h3>
-              </div>
-
-              {/* Address Line 1 */}
-              <div className="space-y-2">
-                <Input
-                  placeholder="Address Line 1"
-                  className="w-full px-4 py-3 borderfocus:ring-2 bg-white text-gray-900"
-                />
-                {/* <p className="text-red-500 text-sm">Billing address not provided</p> */}
-              </div>
-
-              {/* Address Line 2 and ZIP */}
-              <div className="space-y-2">
-                <Input
-                  placeholder="Address Line 2"
-                  className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                />
-              </div>
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="City"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Input
-                    placeholder="ZIP/Postal Code"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Country"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Input
-                    placeholder="State"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Cardholder Email"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Input
-                    type="tel"
-                    placeholder="Cardholder Phone"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Terms and Conditions */}
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                By clicking the button below, you agree to our{' '}
-                <span className="text-yellow-600 hover:text-yellow-700 cursor-pointer underline">privacy policy</span>
-                {' '}and{' '}
-                <span className="text-yellow-600 hover:text-yellow-700 cursor-pointer underline">terms and conditions</span>.
-              </p>
-
-              {/* Book Now Button */}
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-bold py-4 px-8 rounded-none shadow-lg cursor-pointer"
-                disabled={editingPassengerId !== null}
-              >
-                Book Now
-              </Button>
-            </div>
+          <div className="p-6">
+            <StripePayment
+              amount={299.99} // Replace with actual ride amount
+              onPaymentSuccess={(paymentMethod) => {
+                console.log('Payment successful:', paymentMethod);
+                // Handle successful payment - redirect to confirmation page
+                alert('Payment successful! Booking confirmed.');
+              }}
+              onPaymentError={(error) => {
+                console.error('Payment error:', error);
+                alert('Payment failed: ' + error);
+              }}
+              disabled={editingPassengerId !== null}
+            />
           </div>
         </div>
       </div>
