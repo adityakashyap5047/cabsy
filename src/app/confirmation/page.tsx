@@ -5,10 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, MapPin, Clock, Users, Car, CreditCard } from 'lucide-react';
+import { usePaymentGuard } from '@/hooks/useRouteGuard';
 
 const ConfirmationPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { clearAllSessions, setSession } = usePaymentGuard();
   const [bookingDetails, setBookingDetails] = useState<{
     bookingId: string;
     paymentIntentId: string;
@@ -24,16 +26,30 @@ const ConfirmationPage = () => {
     estimatedArrival: string;
   } | null>(null);
   const [countdown, setCountdown] = useState(5);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
-  // Get booking details from URL parameters or localStorage
+  // Check if user is authorized to view this page
   useEffect(() => {
     const paymentIntentId = searchParams.get('payment_intent');
     const amount = searchParams.get('amount');
+    const status = searchParams.get('status');
+    
+    // Check if this is a valid redirect from payment (has required parameters)
+    if (!paymentIntentId || !amount || status !== 'success') {
+      // Redirect to ride booking page if accessing directly
+      router.replace('/ride');
+      return;
+    }
+
+    // Mark as authorized and set session storage to prevent back navigation
+    setIsAuthorized(true);
+    setSession('payment_confirmed', 'true');
+    setSession('confirmation_timestamp', Date.now().toString());
     
     // In a real app, you'd fetch booking details from your backend using the payment intent ID
     // For now, we'll use mock data or localStorage
     const mockBookingDetails = {
-      bookingId: `CB${Date.now()}`,
+      bookingId: `CB1423ljlsfjl432`,
       paymentIntentId: paymentIntentId || 'pi_mock_123',
       amount: amount || '299.99',
       pickup: 'New York City, NY',
@@ -48,14 +64,19 @@ const ConfirmationPage = () => {
     };
 
     setBookingDetails(mockBookingDetails);
-  }, [searchParams]);
+  }, [searchParams, router, setSession]);
 
   // Auto redirect countdown
   useEffect(() => {
+    if (!isAuthorized) return;
+    
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          router.push('/journey');
+          // Clear confirmation session and redirect to journey
+          sessionStorage.removeItem('payment_confirmed');
+          sessionStorage.setItem('journey_active', 'true');
+          router.replace('/journey');
           return 0;
         }
         return prev - 1;
@@ -63,17 +84,24 @@ const ConfirmationPage = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router]);
+  }, [router, isAuthorized]);
 
   const handleGoToJourney = () => {
-    router.push('/journey');
+    // Clear confirmation session and redirect to journey
+    sessionStorage.removeItem('payment_confirmed');
+    sessionStorage.setItem('journey_active', 'true');
+    router.replace('/journey');
   };
 
   const handleBookAnother = () => {
-    router.push('/ride');
+    // Clear all sessions and go to ride booking
+    sessionStorage.removeItem('payment_confirmed');
+    sessionStorage.removeItem('journey_active');
+    router.replace('/ride');
   };
 
-  if (!bookingDetails) {
+  // Show loading while checking authorization
+  if (!isAuthorized || !bookingDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-600"></div>

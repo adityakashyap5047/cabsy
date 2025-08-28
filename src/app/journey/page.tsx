@@ -16,6 +16,7 @@ import {
   Timer,
   Route
 } from 'lucide-react';
+import { useJourneyGuard } from '@/hooks/useRouteGuard';
 
 interface JourneyStatus {
   status: 'assigned' | 'on_way' | 'arrived' | 'in_progress' | 'completed';
@@ -27,6 +28,24 @@ interface JourneyStatus {
 
 const JourneyPage = () => {
   const router = useRouter();
+  const { clearAllSessions } = useJourneyGuard();
+  
+  // Check if user is authorized to view this page
+  useEffect(() => {
+    const journeyActive = sessionStorage.getItem('journey_active');
+    const paymentConfirmed = sessionStorage.getItem('payment_confirmed');
+    
+    // If no active journey session and no payment confirmation, redirect to ride booking
+    if (!journeyActive && !paymentConfirmed) {
+      router.replace('/ride');
+      return;
+    }
+    
+    // Prevent going back to confirmation page by replacing browser history
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', '/journey');
+    }
+  }, [router]);
   const [journeyStatus, setJourneyStatus] = useState<JourneyStatus>({
     status: 'assigned',
     driverLocation: { lat: 40.7128, lng: -74.0060 },
@@ -68,6 +87,9 @@ const JourneyPage = () => {
           newStatus = 'completed';
           newLocation = 'Journey completed';
           clearInterval(progressTimer);
+          // Clear journey session when completed
+          sessionStorage.removeItem('journey_active');
+          sessionStorage.removeItem('payment_confirmed');
         }
 
         newPercentage = Math.min(prev.completedPercentage + 2, 100);
@@ -130,7 +152,9 @@ const JourneyPage = () => {
   };
 
   const handleBackToBooking = () => {
-    router.push('/ride');
+    // Clear all session data before going to booking
+    clearAllSessions();
+    router.replace('/ride');
   };
 
   return (
