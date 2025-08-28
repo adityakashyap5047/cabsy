@@ -173,7 +173,7 @@ const Checkout = () => {
     <div className='mt-4'>
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-6 py-8">
+        <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Passenger Information</h2>
           </div>
@@ -528,16 +528,16 @@ const Checkout = () => {
                         {/* Update/Cancel Buttons */}
                         <div className="flex justify-end space-x-3">
                         <Button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
                         >
                             Cancel
                         </Button>
                         <Button
-                            type="button"
-                            onClick={handleUpdatePassenger}
-                            className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                          type="button"
+                          onClick={handleUpdatePassenger}
+                          className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
                         >
                             Update
                         </Button>
@@ -563,26 +563,24 @@ const Checkout = () => {
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Return Service</h2>
           </div>
-          <div className='flex items-center px-4 mt-2'>
+          <div className='flex items-center justify-between px-4 mt-2'>
             <p>Would you like to book return service?</p>
-            <Button 
-              variant={"primary"} 
-              className={`bg-red-500 rounded-none ml-4 ${
-                editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              disabled={editingPassengerId !== null}
-            >
-              Yes
-            </Button>
-            <Button 
-              variant={"primary"} 
-              className={`bg-slate-700 rounded-none ${
-                editingPassengerId !== null ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              disabled={editingPassengerId !== null}
-            >
-              No
-            </Button>
+            <div>
+              <Button
+                type="button"
+                className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium px-6"
+                disabled={editingPassengerId !== null}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                className={`rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium px-6 ${true && "bg-gray-500 text-white"}`}
+                disabled={editingPassengerId !== null || true}
+              >
+                No
+              </Button>
+            </div>
           </div>
           <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Promo Code</h2>
