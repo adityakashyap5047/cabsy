@@ -100,27 +100,91 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
 
     try {
-      // Create payment method
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: billingDetails,
+      // Step 1: Create payment intent on the backend
+      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          currency: 'usd',
+          metadata: {
+            bookingType: 'cab_booking',
+            timestamp: new Date().toISOString(),
+          },
+        }),
       });
 
-      if (error) {
-        onPaymentError(error.message || 'Payment failed');
+      if (!paymentIntentResponse.ok) {
+        const error = await paymentIntentResponse.json();
+        throw new Error(error.error || 'Failed to create payment intent');
+      }
+
+      const { clientSecret } = await paymentIntentResponse.json();
+
+      // Step 2: Confirm payment with client secret
+      const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: billingDetails,
+          },
+        }
+      );
+
+      if (confirmError) {
+        onPaymentError(confirmError.message || 'Payment confirmation failed');
         setIsProcessing(false);
         return;
       }
 
-      // Here you would typically send the payment method to your backend
-      // to create a payment intent and process the payment
-      console.log('Payment Method:', paymentMethod);
-      onPaymentSuccess(paymentMethod);
+      // Step 3: Verify payment on backend
+      const confirmResponse = await fetch('/api/confirm-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentIntentId: paymentIntent.id,
+          bookingDetails: {
+            amount: amount,
+            billingDetails: billingDetails,
+            timestamp: new Date().toISOString(),
+          },
+        }),
+      });
+
+      if (!confirmResponse.ok) {
+        const error = await confirmResponse.json();
+        throw new Error(error.error || 'Payment verification failed');
+      }
+
+      const confirmationData = await confirmResponse.json();
+      
+      if (confirmationData.success && paymentIntent.status === 'succeeded') {
+        // Payment successful - pass the payment intent data directly
+        console.log('Payment successful:', paymentIntent);
+        
+        // For now, pass a simplified object that matches the expected interface
+        const successData = {
+          id: paymentIntent.id,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount,
+          billing_details: billingDetails,
+        };
+        
+        // Since the original interface expects a PaymentMethod, we'll pass it as unknown and cast
+        onPaymentSuccess(successData as unknown as import('@stripe/stripe-js').PaymentMethod);
+      } else {
+        onPaymentError('Payment was not successful');
+      }
       
     } catch (err: unknown) {
       console.error('Payment error:', err);
-      onPaymentError('An unexpected error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      onPaymentError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
