@@ -32,7 +32,8 @@ const CARD_ELEMENT_OPTIONS = {
       iconColor: '#9e2146'
     }
   },
-  hidePostalCode: true
+  hidePostalCode: true,
+  disableLink: true
 };
 
 interface PaymentFormProps {
@@ -191,12 +192,33 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Payment Method Section */}
-      <div className="p-4 pt-0 pb-0">
-        {/* Stripe Card Element */}
-        <div className="mb-4">
-          <Label className="block text-sm font-medium text-gray-700 mb-2">
+    <div style={{ isolation: 'isolate' }}>
+      <form 
+        onSubmit={handleSubmit} 
+        autoComplete="off"
+        data-form-type="other"
+      >
+        {/* Hidden honeypot fields to confuse autofill */}
+        <input 
+          type="text" 
+          name="fake_username" 
+          style={{ display: 'none' }} 
+          tabIndex={-1} 
+          autoComplete="new-password"
+        />
+        <input 
+          type="password" 
+          name="fake_password" 
+          style={{ display: 'none' }} 
+          tabIndex={-1} 
+          autoComplete="new-password"
+        />
+        
+        {/* Payment Method Section */}
+        <div className="p-4 pt-0 pb-0">
+          {/* Stripe Card Element */}
+          <div className="mb-4">
+            <Label className="block text-sm font-medium text-gray-700 mb-2">
             Card Information
           </Label>
           <div className={`p-3 border bg-white ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -224,6 +246,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -240,6 +263,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -256,6 +280,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
             />
           </div>
           
@@ -271,6 +296,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -287,6 +313,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -303,6 +330,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -319,6 +347,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               onChange={handleBillingChange}
               className="mt-1"
               disabled={disabled}
+              autoComplete="off"
               required
             />
           </div>
@@ -348,7 +377,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           `Pay $${amount.toFixed(2)}`
         )}
       </Button>
-    </form>
+      </form>
+    </div>
   );
 };
 
@@ -361,8 +391,16 @@ interface StripePaymentProps {
 }
 
 const StripePayment: React.FC<StripePaymentProps> = (props) => {
+  const options = {
+    mode: 'payment' as const,
+    amount: Math.round(props.amount * 100), // Convert to cents
+    currency: 'usd',
+    // Disable Link payments completely
+    payment_method_creation: 'manual' as const,
+  };
+
   return (
-    <Elements stripe={stripePromise}>
+    <Elements stripe={stripePromise} options={options}>
       <PaymentForm {...props} />
     </Elements>
   );
