@@ -76,10 +76,6 @@ const ConfirmationPage = () => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          // Clear confirmation session and redirect to journey
-          sessionStorage.removeItem('payment_confirmed');
-          sessionStorage.setItem('journey_active', 'true');
-          router.replace('/journey');
           return 0;
         }
         return prev - 1;
@@ -87,7 +83,17 @@ const ConfirmationPage = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router, isAuthorized]);
+  }, [isAuthorized]);
+
+  // Handle navigation when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0 && isAuthorized) {
+      // Clear confirmation session and redirect to journey
+      sessionStorage.removeItem('payment_confirmed');
+      sessionStorage.setItem('journey_active', 'true');
+      router.replace('/journey');
+    }
+  }, [countdown, isAuthorized, router]);
 
   const handleGoToJourney = () => {
     // Clear confirmation session and redirect to journey
