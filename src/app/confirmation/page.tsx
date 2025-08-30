@@ -10,7 +10,7 @@ import { usePaymentGuard } from '@/hooks/useRouteGuard';
 const ConfirmationPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { clearAllSessions } = usePaymentGuard();
+  usePaymentGuard(); // Just call the hook without destructuring unused functions
   const [bookingDetails, setBookingDetails] = useState<{
     bookingId: string;
     paymentIntentId: string;
