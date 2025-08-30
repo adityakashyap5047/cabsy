@@ -10,7 +10,7 @@ import { usePaymentGuard } from '@/hooks/useRouteGuard';
 const ConfirmationPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { clearAllSessions, setSession } = usePaymentGuard();
+  const { clearAllSessions } = usePaymentGuard();
   const [bookingDetails, setBookingDetails] = useState<{
     bookingId: string;
     paymentIntentId: string;
@@ -41,30 +41,33 @@ const ConfirmationPage = () => {
       return;
     }
 
-    // Mark as authorized and set session storage to prevent back navigation
-    setIsAuthorized(true);
-    setSession('payment_confirmed', 'true');
-    setSession('confirmation_timestamp', Date.now().toString());
-    
-    // In a real app, you'd fetch booking details from your backend using the payment intent ID
-    // For now, we'll use mock data or localStorage
-    const mockBookingDetails = {
-      bookingId: `CB1423ljlsfjl432`,
-      paymentIntentId: paymentIntentId || 'pi_mock_123',
-      amount: amount || '299.99',
-      pickup: 'New York City, NY',
-      dropoff: 'LaGuardia Airport, NY',
-      date: new Date().toLocaleDateString(),
-      time: '2:30 PM',
-      vehicle: 'Premium Sedan',
-      passengers: 2,
-      driverName: 'John Smith',
-      driverPhone: '+1 (555) 123-4567',
-      estimatedArrival: '2:25 PM'
-    };
+    // Only set if not already authorized (prevent infinite re-renders)
+    if (!isAuthorized) {
+      setIsAuthorized(true);
+      // Use direct sessionStorage instead of setSession to avoid dependency issues
+      sessionStorage.setItem('payment_confirmed', 'true');
+      sessionStorage.setItem('confirmation_timestamp', Date.now().toString());
+      
+      // In a real app, you'd fetch booking details from your backend using the payment intent ID
+      // For now, we'll use mock data or localStorage
+      const mockBookingDetails = {
+        bookingId: `CB1423ljlsfjl432`,
+        paymentIntentId: paymentIntentId || 'pi_mock_123',
+        amount: amount || '299.99',
+        pickup: 'New York City, NY',
+        dropoff: 'LaGuardia Airport, NY',
+        date: new Date().toLocaleDateString(),
+        time: '2:30 PM',
+        vehicle: 'Premium Sedan',
+        passengers: 2,
+        driverName: 'John Smith',
+        driverPhone: '+1 (555) 123-4567',
+        estimatedArrival: '2:25 PM'
+      };
 
-    setBookingDetails(mockBookingDetails);
-  }, [searchParams, router, setSession]);
+      setBookingDetails(mockBookingDetails);
+    }
+  }, [searchParams, router, isAuthorized]);
 
   // Auto redirect countdown
   useEffect(() => {
