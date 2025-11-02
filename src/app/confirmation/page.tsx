@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, MapPin, Clock, Users, Car, CreditCard } from 'lucide-react';
 import { usePaymentGuard } from '@/hooks/useRouteGuard';
 
-const ConfirmationPage = () => {
+function ConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  usePaymentGuard(); // Just call the hook without destructuring unused functions
+  usePaymentGuard(); 
   const [bookingDetails, setBookingDetails] = useState<{
     bookingId: string;
     paymentIntentId: string;
@@ -28,7 +28,6 @@ const ConfirmationPage = () => {
   const [countdown, setCountdown] = useState(5);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
-  // Check if user is authorized to view this page
   useEffect(() => {
     const paymentIntentId = searchParams.get('payment_intent');
     const amount = searchParams.get('amount');
@@ -267,6 +266,20 @@ const ConfirmationPage = () => {
       </div>
     </div>
   );
-};
+}
 
-export default ConfirmationPage;
+// Main page component with Suspense boundary
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading confirmation...</p>
+        </div>
+      </div>
+    }>
+      <ConfirmationContent />
+    </Suspense>
+  );
+}
