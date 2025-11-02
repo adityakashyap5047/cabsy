@@ -73,7 +73,6 @@ export default function StepHeader({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Show Edit button only when completed and not editing */}
           {isCompleted && !isEditing && onEdit && (
             <button
               onClick={(e) => {
@@ -89,18 +88,15 @@ export default function StepHeader({
         </div>
       </div>
 
-      {/* Summary View with smooth transition */}
       <div
         className={cn(
-          "overflow-hidden transition-all duration-500 ease-in-out",
-          isCompleted && !isEditing && showSummary ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          "overflow-hidden transition-all duration-700 ease-in-out",
+          isCompleted && !isEditing && showSummary ? "max-h-96 opacity-100 transform translate-y-0" : "max-h-0 opacity-0 transform"
         )}
       >
-        {isCompleted && !isEditing && showSummary && summary && (
-          <div className="bg-gray-100 px-6 py-4 border-l-4 border-yellow-500">
-            {summary}
-          </div>
-        )}
+        <div className={`bg-gray-100 px-6 py-4 border-l-4 border-yellow-500 transition-all duration-500 ease-in-out ${isCompleted && !isEditing && showSummary && summary ? "transform translate-y-0 opacity-100" : "transform opacity-0"}`}>
+          {summary}
+        </div>
       </div>
     </div>
   );

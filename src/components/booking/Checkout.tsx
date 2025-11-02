@@ -252,9 +252,7 @@ const Checkout = () => {
                 />
               </div>
             </form>
-            {/* <div className="flex justify-end my-2"> */}
             <div className="space-y-4">
-                {/* Add Passenger Button */}
                 <div className="flex justify-end">
                   <Button 
                     type="button" 
