@@ -1,8 +1,10 @@
 "use client";
 
 import React from 'react';
-import { Dot, Edit } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import DottedCircle from '../circle/DottedCircle';
+import EmptyCircle from '../circle/EmptyCircle';
 
 interface StepHeaderProps {
   stepNumber: number;
@@ -50,17 +52,13 @@ export default function StepHeader({
             : "bg-gray-500 cursor-default"
         )}
       >
-        <div className={`flex items-center gap-3 ${isCompleted && !isEditing ? "cursor-pointer" : "cursor-default"}`}
+        <div className={`flex items-center gap-2 ${isCompleted && !isEditing ? "cursor-pointer" : "cursor-default"}`}
           onClick={handleHeaderClick}
         >
           <div
-            className={`w-3 h-3 rounded-full flex items-center justify-center font-semibold transition-all duration-300
-              ${isCompleted && !isEditing
-                ? "bg-yellow-500 text-white"
-                : "bg-transparent border-2 border-yellow-500 text-yellow-500"}`
-            }
+            className={`transition-all duration-300`}
           >
-            {isCompleted && !isEditing ? <Dot className='h-1' /> : ""}
+            {isCompleted && !isEditing ? <DottedCircle /> : <EmptyCircle />}
           </div>
           <span className={cn(
             "font-semibold text-sm transition-colors duration-300",
@@ -86,17 +84,24 @@ export default function StepHeader({
           )}
         </div>
       </div>
-          <div className='h-4 w-4 rounded-full border border-red-400' />
-          <div className='h-4 w-4 flex justify-center items-center rounded-full border border-red-400'>
-            <div className='h-2 w-2 rounded-full bg-red-400' />
-          </div>
+      
+      {/* Summary View with smooth vertical sliding window effect */}
       <div
         className={cn(
           "overflow-hidden transition-all duration-700 ease-in-out",
-          isCompleted && !isEditing && showSummary ? "max-h-96 opacity-100 transform translate-y-0" : "max-h-0 opacity-0 transform"
+          isCompleted && !isEditing && showSummary 
+            ? "max-h-[600px] opacity-100" 
+            : "max-h-0 opacity-0"
         )}
       >
-        <div className={`bg-gray-100 px-6 py-4 border-l-4 border-yellow-500 transition-all duration-500 ease-in-out ${isCompleted && !isEditing && showSummary && summary ? "transform translate-y-0 opacity-100" : "transform opacity-0"}`}>
+        <div 
+          className="bg-gray-100 px-6 py-4 border-l-4 border-yellow-500"
+          style={{
+            transition: 'all 700ms ease-in-out',
+            transform: isCompleted && !isEditing && showSummary ? 'translateY(0)' : 'translateY(-16px)',
+            opacity: isCompleted && !isEditing && showSummary ? 1 : 0
+          }}
+        >
           {summary}
         </div>
       </div>
