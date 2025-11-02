@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Check, Edit } from 'lucide-react';
+import { Dot, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StepHeaderProps {
@@ -42,7 +42,7 @@ export default function StepHeader({
     <div className="mb-4">
       <div
         className={cn(
-          "flex items-center justify-between px-4 py-3 transition-all duration-300",
+          "flex items-center justify-between px-4 py-1 transition-all duration-300",
           isCompleted && !isEditing 
             ? "bg-gray-200 hover:bg-gray-300" 
             : isEditing 
@@ -54,17 +54,16 @@ export default function StepHeader({
           onClick={handleHeaderClick}
         >
           <div
-            className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all duration-300",
-              isCompleted && !isEditing
+            className={`w-3 h-3 rounded-full flex items-center justify-center font-semibold transition-all duration-300
+              ${isCompleted && !isEditing
                 ? "bg-yellow-500 text-white"
-                : "bg-transparent border-2 border-yellow-500 text-yellow-500"
-            )}
+                : "bg-transparent border-2 border-yellow-500 text-yellow-500"}`
+            }
           >
-            {isCompleted && !isEditing ? <Check className="w-5 h-5" /> : stepNumber}
+            {isCompleted && !isEditing ? <Dot className='h-1' /> : ""}
           </div>
           <span className={cn(
-            "font-semibold text-lg transition-colors duration-300",
+            "font-semibold text-sm transition-colors duration-300",
             isCompleted && !isEditing ? "text-gray-700" : "text-white"
           )}
           >
@@ -87,7 +86,10 @@ export default function StepHeader({
           )}
         </div>
       </div>
-
+          <div className='h-4 w-4 rounded-full border border-red-400' />
+          <div className='h-4 w-4 flex justify-center items-center rounded-full border border-red-400'>
+            <div className='h-2 w-2 rounded-full bg-red-400' />
+          </div>
       <div
         className={cn(
           "overflow-hidden transition-all duration-700 ease-in-out",
