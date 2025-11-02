@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Clock, Minus, Plus, Trash2, Users, } from "lucide-react";
+import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Clock, Minus, Plus, Trash2, Users, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -22,19 +22,32 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import TimeKeeper from "react-timekeeper";
+import { useBooking } from "@/context/BookingContext";
+import StepHeader from "./StepHeader";
 
 export default function AddDetails() {
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
-  const [time, setTime] = React.useState<string | null>(null);
+  const { bookingDetails, updateBookingDetails, completeStep, expandedSteps, toggleStep, completedSteps } = useBooking();
+  
+  const [serviceType, setServiceType] = React.useState<string>(bookingDetails.serviceType || '');
+  const [date, setDate] = React.useState<Date | undefined>(bookingDetails.date);
+  const [time, setTime] = React.useState<string | null>(bookingDetails.time);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
-  const [stops, setStops] = React.useState<string[]>([]);
+  const [stops, setStops] = React.useState<string[]>(bookingDetails.stops || []);
   const [stopError, setStopError] = React.useState<number | null>(null); // Track which stop has error
   const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
-  const [pickupLocation, setPickupLocation] = React.useState<string>("");
-  const [dropoffLocation, setDropoffLocation] = React.useState<string>("");
-  const [passenger, setPassenger] = React.useState<number>(1);
-  const [luggage, setLuggage] = React.useState<number>(0);
+  const [pickupLocation, setPickupLocation] = React.useState<string>(bookingDetails.pickupLocation || "");
+  const [dropoffLocation, setDropoffLocation] = React.useState<string>(bookingDetails.dropoffLocation || "");
+  const [passenger, setPassenger] = React.useState<number>(bookingDetails.passengers || 1);
+  const [luggage, setLuggage] = React.useState<number>(bookingDetails.luggage || 0);
+  
+  // State for summary visibility (separate from form expansion)
+  const [showSummary, setShowSummary] = React.useState(false);
+
+  const isExpanded = expandedSteps.includes(1);
+  const isCompleted = completedSteps.includes(1);
+  const isEditing = isExpanded && isCompleted; // Editing mode: expanded after being completed
+
 
   React.useEffect(() => {
     if (justAddedStop && stops.length > 0) {
@@ -72,15 +85,113 @@ export default function AddDetails() {
       setStopError(null);
     }
   }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!pickupLocation.trim() || !dropoffLocation.trim()) {
+      alert('Please fill in both pickup and drop-off locations');
+      return;
+    }
+    
+    // Save the booking details
+    updateBookingDetails({
+      serviceType,
+      date,
+      time,
+      pickupLocation,
+      stops,
+      dropoffLocation,
+      passengers: passenger,
+      luggage,
+    });
+    
+    // Mark step 1 as complete
+    completeStep(1);
+    
+    // Collapse the form
+    setTimeout(() => {
+      toggleStep(1); // Collapse step 1 form
+      setShowSummary(true); // Show summary
+      toggleStep(2); // Expand step 2
+      
+      // Scroll to step 2 smoothly
+      setTimeout(() => {
+        const step2Element = document.querySelector('[data-step="2"]');
+        if (step2Element) {
+          step2Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }, 100);
+  };
+
+  const handleEdit = () => {
+    // Expand the form for editing
+    setShowSummary(false); // Hide summary
+    if (!isExpanded) {
+      toggleStep(1); // Open the form
+    }
+  };
+
+  const handleToggleSummary = () => {
+    // Toggle summary visibility when clicking on header
+    setShowSummary(prev => !prev);
+  };
+
+  // Summary component to show when collapsed
+  const summary = (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+      {/* Left Column */}
+      <div className="space-y-3">
+        <div>
+          <span className="font-semibold text-gray-700">
+            {date && format(date, "MM/dd/yyyy")} {time}
+          </span>
+        </div>
+        <div>
+          <span className="font-semibold text-gray-600">Passenger:</span>{' '}
+          <span className="text-gray-700">{passenger}</span>
+        </div>
+      </div>
+      
+      {/* Right Column */}
+      <div className="space-y-3">
+        <div className="flex items-start gap-2">
+          <MapPin className="w-4 h-4 mt-1 text-gray-600 flex-shrink-0" />
+          <span className="text-gray-700">{pickupLocation}</span>
+        </div>
+        <div className="flex items-start gap-2">
+          <MapPin className="w-4 h-4 mt-1 text-gray-600 flex-shrink-0" />
+          <span className="text-gray-700">{dropoffLocation}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+
   return (
-    <div className="p-6 space-y-6">
-      <form className="space-y-4">
+    <div>
+      <StepHeader
+        stepNumber={1}
+        title="Ride Info"
+        isCompleted={isCompleted}
+        isEditing={isEditing}
+        showSummary={showSummary}
+        onToggleSummary={handleToggleSummary}
+        onEdit={handleEdit}
+        summary={summary}
+      />
+      
+      {isExpanded && (
+        <div className="p-6 space-y-6 transition-all duration-500 ease-in-out">
+          <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Service Type */}
         <div className="flex items-center gap-16 max-md:flex-col">
           <div className="space-y-6 w-1/2">
             <div className="space-y-2">
             <Label htmlFor="service">Select Service Type</Label>
-            <Select>
+            <Select value={serviceType} onValueChange={setServiceType}>
               <SelectTrigger className="w-full rounded-none cursor-pointer" id="service">
                 <SelectValue placeholder="Choose a service type" />
               </SelectTrigger>
@@ -375,6 +486,8 @@ export default function AddDetails() {
           Select Vehicle
         </Button>
       </form>
+        </div>
+      )}
     </div>
   );
 }
