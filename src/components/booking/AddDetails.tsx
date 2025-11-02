@@ -149,21 +149,35 @@ export default function AddDetails() {
             {date && format(date, "MM/dd/yyyy")} {time}
           </span>
         </div>
-        <div>
-          <span className="font-semibold text-gray-600">Passenger:</span>{' '}
-          <span className="text-gray-700">{passenger}</span>
+        <div className="flex gap-4">
+          <div>
+            <span className="font-semibold text-gray-600">Passenger:</span>{' '}
+            <span className="text-gray-700">{passenger}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-gray-600">Luggage:</span>{' '}
+            <span className="text-gray-700">{luggage}</span>
+          </div>
         </div>
       </div>
       
       {/* Right Column */}
       <div className="space-y-3">
         <div className="flex items-start gap-2">
-          <MapPin className="w-4 h-4 mt-1 text-gray-600 flex-shrink-0" />
-          <span className="text-gray-700">{pickupLocation}</span>
+          <MapPin className="w-4 h-4 mt-1 text-green-500 flex-shrink-0" />
+          <span className="text-green-400 font-semibold">{pickupLocation}</span>
         </div>
+        {
+          stops && stops?.length > 0 && stops.map((stop, idx) => (
+            <div key={idx} className="flex ml-4 items-start gap-2">
+              <MapPin className="w-4 h-4 mt-1 text-yellow-500 flex-shrink-0" />
+              <span className="text-yellow-400 font-semibold">{stop}</span>
+            </div>
+          ))
+        }
         <div className="flex items-start gap-2">
-          <MapPin className="w-4 h-4 mt-1 text-gray-600 flex-shrink-0" />
-          <span className="text-gray-700">{dropoffLocation}</span>
+          <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
+          <span className="text-red-400 font-semibold">{dropoffLocation}</span>
         </div>
       </div>
     </div>
