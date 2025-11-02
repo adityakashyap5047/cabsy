@@ -17,8 +17,8 @@ export function middleware(request: NextRequest) {
     // Only allow requests from your domain in production
     if (process.env.NODE_ENV === 'production') {
       const allowedOrigins = [
-        'https://yourdomain.com', // Replace with your production domain
-        'https://www.yourdomain.com'
+        'https://cabsyio.vercel.app',
+        'https://www.cabsyio.vercel.app'
       ];
       
       if (origin && !allowedOrigins.includes(origin)) {
