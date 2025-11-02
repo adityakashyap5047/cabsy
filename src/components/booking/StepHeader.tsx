@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Check, Edit, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StepHeaderProps {
