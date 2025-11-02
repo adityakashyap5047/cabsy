@@ -25,16 +25,7 @@ import TimeKeeper from "react-timekeeper";
 
 export default function AddDetails() {
   const [date, setDate] = React.useState<Date | undefined>(undefined);
-  const [time, setTime] = React.useState<string>(() => {
-    // Set current time as default
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? ' PM' : ' AM';
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes.toString().padStart(2, '0');
-    return `${displayHours}:${displayMinutes}${ampm}`;
-  });
+  const [time, setTime] = React.useState<string | null>(null);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [stops, setStops] = React.useState<string[]>([]);
@@ -111,8 +102,7 @@ export default function AddDetails() {
                     <Button
                       variant="primary"
                       className={cn(
-                        `w-full ${!date ? "justify-end cursor-text" : "justify-between cursor-pointer"} border rounded-none text-left font-normal`,
-                        !date && "text-muted-foreground"
+                        `w-full ${!date ? "justify-end cursor-text" : "justify-between cursor-pointer"} border rounded-none text-left font-normal`
                       )}
                       onClick={() => {
                         if (!date) {
@@ -146,15 +136,27 @@ export default function AddDetails() {
                   </PopoverContent>
                 </Popover>
               </div>
-              {/* Pick-up Time */}
               <div className="space-y-2 w-1/2">
                 <Label>Pick-Up Time</Label>
                 <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="primary"
-                      className="w-full border rounded-none cursor-pointer justify-between text-left font-normal"
-                      onClick={() => setShowTimePicker(true)}
+                      className={`w-full border rounded-none ${!time ? "cursor-text justify-end" : "cursor-pointer justify-between"} text-left font-normal`}
+                      onClick={() => 
+                        {
+                          if(!time){
+                            const now = new Date();
+                            const hours = now.getHours();
+                            const minutes = now.getMinutes();
+                            const ampm = hours >= 12 ? ' PM' : ' AM';
+                            const displayHours = hours % 12 || 12;
+                            const displayMinutes = minutes.toString().padStart(2, '0');
+                            setTime(`${displayHours}:${displayMinutes}${ampm}`);
+                          }
+                          setShowTimePicker(true)
+                        }
+                      }
                     >
                       {time}
                       <span className="mr-2"><Clock className="h-4 w-4" /></span>
