@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Minus, Plus, Trash2, Users, } from "lucide-react";
+import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Clock, Minus, Plus, Trash2, Users, } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import TimeKeeper from "react-timekeeper";
 
 export default function AddDetails() {
-  const [date, setDate] = React.useState<Date>(new Date());
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
   const [time, setTime] = React.useState<string>(() => {
     // Set current time as default
     const now = new Date();
@@ -45,7 +45,6 @@ export default function AddDetails() {
   const [passenger, setPassenger] = React.useState<number>(1);
   const [luggage, setLuggage] = React.useState<number>(0);
 
-  // Auto-focus newly added stop
   React.useEffect(() => {
     if (justAddedStop && stops.length > 0) {
       const timer = setTimeout(() => {
@@ -112,13 +111,18 @@ export default function AddDetails() {
                     <Button
                       variant="primary"
                       className={cn(
-                        "w-full justify-start border rounded-none text-left font-normal",
+                        `w-full ${!date ? "justify-end cursor-text" : "justify-between cursor-pointer"} border rounded-none text-left font-normal`,
                         !date && "text-muted-foreground"
                       )}
-                      onClick={() => setShowDatePicker(true)}
+                      onClick={() => {
+                        if (!date) {
+                          setDate(new Date());
+                        }
+                        setShowDatePicker(true);
+                      }}
                     >
+                      {date && format(date, "MM/dd/yyyy")}
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "MM/dd/yyyy") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -149,11 +153,11 @@ export default function AddDetails() {
                   <PopoverTrigger asChild>
                     <Button
                       variant="primary"
-                      className="w-full border rounded-none cursor-pointer justify-start text-left font-normal"
+                      className="w-full border rounded-none cursor-pointer justify-between text-left font-normal"
                       onClick={() => setShowTimePicker(true)}
                     >
-                      <span className="mr-2">🕐</span>
                       {time}
+                      <span className="mr-2"><Clock className="h-4 w-4" /></span>
                     </Button>
                   </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" >
