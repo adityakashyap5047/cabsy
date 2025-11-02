@@ -159,6 +159,9 @@ export default function AddDetails() {
             <span className="text-gray-700">{luggage}</span>
           </div>
         </div>
+        <h1 className="text-xl font-semibold text-gray-600">
+          Estimated Fare: <span className="text-yellow-600 text-sm font-semibold">$124.50</span>
+        </h1>
       </div>
       
       {/* Right Column */}

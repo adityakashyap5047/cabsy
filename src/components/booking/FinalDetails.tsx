@@ -4,8 +4,12 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import StepHeader from './StepHeader';
+import { useBooking } from '@/context/BookingContext';
 
 const FinalDetails = () => {
+  const { completeStep, toggleStep, completedSteps, expandedSteps } = useBooking();
+  
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -19,6 +23,11 @@ const FinalDetails = () => {
   });
 
   const [showDataInfo, setShowDataInfo] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+
+  const isExpanded = expandedSteps.includes(2);
+  const isCompleted = completedSteps.includes(2);
+  const isEditing = isExpanded && isCompleted;
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,33 +47,102 @@ const FinalDetails = () => {
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login data:', loginData);
     // Add login logic here
+    // After successful login, complete step and move to next
+    completeStep(2);
+    setTimeout(() => {
+      toggleStep(2); // Collapse step 3
+      setShowSummary(true); // Show summary
+      toggleStep(3); // Expand step 4
+      
+      // Scroll to step 4
+      setTimeout(() => {
+        const step4Element = document.querySelector('[data-step="3"]');
+        if (step4Element) {
+          step4Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }, 100);
   };
 
   const handleGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all required fields are filled
+    if (!guestData.firstName.trim() || !guestData.lastName.trim() || 
+        !guestData.phoneNumber.trim() || !guestData.email.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
     console.log('Guest data:', guestData);
-    // Add guest checkout logic here
+    
+    // Complete step 3 and move to step 4 (Checkout)
+    completeStep(2);
+    
+    setTimeout(() => {
+      toggleStep(2); // Collapse step 3
+      setShowSummary(true); // Show summary
+      toggleStep(3); // Expand step 4 (Checkout)
+      
+      // Scroll to step 4 smoothly
+      setTimeout(() => {
+        const step4Element = document.querySelector('[data-step="3"]');
+        if (step4Element) {
+          step4Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }, 100);
   };
+
+  const handleEdit = () => {
+    setShowSummary(false);
+    if (!isExpanded) {
+      toggleStep(2);
+    }
+  };
+
+  const handleToggleSummary = () => {
+    setShowSummary(prev => !prev);
+  };
+
+  const summary = (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+      <div className="space-y-3">
+        <div>
+          <span className="font-semibold text-gray-600">Guest:</span>{' '}
+          <span className="text-gray-700">{guestData.firstName} {guestData.lastName}</span>
+        </div>
+        <div>
+          <span className="font-semibold text-gray-600">Phone:</span>{' '}
+          <span className="text-gray-700">{guestData.phoneNumber}</span>
+        </div>
+      </div>
+      <div className="space-y-3">
+        <div>
+          <span className="font-semibold text-gray-600">Email:</span>{' '}
+          <span className="text-gray-700">{guestData.email}</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className='mb-4'>
-      <div className="px-14 py-4">
-          <h1 className="text-2xl font-medium text-gray-800 mb-2">
-            Your total is <span className="text-yellow-600 font-semibold">$124.50</span>
-          </h1>
-          <p className="text-gray-600">
-            Please{' '}
-            <span className="font-medium text-gray-800">Log In</span>
-            {' '}to your account or{' '}
-            <span className="font-medium text-gray-800">continue as guest</span>
-            {' '}to book your reservation.
-          </p>
-        </div>
+      <StepHeader
+        stepNumber={2}
+        title="Account Info"
+        isCompleted={isCompleted}
+        isEditing={isEditing}
+        showSummary={showSummary}
+        onToggleSummary={handleToggleSummary}
+        onEdit={handleEdit}
+        summary={summary}
+      />
+      {isExpanded && (
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
-        <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
+        <div className="w-full md:w-1/2 flex flex-col px-6">
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Log In to your account</h2>
           </div>
@@ -138,7 +216,7 @@ const FinalDetails = () => {
           <div className="w-px bg-gray-300 mx-0 h-full" />
         </div>
         {/* Guest Section */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-6 py-8">
+        <div className="w-full md:w-1/2 flex flex-col justify-center px-6">
           <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Continue as guest</h2>
           </div>
@@ -247,6 +325,7 @@ const FinalDetails = () => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Minus, PenBox, Plus, Trash2, LockKeyhole } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import StripePayment from '../payment/StripePayment';
+import StepHeader from './StepHeader';
 
 const Checkout = () => {
   const router = useRouter();
@@ -174,6 +175,16 @@ const Checkout = () => {
 
   return (
     <div className='mt-4'>
+      <StepHeader
+        stepNumber={3}
+        title="Booking Info"
+        isCompleted={false}
+        isEditing={true}
+        showSummary={false}
+        // onToggleSummary={handleToggleSummary}
+        // onEdit={handleEdit}
+        // summary={summary}
+      />
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
         <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
