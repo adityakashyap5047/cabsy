@@ -44,14 +44,15 @@ export default function StepHeader({
         className={cn(
           "flex items-center justify-between px-4 py-3 transition-all duration-300",
           isCompleted && !isEditing 
-            ? "bg-gray-200 cursor-pointer hover:bg-gray-300" 
+            ? "bg-gray-200 hover:bg-gray-300" 
             : isEditing 
             ? "bg-gray-500 cursor-default"
             : "bg-gray-500 cursor-default"
         )}
-        onClick={handleHeaderClick}
       >
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${isCompleted && !isEditing ? "cursor-pointer" : "cursor-default"}`}
+          onClick={handleHeaderClick}
+        >
           <div
             className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all duration-300",
@@ -65,7 +66,8 @@ export default function StepHeader({
           <span className={cn(
             "font-semibold text-lg transition-colors duration-300",
             isCompleted && !isEditing ? "text-gray-700" : "text-white"
-          )}>
+          )}
+          >
             Step {stepNumber}: {title}
           </span>
         </div>
@@ -78,7 +80,7 @@ export default function StepHeader({
                 e.stopPropagation();
                 onEdit();
               }}
-              className="flex items-center gap-1 text-gray-700 hover:text-yellow-600 transition-colors duration-200"
+              className="flex items-center cursor-pointer gap-1 text-gray-700 hover:text-yellow-600 transition-colors duration-200"
             >
               <Edit className="w-4 h-4" />
               <span className="text-sm font-medium">Edit</span>
