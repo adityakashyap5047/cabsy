@@ -107,22 +107,18 @@ const FinalDetails = () => {
   };
 
   const summary = (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-      <div className="space-y-3">
-        <div>
-          <span className="font-semibold text-gray-600">Guest:</span>{' '}
-          <span className="text-gray-700">{guestData.firstName} {guestData.lastName}</span>
-        </div>
-        <div>
-          <span className="font-semibold text-gray-600">Phone:</span>{' '}
-          <span className="text-gray-700">{guestData.phoneNumber}</span>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+      <div>
+        <span className="font-semibold text-gray-600">Guest:</span>{' '}
+        <span className="text-gray-700">{guestData.firstName} {guestData.lastName}</span>
       </div>
-      <div className="space-y-3">
-        <div>
-          <span className="font-semibold text-gray-600">Email:</span>{' '}
-          <span className="text-gray-700">{guestData.email}</span>
-        </div>
+      <div>
+        <span className="font-semibold text-gray-600">Phone:</span>{' '}
+        <span className="text-gray-700">{guestData.phoneNumber}</span>
+      </div>
+      <div>
+        <span className="font-semibold text-gray-600">Email:</span>{' '}
+        <span className="text-gray-700">{guestData.email}</span>
       </div>
     </div>
   );

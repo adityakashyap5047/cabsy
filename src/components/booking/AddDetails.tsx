@@ -141,8 +141,7 @@ export default function AddDetails() {
 
   // Summary component to show when collapsed
   const summary = (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-      {/* Left Column */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-y-3">
       <div className="space-y-3">
         <div>
           <span className="font-semibold text-gray-700">
@@ -159,12 +158,8 @@ export default function AddDetails() {
             <span className="text-gray-700">{luggage}</span>
           </div>
         </div>
-        <h1 className="text-xl font-semibold text-gray-600">
-          Estimated Fare: <span className="text-yellow-600 text-sm font-semibold">$124.50</span>
-        </h1>
       </div>
       
-      {/* Right Column */}
       <div className="space-y-3">
         <div className="flex items-start gap-2">
           <MapPin className="w-4 h-4 mt-1 text-green-500 flex-shrink-0" />
@@ -182,6 +177,12 @@ export default function AddDetails() {
           <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
           <span className="text-red-400 font-semibold">{dropoffLocation}</span>
         </div>
+      </div>
+      <div className="">
+        {/* <span>{serviceType}</span> */}
+        <h1 className="text-xl font-semibold text-gray-600">
+        Estimated Fare: <span className="text-yellow-600 text-sm font-semibold">$124.50</span>
+      </h1>
       </div>
     </div>
   );
