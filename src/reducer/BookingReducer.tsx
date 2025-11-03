@@ -6,7 +6,7 @@ interface Passenger {
   phone?: string;
 }
 
-interface BookingState {
+export interface BookingState {
   bookingDetails: {
     serviceType: string;
     date: Date | undefined;
@@ -25,7 +25,7 @@ interface BookingState {
   expandedSteps: number[];
 }
 
-type BookingAction =
+export type BookingAction =
   | { type: "UPDATE_BOOKING_DETAILS"; payload: Partial<BookingState["bookingDetails"]> }
   | { type: "SET_VEHICLE"; payload: string }
   | { type: "SET_USER"; payload: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } }
