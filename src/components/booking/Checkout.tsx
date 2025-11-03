@@ -1,17 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Minus, PenBox, Plus, Trash2, LockKeyhole } from 'lucide-react';
+import { Minus, PenBox, Plus, Trash2 } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
-import StripePayment from '../payment/StripePayment';
+// import StripePayment from '../payment/StripePayment';
 import StepHeader from './StepHeader';
+import { useBooking } from '@/context/BookingContext';
 
 const Checkout = () => {
-  const router = useRouter();
+  // const router = useRouter();
+  const { completedSteps, expandedSteps, toggleStep } = useBooking();
+  // const { completedSteps, completeStep, expandedSteps, toggleStep } = useBooking();
+  
+  const stepNumber = 3;
+  const isExpanded = expandedSteps.includes(stepNumber);
+  const isCompleted = completedSteps.includes(stepNumber);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  // const [paymentMethod, setPaymentMethod] = useState<string>('');
+  // const [paymentAmount, setPaymentAmount] = useState<number>(0);
 
     const [guestData, setGuestData] = useState({
         firstName: 'Aditya',
@@ -45,105 +56,94 @@ const Checkout = () => {
     });
 
     const handlePassengerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewPassenger(prev => ({
+      const { name, value } = e.target;
+      setNewPassenger(prev => ({
+        ...prev,
+        [name]: value
+      }));
+      // Clear error when user starts typing
+      if (passengerErrors[name as keyof typeof passengerErrors]) {
+        setPassengerErrors(prev => ({
           ...prev,
-          [name]: value
+          [name]: ''
         }));
-        // Clear error when user starts typing
-        if (passengerErrors[name as keyof typeof passengerErrors]) {
-          setPassengerErrors(prev => ({
-            ...prev,
-            [name]: ''
-          }));
-        }
-      };
+      }
+    };
     
-      const validatePassenger = () => {
-        const errors = {
-          firstName: '',
-          lastName: '',
-          phoneNumber: '',
-          email: ''
+    const validatePassenger = () => {
+      const errors = {
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        email: ''
+      };
+  
+      if (!newPassenger.firstName.trim()) {
+        errors.firstName = 'First name is required';
+      }
+  
+      if (!newPassenger.lastName.trim()) {
+        errors.lastName = 'Last name is required';
+      }
+  
+      if (newPassenger.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(newPassenger.phoneNumber)) {
+        errors.phoneNumber = 'Please enter a valid phone number';
+      }
+  
+      if (newPassenger.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newPassenger.email)) {
+        errors.email = 'Please enter a valid email address';
+      }
+  
+      setPassengerErrors(errors);
+      return !errors.firstName && !errors.lastName && !errors.phoneNumber && !errors.email;
+    };
+  
+    const handleAddPassenger = () => {
+      if (validatePassenger()) {
+        const passenger = {
+          id: Date.now(),
+          ...newPassenger
         };
-    
-        if (!newPassenger.firstName.trim()) {
-          errors.firstName = 'First name is required';
-        }
-    
-        if (!newPassenger.lastName.trim()) {
-          errors.lastName = 'Last name is required';
-        }
-    
-        if (newPassenger.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(newPassenger.phoneNumber)) {
-          errors.phoneNumber = 'Please enter a valid phone number';
-        }
-    
-        if (newPassenger.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newPassenger.email)) {
-          errors.email = 'Please enter a valid email address';
-        }
-    
-        setPassengerErrors(errors);
-        return !errors.firstName && !errors.lastName && !errors.phoneNumber && !errors.email;
-      };
-    
-      const handleAddPassenger = () => {
-        if (validatePassenger()) {
-          const passenger = {
-            id: Date.now(),
-            ...newPassenger
-          };
-          setPassengers(prev => [...prev, passenger]);
-          setShowAddPassenger(false);
-          setNewPassenger({
-            firstName: '',
-            lastName: '',
-            phoneNumber: '',
-            email: ''
-          });
-        }
-      };
-    
-      const handleRemovePassenger = (id: number) => {
-        setPassengers(prev => prev.filter(p => p.id !== id));
-      };
-
-      const handleEditPassenger = (passenger: typeof passengers[0]) => {
-        setEditingPassengerId(passenger.id);
+        setPassengers(prev => [...prev, passenger]);
+        setShowAddPassenger(false);
         setNewPassenger({
-          firstName: passenger.firstName,
-          lastName: passenger.lastName,
-          phoneNumber: passenger.phoneNumber,
-          email: passenger.email
-        });
-        setPassengerErrors({
           firstName: '',
           lastName: '',
           phoneNumber: '',
           email: ''
         });
-      };
+      }
+    };
+  
+    const handleRemovePassenger = (id: number) => {
+      setPassengers(prev => prev.filter(p => p.id !== id));
+    };
 
-      const handleUpdatePassenger = () => {
-        if (validatePassenger() && editingPassengerId !== null) {
-          setPassengers(prev => 
-            prev.map(p => 
-              p.id === editingPassengerId 
-                ? { ...p, ...newPassenger }
-                : p
-            )
-          );
-          setEditingPassengerId(null);
-          setNewPassenger({
-            firstName: '',
-            lastName: '',
-            phoneNumber: '',
-            email: ''
-          });
-        }
-      };
+    const handleEditPassenger = (passenger: typeof passengers[0]) => {
+      setEditingPassengerId(passenger.id);
+      setNewPassenger({
+        firstName: passenger.firstName,
+        lastName: passenger.lastName,
+        phoneNumber: passenger.phoneNumber,
+        email: passenger.email
+      });
+      setPassengerErrors({
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        email: ''
+      });
+    };
 
-      const handleCancelEdit = () => {
+    const handleUpdatePassenger = () => {
+      if (validatePassenger() && editingPassengerId !== null) {
+        setPassengers(prev => 
+          prev.map(p => 
+            p.id === editingPassengerId 
+              ? { ...p, ...newPassenger }
+              : p
+          )
+        );
         setEditingPassengerId(null);
         setNewPassenger({
           firstName: '',
@@ -151,13 +151,24 @@ const Checkout = () => {
           phoneNumber: '',
           email: ''
         });
-        setPassengerErrors({
-          firstName: '',
-          lastName: '',
-          phoneNumber: '',
-          email: ''
-        });
-      };
+      }
+    };
+
+    const handleCancelEdit = () => {
+      setEditingPassengerId(null);
+      setNewPassenger({
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        email: ''
+      });
+      setPassengerErrors({
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        email: ''
+      });
+    };
 
   const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -173,18 +184,44 @@ const Checkout = () => {
     // Add guest checkout logic here
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+    setShowSummary(false);
+  };
+
+  const handleToggleSummary = () => {
+    if (isCompleted) {
+      setShowSummary(!showSummary);
+      toggleStep(stepNumber);
+    }
+  };
+
+  const summary = true ? (
+    <div className="space-y-2 text-sm">
+      <div className="flex justify-between">
+        <span className="text-gray-600">Payment Method:</span>
+        {/* <span className="font-medium">{paymentMethod}</span> */}
+      </div>
+      <div className="flex justify-between">
+        <span className="text-gray-600">Amount Paid:</span>
+        {/* <span className="font-medium">${paymentAmount.toFixed(2)}</span> */}
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className='mt-4'>
       <StepHeader
-        stepNumber={3}
-        title="Booking Info"
-        isCompleted={false}
-        isEditing={true}
-        showSummary={false}
-        // onToggleSummary={handleToggleSummary}
-        // onEdit={handleEdit}
-        // summary={summary}
+        stepNumber={stepNumber}
+        title="Checkout"
+        isCompleted={isCompleted}
+        isEditing={isEditing}
+        showSummary={showSummary}
+        onToggleSummary={handleToggleSummary}
+        onEdit={handleEdit}
+        summary={summary}
       />
+      {isExpanded && (
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
         <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
@@ -624,25 +661,43 @@ const Checkout = () => {
             </div>
           </div>
           <div>
-            <div className="bg-slate-800 rounded-sm flex justify-between mt-4 px-12 py-4 border-b border-gray-100">
+            <div className="bg-slate-800 rounded flex justify-between mt-4 px-12 py-4 border-b border-gray-100">
               <p className='text-xl font-semibold text-gray-400'>Total</p>
               <p className='text-xl font-semibold text-gray-400'>$6719.39</p>
             </div>
           </div>
-          <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
+          <Button
+            type="submit"
+            className={`w-full mt-4 bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium py-3 px-6 transition-all duration-200 hover:shadow-lg transform
+            }`}
+          >
+            Pay $6719.39
+          </Button>
+          {/* <div className="bg-gray-100 mt-4 px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Payment Information</h2>
-          </div>
-          <p className='flex items-center mt-4 px-4 gap-2 text-sm text-gray-600'><LockKeyhole className='h-4' /> All transactions are safe and secure.</p>
+          </div> */}
+          {/* <p className='flex items-center mt-4 px-4 gap-2 text-sm text-gray-600'><LockKeyhole className='h-4' /> All transactions are safe and secure.</p> */}
           
           {/* Payment Form */}
-          <div className="p-6">
+          {/* <div className="p-6">
             <StripePayment
               amount={299.99} // Replace with actual ride amount
-              onPaymentSuccess={(paymentMethod) => {
-                console.log('Payment successful:', paymentMethod);
+              onPaymentSuccess={(paymentMethodData) => {
+                console.log('Payment successful:', paymentMethodData);
+                
+                // Save payment info
+                setPaymentMethod(paymentMethodData.type || 'Card');
+                setPaymentAmount(299.99);
+                
+                // Complete step and collapse
+                completeStep(stepNumber);
+                setIsEditing(false);
+                setShowSummary(true);
+                toggleStep(stepNumber);
+                
                 // Redirect to confirmation page with payment details
                 const queryParams = new URLSearchParams({
-                  payment_intent: paymentMethod.id || 'success',
+                  payment_intent: paymentMethodData.id || 'success',
                   amount: '299.99',
                   status: 'success'
                 });
@@ -654,9 +709,10 @@ const Checkout = () => {
               }}
               disabled={editingPassengerId !== null}
             />
-          </div>
+          </div> */}
         </div>
       </div>
+      )}
     </div>
   );
 };
