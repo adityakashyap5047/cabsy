@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Edit } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import DottedCircle from '../circle/DottedCircle';
 import EmptyCircle from '../circle/EmptyCircle';
 
@@ -28,43 +27,28 @@ export default function StepHeader({
   summary,
 }: StepHeaderProps) {
   
-  const handleHeaderClick = () => {
+  const handleTitleClick = () => {
     if (isCompleted && !isEditing) {
-      // When completed and not editing, toggle summary
       if (onToggleSummary) {
         onToggleSummary();
       }
     } else if (!isCompleted) {
-      // When not completed, do nothing (can't toggle)
       return;
     }
   };
 
   return (
     <div className="mb-4">
-      <div
-        className={cn(
-          "flex items-center justify-between px-4 py-1 transition-all duration-300",
-          isCompleted && !isEditing 
-            ? "bg-gray-200 hover:bg-gray-300" 
-            : isEditing 
-            ? "bg-gray-500 cursor-default"
-            : "bg-gray-500 cursor-default"
-        )}
-      >
+      <div className="flex items-center justify-between px-4 py-3 transition-all duration-300 bg-[#ccc8c8]" >
         <div className={`flex items-center gap-2 ${isCompleted && !isEditing ? "cursor-pointer" : "cursor-default"}`}
-          onClick={handleHeaderClick}
+          onClick={handleTitleClick}
         >
           <div
-            className={`transition-all duration-300`}
+            className="transition-all duration-300"
           >
             {isCompleted && !isEditing ? <DottedCircle /> : <EmptyCircle />}
           </div>
-          <span className={cn(
-            "font-semibold text-sm transition-colors duration-300",
-            isCompleted && !isEditing ? "text-gray-700" : "text-white"
-          )}
-          >
+          <span className="text-sm transition-colors duration-300 text-[#ae9409] font-bold">
             Step {stepNumber}: {title}
           </span>
         </div>
@@ -76,7 +60,7 @@ export default function StepHeader({
                 e.stopPropagation();
                 onEdit();
               }}
-              className="flex items-center cursor-pointer gap-1 text-gray-700 hover:text-yellow-600 transition-colors duration-200"
+              className="flex items-center cursor-pointer gap-1 text-gray-700 hover:text-[#ae9409] transition-colors duration-200"
             >
               <Edit className="w-4 h-4" />
               <span className="text-sm font-medium">Edit</span>
@@ -85,17 +69,13 @@ export default function StepHeader({
         </div>
       </div>
       
-      {/* Summary View with smooth vertical sliding window effect */}
       <div
-        className={cn(
-          "overflow-hidden transition-all duration-700 ease-in-out",
-          isCompleted && !isEditing && showSummary 
-            ? "max-h-[600px] opacity-100" 
-            : "max-h-0 opacity-0"
-        )}
+        className={`overflow-hidden transition-all duration-700 ease-in-out
+          ${isCompleted && !isEditing && showSummary ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`
+        }
       >
         <div 
-          className="bg-gray-100 px-6 py-4 border-l-4 border-yellow-500"
+          className="bg-gray-100 px-6 py-4 border-l-4 border-[#ae9409]"
           style={{
             transition: 'all 700ms ease-in-out',
             transform: isCompleted && !isEditing && showSummary ? 'translateY(0)' : 'translateY(-16px)',
