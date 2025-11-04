@@ -8,8 +8,10 @@ import StepHeader from './StepHeader';
 import { useBooking } from '@/context/BookingContext';
 
 const FinalDetails = () => {
-  const { completeStep, toggleStep, completedSteps, expandedSteps } = useBooking();
-  
+  const { state, dispatch } = useBooking();
+
+  const step = 2;
+
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -23,10 +25,10 @@ const FinalDetails = () => {
   });
 
   const [showDataInfo, setShowDataInfo] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
 
-  const isExpanded = expandedSteps.includes(2);
-  const isCompleted = completedSteps.includes(2);
+  const isExpanded = state.expandedSteps.includes(step);
+  const isCompleted = state.completedSteps.includes(step);
+  const showSummary = !isExpanded && isCompleted;
   const isEditing = isExpanded && isCompleted;
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,16 +50,24 @@ const FinalDetails = () => {
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add login logic here
+    // Save user data
+    dispatch({
+      type: "SET_USER",
+      payload: {
+        email: loginData.email
+      }
+    });
+    
     // After successful login, complete step and move to next
-    completeStep(2);
+    dispatch({ type: "COMPLETE_STEP", payload: step });
+    dispatch({ type: "TOGGLE_STEP", payload: step }); // Collapse current step
+    
     setTimeout(() => {
-      toggleStep(2); // Collapse step 3
-      setShowSummary(true); // Show summary
-      toggleStep(3); // Expand step 4
+      dispatch({ type: "TOGGLE_STEP", payload: 4 }); // Expand step 4
       
       // Scroll to step 4
       setTimeout(() => {
-        const step4Element = document.querySelector('[data-step="3"]');
+        const step4Element = document.querySelector('[data-step="4"]');
         if (step4Element) {
           step4Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -75,19 +85,26 @@ const FinalDetails = () => {
       return;
     }
     
-    console.log('Guest data:', guestData);
+    // Save guest data
+    dispatch({
+      type: "SET_USER",
+      payload: {
+        name: `${guestData.firstName} ${guestData.lastName}`,
+        email: guestData.email,
+        phone: guestData.phoneNumber
+      }
+    });
     
     // Complete step 3 and move to step 4 (Checkout)
-    completeStep(2);
+    dispatch({ type: "COMPLETE_STEP", payload: step });
+    dispatch({ type: "TOGGLE_STEP", payload: step }); // Collapse current step
     
     setTimeout(() => {
-      toggleStep(2); // Collapse step 3
-      setShowSummary(true); // Show summary
-      toggleStep(3); // Expand step 4 (Checkout)
+      dispatch({ type: "TOGGLE_STEP", payload: 4 }); // Expand step 4 (Checkout)
       
       // Scroll to step 4 smoothly
       setTimeout(() => {
-        const step4Element = document.querySelector('[data-step="3"]');
+        const step4Element = document.querySelector('[data-step="4"]');
         if (step4Element) {
           step4Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -96,14 +113,13 @@ const FinalDetails = () => {
   };
 
   const handleEdit = () => {
-    setShowSummary(false);
-    if (!isExpanded) {
-      toggleStep(2);
-    }
+    dispatch({ type: "TOGGLE_STEP", payload: step });
   };
 
   const handleToggleSummary = () => {
-    setShowSummary(prev => !prev);
+    if (isCompleted) {
+      dispatch({ type: "TOGGLE_STEP", payload: step });
+    }
   };
 
   const summary = (
@@ -126,7 +142,7 @@ const FinalDetails = () => {
   return (
     <div className='mb-4'>
       <StepHeader
-        stepNumber={2}
+        stepNumber={step}
         title="Account Info"
         isCompleted={isCompleted}
         isEditing={isEditing}
@@ -135,7 +151,13 @@ const FinalDetails = () => {
         onEdit={handleEdit}
         summary={summary}
       />
-      {isExpanded && (
+      <div 
+        className="overflow-hidden transition-all duration-700 ease-in-out"
+        style={{
+          maxHeight: isExpanded ? '5000px' : '0',
+          opacity: isExpanded ? 1 : 0
+        }}
+      >
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
         <div className="w-full md:w-1/2 flex flex-col px-6">
@@ -321,7 +343,7 @@ const FinalDetails = () => {
           </div>
         </div>
       </div>
-      )}
+      </div>
     </div>
   );
 };

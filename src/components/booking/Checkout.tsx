@@ -1,28 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Minus, PenBox, Plus, Trash2 } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
-// import StripePayment from '../payment/StripePayment';
+import StripePayment from '../payment/StripePayment';
 import StepHeader from './StepHeader';
 import { useBooking } from '@/context/BookingContext';
 
 const Checkout = () => {
-  // const router = useRouter();
-  const { completedSteps, expandedSteps, toggleStep } = useBooking();
-  // const { completedSteps, completeStep, expandedSteps, toggleStep } = useBooking();
+  const router = useRouter();
+  const { state, dispatch } = useBooking();
   
-  const stepNumber = 3;
-  const isExpanded = expandedSteps.includes(stepNumber);
-  const isCompleted = completedSteps.includes(stepNumber);
+  const stepNumber = 4;
+  const isExpanded = state.expandedSteps.includes(stepNumber);
+  const isCompleted = state.completedSteps.includes(stepNumber);
+  const showSummary = !isExpanded && isCompleted;
   const [isEditing, setIsEditing] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
-  // const [paymentMethod, setPaymentMethod] = useState<string>('');
-  // const [paymentAmount, setPaymentAmount] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
 
     const [guestData, setGuestData] = useState({
         firstName: 'Aditya',
@@ -180,31 +179,37 @@ const Checkout = () => {
 
   const handleGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent submission if editing a passenger
+    if (editingPassengerId !== null) {
+      alert('Please finish editing the passenger information first.');
+      return;
+    }
+    
     console.log('Guest data:', guestData);
     // Add guest checkout logic here
   };
 
   const handleEdit = () => {
     setIsEditing(true);
-    setShowSummary(false);
+    dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
   };
 
   const handleToggleSummary = () => {
     if (isCompleted) {
-      setShowSummary(!showSummary);
-      toggleStep(stepNumber);
+      dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
     }
   };
 
-  const summary = true ? (
+  const summary = paymentMethod ? (
     <div className="space-y-2 text-sm">
       <div className="flex justify-between">
         <span className="text-gray-600">Payment Method:</span>
-        {/* <span className="font-medium">{paymentMethod}</span> */}
+        <span className="font-medium">{paymentMethod}</span>
       </div>
       <div className="flex justify-between">
         <span className="text-gray-600">Amount Paid:</span>
-        {/* <span className="font-medium">${paymentAmount.toFixed(2)}</span> */}
+        <span className="font-medium">${paymentAmount.toFixed(2)}</span>
       </div>
     </div>
   ) : null;
@@ -221,7 +226,13 @@ const Checkout = () => {
         onEdit={handleEdit}
         summary={summary}
       />
-      {isExpanded && (
+      <div 
+        className="overflow-hidden transition-all duration-700 ease-in-out"
+        style={{
+          maxHeight: isExpanded ? '6000px' : '0',
+          opacity: isExpanded ? 1 : 0
+        }}
+      >
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
         {/* Login Section */}
         <div className="w-full md:w-1/2 flex flex-col px-6 py-8">
@@ -679,7 +690,7 @@ const Checkout = () => {
           {/* <p className='flex items-center mt-4 px-4 gap-2 text-sm text-gray-600'><LockKeyhole className='h-4' /> All transactions are safe and secure.</p> */}
           
           {/* Payment Form */}
-          {/* <div className="p-6">
+          <div className="p-6">
             <StripePayment
               amount={299.99} // Replace with actual ride amount
               onPaymentSuccess={(paymentMethodData) => {
@@ -689,11 +700,20 @@ const Checkout = () => {
                 setPaymentMethod(paymentMethodData.type || 'Card');
                 setPaymentAmount(299.99);
                 
+                // Save payment to state
+                dispatch({
+                  type: "SET_PAYMENT",
+                  payload: {
+                    method: paymentMethodData.type || 'Card',
+                    amount: 299.99,
+                    status: 'success'
+                  }
+                });
+                
                 // Complete step and collapse
-                completeStep(stepNumber);
+                dispatch({ type: "COMPLETE_STEP", payload: stepNumber });
                 setIsEditing(false);
-                setShowSummary(true);
-                toggleStep(stepNumber);
+                dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
                 
                 // Redirect to confirmation page with payment details
                 const queryParams = new URLSearchParams({
@@ -709,10 +729,10 @@ const Checkout = () => {
               }}
               disabled={editingPassengerId !== null}
             />
-          </div> */}
+          </div>
         </div>
       </div>
-      )}
+      </div>
     </div>
   );
 };
