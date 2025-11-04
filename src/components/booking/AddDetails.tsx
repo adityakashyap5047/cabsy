@@ -33,6 +33,7 @@ export default function AddDetails() {
 
   const isCompleted = state.completedSteps.includes(step);
   const isExpanded = state.expandedSteps.includes(step);
+  const showSummary = state.summarySteps.includes(step);
 
   const [serviceType, setServiceType] = React.useState<string>(bookingDetails.serviceType || '');
   const [date, setDate] = React.useState<Date | undefined>(bookingDetails.date);
@@ -46,7 +47,6 @@ export default function AddDetails() {
   const [dropoffLocation, setDropoffLocation] = React.useState<string>(bookingDetails.dropoffLocation || "");
   const [passenger, setPassenger] = React.useState<number>(bookingDetails.passengers || 1);
   const [luggage, setLuggage] = React.useState<number>(bookingDetails.luggage || 0);
-  const [showSummary, setShowSummary] = React.useState<boolean>(false);
   const isEditing = isExpanded && isCompleted;
 
   React.useEffect(() => {
@@ -112,25 +112,29 @@ export default function AddDetails() {
     dispatch({ type: "TOGGLE_STEP", payload: step });
     
     setTimeout(() => {
-      setShowSummary(true);
-      dispatch({ type: "TOGGLE_STEP", payload: step + 1 });
+      if (!showSummary) {
+        dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+      }
+      dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
       
       setTimeout(() => {
-        const step2Element = document.querySelector('[data-step="2"]');
-        if (step2Element) {
-          step2Element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const nextStepElement = document.querySelector(`[data-step="${step + 1}"]`);
+        if (nextStepElement) {
+          nextStepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 300);
     }, 100);
   };
 
   const handleEdit = () => {
-    setShowSummary(false);
+    dispatch({ type: "COLLAPSE_AFTER_STEP", payload: step });
     if(!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: step });
   };
 
   const handleToggleSummary = () => {
-    if(!isExpanded) setShowSummary(prev => !prev);
+    if (isCompleted) {
+      dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+    }
   };
 
   const summary = (
@@ -194,7 +198,7 @@ export default function AddDetails() {
       />
       
       <div 
-        className="overflow-hidden transition-all duration-700 ease-in-out"
+        className="overflow-hidden transition-all duration-900 ease-in-out"
         style={{
           maxHeight: isExpanded ? '5000px' : '0',
           opacity: isExpanded ? 1 : 0

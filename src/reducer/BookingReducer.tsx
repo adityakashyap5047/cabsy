@@ -23,6 +23,7 @@ export interface BookingState {
   currentStep: number;
   completedSteps: number[];
   expandedSteps: number[];
+  summarySteps: number[];
 }
 
 export type BookingAction =
@@ -36,6 +37,9 @@ export type BookingAction =
   | { type: "SET_STEP"; payload: number }
   | { type: "COMPLETE_STEP"; payload: number }
   | { type: "TOGGLE_STEP"; payload: number }
+  | { type: "COLLAPSE_AFTER_STEP"; payload: number }
+  | { type: "EXPAND_ONLY_STEP"; payload: number }
+  | { type: "TOGGLE_SUMMARY"; payload: number }
   | { type: "RESET" };
 
 export const initialState: BookingState = {
@@ -55,6 +59,7 @@ export const initialState: BookingState = {
   currentStep: 1,
   completedSteps: [],
   expandedSteps: [1],
+  summarySteps: [],
 };
 
 export default function bookingReducer(state: BookingState, action: BookingAction): BookingState {
@@ -113,9 +118,26 @@ export default function bookingReducer(state: BookingState, action: BookingActio
         ? { ...state, expandedSteps: state.expandedSteps.filter(s => s !== action.payload) }
         : { ...state, expandedSteps: [...state.expandedSteps, action.payload] };
 
-    case "RESET":
-      return initialState;
+    case "COLLAPSE_AFTER_STEP":
+      return {
+        ...state,
+        expandedSteps: state.expandedSteps.filter(s => s <= action.payload)
+      };
 
+    case "EXPAND_ONLY_STEP":
+      return {
+        ...state,
+        expandedSteps: [action.payload]
+      };
+
+    case "TOGGLE_SUMMARY":
+      return state.summarySteps.includes(action.payload)
+        ? { ...state, summarySteps: state.summarySteps.filter(s => s !== action.payload) }
+        : { ...state, summarySteps: [...state.summarySteps, action.payload] };
+    
+    case "RESET":
+      return initialState;    
+      
     default:
       return state;
   }
