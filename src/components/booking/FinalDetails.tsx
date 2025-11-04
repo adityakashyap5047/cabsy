@@ -98,13 +98,6 @@ const FinalDetails = () => {
         dispatch({ type: "TOGGLE_SUMMARY", payload: step });
       }
       dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
-      
-      setTimeout(() => {
-        const nextStepElement = document.querySelector(`[data-step="${step + 1}"]`);
-        if (nextStepElement) {
-          nextStepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 300);
     }, 100);
   };
 
