@@ -14,11 +14,10 @@ import { useBooking } from '@/context/BookingContext';
 const Checkout = () => {
   const router = useRouter();
   const { state, dispatch } = useBooking();
-  
-  const stepNumber = 4;
+  const stepNumber = 3;
   const isExpanded = state.expandedSteps.includes(stepNumber);
   const isCompleted = state.completedSteps.includes(stepNumber);
-  const showSummary = !isExpanded && isCompleted;
+  const showSummary = state.summarySteps.includes(stepNumber);
   const [isEditing, setIsEditing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
@@ -192,12 +191,16 @@ const Checkout = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
-    dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
+    // Collapse all steps after this one (though this is the last step)
+    dispatch({ type: "COLLAPSE_AFTER_STEP", payload: stepNumber });
+    // Expand current step
+    if (!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
   };
 
   const handleToggleSummary = () => {
+    // Toggle summary visibility (expand/collapse summary info)
     if (isCompleted) {
-      dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
+      dispatch({ type: "TOGGLE_SUMMARY", payload: stepNumber });
     }
   };
 

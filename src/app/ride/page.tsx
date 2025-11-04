@@ -10,14 +10,13 @@ const RidePage = () => {
     <BookingProvider>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="my-12 text-[#AE9409] font-sans font-semibold text-4xl">Please Fill Out All Required Info</p>
-        <AddDetails />
-        {/* <div data-step="2"> */}
-          {/* <SelectVehicle /> */}
-        {/* </div> */}
-        <div data-step="3">
+        <div data-step="1">
+          <AddDetails /> 
+        </div>
+        <div data-step="2">
           <FinalDetails />
         </div>
-        <div data-step="4">
+        <div data-step="3">
           <Checkout />
         </div>
       </div>
