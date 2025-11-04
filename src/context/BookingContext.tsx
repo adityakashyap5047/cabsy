@@ -1,3 +1,5 @@
+"use client";
+
 import bookingReducer, { BookingAction, BookingState, initialState } from "@/reducer/BookingReducer";
 import { createContext, useContext, useReducer } from "react";
 

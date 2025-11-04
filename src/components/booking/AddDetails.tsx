@@ -26,28 +26,28 @@ import { useBooking } from "@/context/BookingContext";
 import StepHeader from "./StepHeader";
 
 export default function AddDetails() {
-  const { bookingDetails, updateBookingDetails, completeStep, expandedSteps, toggleStep, completedSteps } = useBooking();
-  
+  const { state, dispatch } = useBooking();
+
+  const step = 1;
+  const { bookingDetails } = state;
+
+  const isCompleted = state.completedSteps.includes(step);
+  const isExpanded = state.expandedSteps.includes(step);
+
   const [serviceType, setServiceType] = React.useState<string>(bookingDetails.serviceType || '');
   const [date, setDate] = React.useState<Date | undefined>(bookingDetails.date);
   const [time, setTime] = React.useState<string | null>(bookingDetails.time);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [stops, setStops] = React.useState<string[]>(bookingDetails.stops || []);
-  const [stopError, setStopError] = React.useState<number | null>(null); // Track which stop has error
+  const [stopError, setStopError] = React.useState<number | null>(null);
   const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
   const [pickupLocation, setPickupLocation] = React.useState<string>(bookingDetails.pickupLocation || "");
   const [dropoffLocation, setDropoffLocation] = React.useState<string>(bookingDetails.dropoffLocation || "");
   const [passenger, setPassenger] = React.useState<number>(bookingDetails.passengers || 1);
   const [luggage, setLuggage] = React.useState<number>(bookingDetails.luggage || 0);
-  
-  // State for summary visibility (separate from form expansion)
-  const [showSummary, setShowSummary] = React.useState(false);
-
-  const isExpanded = expandedSteps.includes(1);
-  const isCompleted = completedSteps.includes(1);
-  const isEditing = isExpanded && isCompleted; // Editing mode: expanded after being completed
-
+  const [showSummary, setShowSummary] = React.useState<boolean>(false);
+  const isEditing = isExpanded && isCompleted;
 
   React.useEffect(() => {
     if (justAddedStop && stops.length > 0) {
@@ -65,18 +65,18 @@ export default function AddDetails() {
 
   const handleAddStop = () => {
     if (stops.length > 0 && stops[stops.length - 1].trim() === "") {
-      setStopError(stops.length - 1); // Set error for the last stop
+      setStopError(stops.length - 1);
       return;
     }
 
     setStops(prev => [...prev, ""]);
     setStopError(null);
-    setJustAddedStop(true); // Trigger auto-focus
+    setJustAddedStop(true); 
   }
 
   const handleRemoveStop = (index: number) => {
     setStops(prev => prev.filter((_, i) => i !== index));
-    setStopError(null); // Clear any errors when removing a stop
+    setStopError(null);
   }
 
   const handleStopChange = (index: number, value: string) => {
@@ -89,34 +89,32 @@ export default function AddDetails() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!pickupLocation.trim() || !dropoffLocation.trim()) {
       alert('Please fill in both pickup and drop-off locations');
       return;
     }
     
-    // Save the booking details
-    updateBookingDetails({
-      serviceType,
-      date,
-      time,
-      pickupLocation,
-      stops,
-      dropoffLocation,
-      passengers: passenger,
-      luggage,
+    dispatch({
+      type: "UPDATE_BOOKING_DETAILS",
+      payload: {
+        serviceType,
+        date,
+        time,
+        pickupLocation,
+        stops,
+        dropoffLocation,
+        passengers: passenger,
+        luggage,
+      }
     });
     
-    // Mark step 1 as complete
-    completeStep(1);
+    dispatch({ type: "COMPLETE_STEP", payload: step });
+    dispatch({ type: "TOGGLE_STEP", payload: step });
     
-    // Collapse the form
     setTimeout(() => {
-      toggleStep(1); // Collapse step 1 form
-      setShowSummary(true); // Show summary
-      toggleStep(2); // Expand step 2
+      setShowSummary(true);
+      dispatch({ type: "TOGGLE_STEP", payload: step + 1 });
       
-      // Scroll to step 2 smoothly
       setTimeout(() => {
         const step2Element = document.querySelector('[data-step="2"]');
         if (step2Element) {
@@ -127,19 +125,14 @@ export default function AddDetails() {
   };
 
   const handleEdit = () => {
-    // Expand the form for editing
-    setShowSummary(false); // Hide summary
-    if (!isExpanded) {
-      toggleStep(1); // Open the form
-    }
+    setShowSummary(false);
+    if(!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: step });
   };
 
   const handleToggleSummary = () => {
-    // Toggle summary visibility when clicking on header
-    setShowSummary(prev => !prev);
+    if(!isExpanded) setShowSummary(prev => !prev);
   };
 
-  // Summary component to show when collapsed
   const summary = (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-y-3">
       <div className="space-y-3">
@@ -187,15 +180,14 @@ export default function AddDetails() {
     </div>
   );
 
-
   return (
     <div>
       <StepHeader
-        stepNumber={1}
+        stepNumber={step}
         title="Ride Info"
         isCompleted={isCompleted}
-        isEditing={isEditing}
         showSummary={showSummary}
+        isEditing={isEditing}
         onToggleSummary={handleToggleSummary}
         onEdit={handleEdit}
         summary={summary}
@@ -204,26 +196,24 @@ export default function AddDetails() {
       {isExpanded && (
         <div className="p-6 space-y-6 transition-all duration-500 ease-in-out">
           <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* Service Type */}
         <div className="flex items-center gap-16 max-md:flex-col">
           <div className="space-y-6 w-1/2">
             <div className="space-y-2">
-            <Label htmlFor="service">Select Service Type</Label>
-            <Select value={serviceType} onValueChange={setServiceType}>
-              <SelectTrigger className="w-full rounded-none cursor-pointer" id="service">
-                <SelectValue placeholder="Choose a service type" />
-              </SelectTrigger>
-              <SelectContent className="rounded-none">
-                <SelectItem value="from-airport">From Airport</SelectItem>
-                <SelectItem value="to-airport">To Airport</SelectItem>
-                <SelectItem value="point-to-point">Point-to-Point</SelectItem>
-                <SelectItem value="hourly">Hourly Car Service</SelectItem>
-                <SelectItem value="wedding">Wedding Car Service</SelectItem>
-              </SelectContent>
-            </Select>
+              <Label htmlFor="service">Select Service Type</Label>
+              <Select value={serviceType} onValueChange={setServiceType}>
+                <SelectTrigger className="w-full rounded-none cursor-pointer" id="service">
+                  <SelectValue placeholder="Choose a service type" />
+                </SelectTrigger>
+                <SelectContent className="rounded-none">
+                  <SelectItem value="from-airport">From Airport</SelectItem>
+                  <SelectItem value="to-airport">To Airport</SelectItem>
+                  <SelectItem value="point-to-point">Point-to-Point</SelectItem>
+                  <SelectItem value="hourly">Hourly Car Service</SelectItem>
+                  <SelectItem value="wedding">Wedding Car Service</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex w-full gap-2">
-              {/* Pick-up Date */}
               <div className="space-y-2 w-1/2">
                 <Label>Pick-Up Date</Label>
                 <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
@@ -307,7 +297,6 @@ export default function AddDetails() {
               </div>
             </div>
 
-            {/* Pickup Location */}
             <div>
               <Label htmlFor="pickup" className="mb-2">Pick-Up Location</Label>
               <Input 
@@ -351,10 +340,9 @@ export default function AddDetails() {
                           placeholder="Add Your Stop"
                           className={cn(
                             "w-full transition-colors duration-200",
-                            // Error state - red border
                             stopError === index 
                               ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
-                              : // Normal state - only show colored border when there's text
+                              : 
                                 stop.trim() 
                                   ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
                                   : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
@@ -381,7 +369,6 @@ export default function AddDetails() {
               )}
             </div>
 
-            {/* Dropoff Location */}
             <div className="space-y-2">
               <Label htmlFor="dropoff">Drop-Off Location</Label>
               <Input 
@@ -448,7 +435,6 @@ export default function AddDetails() {
           <div className="bg-gray-500 h-100 w-120" />
         </div>
 
-        {/* Passengers & Luggage */}
         <div className="flex flex-wrap gap-4 md:hidden">
           <div className="space-y-2 min-w-40">
             <Label htmlFor="passengers">Number of Passengers</Label>
@@ -496,7 +482,6 @@ export default function AddDetails() {
           </div>
         </div>
 
-        {/* Submit */}
         <Button 
           type="submit" 
           className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold text-xl m-4 cursor-pointer py-4 px-12 rounded-none shadow-lg transform hover:scale-105 transition-all duration-200"
