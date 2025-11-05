@@ -83,6 +83,13 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
             validationErrors.lastName = 'Last name is required';
         }
 
+        if (data.phoneNumber) {
+            const digitsOnly = data.phoneNumber.replace(/\D/g, '');
+            if (digitsOnly.length !== 10) {
+                validationErrors.phoneNumber = 'Phone number must contain exactly 10 digits';
+            }
+        }
+
         if (!data.phoneNumber.trim() || (data.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(data.phoneNumber))) {
             validationErrors.phoneNumber = 'Please enter a valid phone number';
         }
