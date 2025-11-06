@@ -53,7 +53,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
         }
     };
 
-    const validateAddPassenger = () => {
+    const validatePassenger = () => {
         const validationErrors = {
             firstName: '',
             lastName: '',
@@ -90,7 +90,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
     };
 
     const handleAddPassenger = () => {
-        const validation = validateAddPassenger();
+        const validation = validatePassenger();
         if (validation.isValid) {
             const passenger = {
                 id: Date.now(),

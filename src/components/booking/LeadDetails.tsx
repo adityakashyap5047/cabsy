@@ -67,7 +67,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
         }
     };
 
-    const validateEditGuest = () => {
+    const validateLead = () => {
         const validationErrors = {
             firstName: '',
             lastName: '',
@@ -105,8 +105,8 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
         };
     };
 
-    const handleUpdateGuest = () => {
-        const validation = validateEditGuest();
+    const handleUpdateLead = () => {
+        const validation = validateLead();
         
         if (validation.isValid && onLeadUpdate) {
             onLeadUpdate(data);
@@ -136,7 +136,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
         }
     };
 
-    const handleCancelGuestEdit = () => {
+    const handleCancelLeadEdit = () => {
         setIsEditing(false);
         setData({
             firstName: '',
@@ -274,14 +274,14 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
             <div className="flex justify-end space-x-3">
                 <Button
                     type="button"
-                    onClick={handleCancelGuestEdit}
+                    onClick={handleCancelLeadEdit}
                     className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
                 >
                     Cancel
                 </Button>
                 <Button
                     type="button"
-                    onClick={handleUpdateGuest}
+                    onClick={handleUpdateLead}
                     className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
                 >
                     Update
