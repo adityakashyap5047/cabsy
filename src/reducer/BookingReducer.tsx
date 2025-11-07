@@ -24,6 +24,7 @@ export interface BookingState {
   completedSteps: number[];
   expandedSteps: number[];
   summarySteps: number[];
+  remarks: string;
 }
 
 export type BookingAction =
@@ -40,6 +41,7 @@ export type BookingAction =
   | { type: "COLLAPSE_AFTER_STEP"; payload: number }
   | { type: "EXPAND_ONLY_STEP"; payload: number }
   | { type: "TOGGLE_SUMMARY"; payload: number }
+  | { type: "ADD_REMARKS"; payload: string }
   | { type: "RESET" };
 
 export const initialState: BookingState = {
@@ -60,6 +62,7 @@ export const initialState: BookingState = {
   completedSteps: [],
   expandedSteps: [1],
   summarySteps: [],
+  remarks: "",
 };
 
 export default function bookingReducer(state: BookingState, action: BookingAction): BookingState {
@@ -74,33 +77,33 @@ export default function bookingReducer(state: BookingState, action: BookingActio
       return { ...state, user: { ...state.user, ...action.payload }, currentStep: 3 };
 
     case "ADD_PASSENGER":
-        return {
-            ...state,
-            user: {
-            ...state.user,
-            passengers: [...(state.user?.passengers || []), action.payload],
-            },
-        };
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          passengers: [...(state.user?.passengers || []), action.payload],
+        },
+      };
     
     case "UPDATE_PASSENGER":
-        return {
-            ...state,
-            user: {
-            ...state.user,
-            passengers: state.user?.passengers?.map((p, i) =>
-                i === action.payload.index ? { ...p, ...action.payload.data } : p
-            ) || [],
-            },
-        };
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          passengers: state.user?.passengers?.map((p, i) =>
+              i === action.payload.index ? { ...p, ...action.payload.data } : p
+          ) || [],
+        },
+      };
 
     case "REMOVE_PASSENGER":
-        return {
-            ...state,
-            user: {
-            ...state.user,
-            passengers: state.user?.passengers?.filter((_, i) => i !== action.payload) || [],
-            },
-        };
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          passengers: state.user?.passengers?.filter((_, i) => i !== action.payload) || [],
+        },
+      };
 
     case "SET_PAYMENT":
       return { ...state, payment: action.payload };
@@ -135,6 +138,9 @@ export default function bookingReducer(state: BookingState, action: BookingActio
         ? { ...state, summarySteps: state.summarySteps.filter(s => s !== action.payload) }
         : { ...state, summarySteps: [...state.summarySteps, action.payload] };
     
+    case "ADD_REMARKS":
+      return { ...state, remarks: action.payload };
+
     case "RESET":
       return initialState;    
       

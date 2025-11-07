@@ -86,7 +86,12 @@ const FinalDetails = () => {
       payload: {
         name: `${guestData.firstName} ${guestData.lastName}`,
         email: guestData.email,
-        phone: guestData.phoneNumber
+        phone: guestData.phoneNumber,
+        passengers: [{
+          name: `${guestData.firstName} ${guestData.lastName}`,
+          email: guestData.email,
+          phone: guestData.phoneNumber
+        }]
       }
     });
     

@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 interface RemarksProps {
   value: string;
   onChange: (value: string) => void;
+  handleRemarksChange: (value: string) => void;
 }
 
-const Remarks: React.FC<RemarksProps> = ({ value, onChange }) => {
+const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange }) => {
   const [isEditing, setIsEditing] = useState(true);
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -24,13 +25,15 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange }) => {
 
   const handleCheck = () => {
     if (value.trim()) {
-      setText(value);
+      setText(value.trim());
+      handleRemarksChange(value.trim());
       setIsEditing(false);
     }
   };
 
   const handleClear = () => {
     onChange('');
+    handleRemarksChange('');
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
@@ -43,6 +46,7 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange }) => {
   const handleDelete = () => {
     setText('');
     onChange('');
+    handleRemarksChange('');
     setIsEditing(true);
   };
 
