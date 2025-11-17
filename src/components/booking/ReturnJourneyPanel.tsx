@@ -74,18 +74,21 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
       />
 
       {/* Side Panel */}
-      <div className={`fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      <div
+        className={`fixed right-0 top-1/2 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0 -translate-y-1/2' : 'translate-x-full -translate-y-1/2'
+        } w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto max-h-[96vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
+        style={{ scrollbarWidth: 'none' }}
+      >
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center z-10">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Return Journey</h2>
           <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Close panel"
+        onClick={onClose}
+        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        aria-label="Close panel"
           >
-            <X className="w-6 h-6 text-gray-600" />
+        <X className="w-6 h-6 text-gray-600" />
           </button>
         </div>
 
@@ -101,24 +104,24 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         {/* Footer */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
           {validationError && (
-            <div className="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
-              {validationError}
-            </div>
+        <div className="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+          {validationError}
+        </div>
           )}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between items-stretch sm:items-center">
-            <Button
-            variant="outline"
-            onClick={onClose}
-            className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveReturnJourney}
-            className="rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-4 sm:px-8 w-full sm:w-auto"
-          >
-            Save Return Journey
-          </Button>
+        <Button
+          variant="outline"
+          onClick={onClose}
+          className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-full sm:w-auto"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSaveReturnJourney}
+          className="rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-4 sm:px-8 w-full sm:w-auto"
+        >
+          Save Return Journey
+        </Button>
           </div>
         </div>
       </div>

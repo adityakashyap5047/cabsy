@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import StepHeader from './StepHeader';
 import { useBooking } from '@/context/BookingContext';
 import LeadDetails from './LeadDetails';
@@ -10,6 +9,7 @@ import AddPassenger, { Passenger } from './AddPassenger';
 import EditPassenger from './EditPassenger';
 import Remarks from './Remarks';
 import ReturnJourneyPanel from './ReturnJourneyPanel';
+import { Edit } from 'lucide-react';
 
 interface CheckoutProps {
   isReturnJourney?: boolean;
@@ -230,6 +230,10 @@ console.log(state);
     return false;
   };
 
+  const handleEditReturnJourney = () => {
+    setIsReturnPanelOpen(true);
+  };
+
   const summary = isCompleted ? (
     <div className="space-y-2 text-sm">
       <div className="flex justify-between">
@@ -314,8 +318,17 @@ console.log(state);
               <div className="w-px bg-gray-300 mx-0 h-full" />
             </div>
             <div className="w-full md:w-1/2 flex flex-col px-4 sm:px-6 py-8">
-          <div className="bg-gray-100 px-4 sm:px-6 py-1 border-b border-gray-200">
+          <div className="bg-gray-100 px-4 sm:px-6 py-1 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-medium text-gray-800">Return Service</h2>
+            {isReturnJourneySaved && (
+              <button
+              onClick={handleEditReturnJourney}
+              className="flex items-center cursor-pointer gap-1 text-gray-700 hover:text-[#ae9409] transition-colors duration-200"
+            >
+              <Edit className="w-4 h-4" />
+              <span className="text-sm font-medium">Edit</span>
+            </button>
+            )}
           </div>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 mt-2 gap-2'>
             <p className="text-sm sm:text-base">Would you like to book return service?</p>
