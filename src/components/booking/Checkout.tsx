@@ -388,26 +388,6 @@ console.log(state);
           )}
           
           <div className="bg-gray-100 mt-4 px-4 sm:px-6 py-1 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-800">Promo Code</h2>
-          </div>
-          <div className="p-4 sm:p-6">
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Input
-                    name="promoCode"
-                    type="text"
-                    placeholder="Enter Promo Code"
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
-                </div>
-
-                <Button type='button' variant={"primary"} className='border border-[#AE9404] text-[#AE9404] rounded-none hover:text-white hover:bg-[#AE9404]'>Apply Promo Code</Button>
-              </div>
-            </form>
-          </div>
-          <div className="bg-gray-100 mt-4 px-4 sm:px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Pricing</h2>
           </div>
           <div>
