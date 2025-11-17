@@ -31,6 +31,11 @@ export interface BookingState {
   completedSteps: number[];
   expandedSteps: number[];
   summarySteps: number[];
+  
+  // Separate step tracking for return journey
+  returnCompletedSteps: number[];
+  returnExpandedSteps: number[];
+  returnSummarySteps: number[];
 }
 
 export type BookingAction =
@@ -55,8 +60,14 @@ export type BookingAction =
   | { type: "COLLAPSE_AFTER_STEP"; payload: number }
   | { type: "EXPAND_ONLY_STEP"; payload: number }
   | { type: "TOGGLE_SUMMARY"; payload: number }
+  | { type: "COMPLETE_RETURN_STEP"; payload: number }
+  | { type: "TOGGLE_RETURN_STEP"; payload: number }
+  | { type: "COLLAPSE_AFTER_RETURN_STEP"; payload: number }
+  | { type: "EXPAND_ONLY_RETURN_STEP"; payload: number }
+  | { type: "TOGGLE_RETURN_SUMMARY"; payload: number }
   | { type: "ADD_ONWARD_REMARKS"; payload: string }
   | { type: "ADD_RETURN_REMARKS"; payload: string }
+  | { type: "CLEAR_RETURN_JOURNEY" }
   | { type: "RESET" };
 
 export const initialState: BookingState = {
@@ -79,6 +90,9 @@ export const initialState: BookingState = {
   completedSteps: [],
   expandedSteps: [1],
   summarySteps: [],
+  returnCompletedSteps: [],
+  returnExpandedSteps: [1],
+  returnSummarySteps: [],
 };
 
 export default function bookingReducer(state: BookingState, action: BookingAction): BookingState {
@@ -96,6 +110,15 @@ export default function bookingReducer(state: BookingState, action: BookingActio
 
     case "ENABLE_RETURN_JOURNEY":
       return { ...state, returnEnabled: action.payload };
+
+    case "CLEAR_RETURN_JOURNEY":
+      return {
+        ...state,
+        returnJourney: undefined,
+        returnCompletedSteps: [],
+        returnExpandedSteps: [1],
+        returnSummarySteps: [],
+      };
 
     case "INITIALIZE_RETURN_JOURNEY":
       return {
@@ -257,6 +280,33 @@ export default function bookingReducer(state: BookingState, action: BookingActio
       return state.summarySteps.includes(action.payload)
         ? { ...state, summarySteps: state.summarySteps.filter(s => s !== action.payload) }
         : { ...state, summarySteps: [...state.summarySteps, action.payload] };
+    
+    case "COMPLETE_RETURN_STEP":
+      return state.returnCompletedSteps.includes(action.payload)
+        ? state
+        : { ...state, returnCompletedSteps: [...state.returnCompletedSteps, action.payload] };
+
+    case "TOGGLE_RETURN_STEP":
+      return state.returnExpandedSteps.includes(action.payload)
+        ? { ...state, returnExpandedSteps: state.returnExpandedSteps.filter(s => s !== action.payload) }
+        : { ...state, returnExpandedSteps: [...state.returnExpandedSteps, action.payload] };
+
+    case "COLLAPSE_AFTER_RETURN_STEP":
+      return {
+        ...state,
+        returnExpandedSteps: state.returnExpandedSteps.filter(s => s <= action.payload)
+      };
+
+    case "EXPAND_ONLY_RETURN_STEP":
+      return {
+        ...state,
+        returnExpandedSteps: [action.payload]
+      };
+
+    case "TOGGLE_RETURN_SUMMARY":
+      return state.returnSummarySteps.includes(action.payload)
+        ? { ...state, returnSummarySteps: state.returnSummarySteps.filter(s => s !== action.payload) }
+        : { ...state, returnSummarySteps: [...state.returnSummarySteps, action.payload] };
     
     case "ADD_ONWARD_REMARKS":
       return { 

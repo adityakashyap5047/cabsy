@@ -35,9 +35,15 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
   const step = 1;
   const currentJourney = isReturnJourney ? state.returnJourney : state.onward;
 
-  const isCompleted = state.completedSteps.includes(step);
-  const isExpanded = state.expandedSteps.includes(step);
-  const showSummary = state.summarySteps.includes(step);
+  const isCompleted = isReturnJourney 
+    ? state.returnCompletedSteps.includes(step)
+    : state.completedSteps.includes(step);
+  const isExpanded = isReturnJourney
+    ? state.returnExpandedSteps.includes(step)
+    : state.expandedSteps.includes(step);
+  const showSummary = isReturnJourney
+    ? state.returnSummarySteps.includes(step)
+    : state.summarySteps.includes(step);
 
   const [serviceType, setServiceType] = React.useState<string>(currentJourney?.serviceType || '');
   const [date, setDate] = React.useState<Date | undefined>(currentJourney?.date);
@@ -112,25 +118,25 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
       }
     });
     
-    dispatch({ type: "COMPLETE_STEP", payload: step });
-    dispatch({ type: "TOGGLE_STEP", payload: step });
+    dispatch({ type: isReturnJourney ? "COMPLETE_RETURN_STEP" : "COMPLETE_STEP", payload: step });
+    dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: step });
     
     setTimeout(() => {
       if (!showSummary) {
-        dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+        dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: step });
       }
-      dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
+      dispatch({ type: isReturnJourney ? "EXPAND_ONLY_RETURN_STEP" : "EXPAND_ONLY_STEP", payload: step + 1 });
     }, 100);
   };
 
   const handleEdit = () => {
-    dispatch({ type: "COLLAPSE_AFTER_STEP", payload: step });
-    if(!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: step });
+    dispatch({ type: isReturnJourney ? "COLLAPSE_AFTER_RETURN_STEP" : "COLLAPSE_AFTER_STEP", payload: step });
+    if(!isExpanded) dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: step });
   };
 
   const handleToggleSummary = () => {
     if (isCompleted) {
-      dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+      dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: step });
     }
   };
 

@@ -21,9 +21,16 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
   
   const [hasReturnJourney, setHasReturnJourney] = useState(state.returnEnabled);
   const [isReturnPanelOpen, setIsReturnPanelOpen] = useState(false);
-  const isExpanded = state.expandedSteps.includes(stepNumber);
-  const isCompleted = state.completedSteps.includes(stepNumber);
-  const showSummary = state.summarySteps.includes(stepNumber);
+  const [isReturnJourneySaved, setIsReturnJourneySaved] = useState(false);
+  const isExpanded = isReturnJourney
+    ? state.returnExpandedSteps.includes(stepNumber)
+    : state.expandedSteps.includes(stepNumber);
+  const isCompleted = isReturnJourney
+    ? state.returnCompletedSteps.includes(stepNumber)
+    : state.completedSteps.includes(stepNumber);
+  const showSummary = isReturnJourney
+    ? state.returnSummarySteps.includes(stepNumber)
+    : state.summarySteps.includes(stepNumber);
   const [isEditing, setIsEditing] = useState(false);
 
   const [leadData, setLeadData] = useState({
@@ -124,13 +131,13 @@ console.log(state);
 
   const handleEdit = () => {
     setIsEditing(true);
-    dispatch({ type: "COLLAPSE_AFTER_STEP", payload: stepNumber });
-    if (!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: stepNumber });
+    dispatch({ type: isReturnJourney ? "COLLAPSE_AFTER_RETURN_STEP" : "COLLAPSE_AFTER_STEP", payload: stepNumber });
+    if (!isExpanded) dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: stepNumber });
   };
 
   const handleToggleSummary = () => {
     if (isCompleted) {
-      dispatch({ type: "TOGGLE_SUMMARY", payload: stepNumber });
+      dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: stepNumber });
     }
   };
 
@@ -142,29 +149,109 @@ console.log(state);
     });
   };
 
+  const validateCheckoutForm = () => {
+    // Validate lead passenger details
+    if (!leadData.firstName || !leadData.lastName || !leadData.phoneNumber) {
+      alert('Please fill in all lead passenger details');
+      return false;
+    }
+    
+    // Validate email format if provided
+    if (leadData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadData.email)) {
+      alert('Please enter a valid email address');
+      return false;
+    }
+    
+    // Validate phone number format (basic validation)
+    if (leadData.phoneNumber && leadData.phoneNumber.length < 10) {
+      alert('Please enter a valid phone number');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleDone = () => {
+    if (!validateCheckoutForm()) {
+      return;
+    }
+
+    setIsEditing(false);
+    dispatch({ type: isReturnJourney ? "COMPLETE_RETURN_STEP" : "COMPLETE_STEP", payload: stepNumber });
+    dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: stepNumber });
+    
+    setTimeout(() => {
+      if (!showSummary) {
+        dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: stepNumber });
+      }
+      if (!isReturnJourney) {
+        dispatch({ type: "EXPAND_ONLY_STEP", payload: stepNumber + 1 });
+      }
+    }, 100);
+  };
+
   const handleEnableReturnJourney = () => {
-    setHasReturnJourney(true);
-    dispatch({ type: "ENABLE_RETURN_JOURNEY", payload: true });
-    dispatch({ type: "INITIALIZE_RETURN_JOURNEY" });
-    setIsReturnPanelOpen(true);
+    if (!isReturnJourneySaved) {
+      setHasReturnJourney(true);
+      dispatch({ type: "ENABLE_RETURN_JOURNEY", payload: true });
+      dispatch({ type: "INITIALIZE_RETURN_JOURNEY" });
+      setIsReturnPanelOpen(true);
+    }
   };
 
   const handleDisableReturnJourney = () => {
     setHasReturnJourney(false);
     setIsReturnPanelOpen(false);
+    setIsReturnJourneySaved(false);
     dispatch({ type: "ENABLE_RETURN_JOURNEY", payload: false });
+    dispatch({ type: "CLEAR_RETURN_JOURNEY" });
   };
 
-  const summary = true ? (
+  const validateReturnJourney = () => {
+    const rj = state.returnJourney;
+    if (!rj) return false;
+    
+    // Validate step 1 (ride details)
+    const step1Valid = rj.pickupLocation && rj.dropoffLocation && rj.date && rj.time;
+    
+    // Validate step 2 (checkout - lead passenger)
+    const user = rj.user;
+    const step2Valid = user && user.passengers && user.passengers.length > 0 && 
+      user.passengers[0].name && user.passengers[0].phone;
+    
+    return step1Valid && step2Valid;
+  };
+
+  const handleReturnJourneySave = () => {
+    if (validateReturnJourney()) {
+      setIsReturnJourneySaved(true);
+      return true;
+    }
+    return false;
+  };
+
+  const summary = isCompleted ? (
     <div className="space-y-2 text-sm">
       <div className="flex justify-between">
-        <span className="text-gray-600">Payment Method:</span>
-        {/* <span className="font-medium">{paymentMethod}</span> */}
+        <span className="text-gray-600">Lead Passenger:</span>
+        <span className="font-medium">{leadData.firstName} {leadData.lastName}</span>
       </div>
       <div className="flex justify-between">
-        <span className="text-gray-600">Amount Paid:</span>
-        {/* <span className="font-medium">${paymentAmount.toFixed(2)}</span> */}
+        <span className="text-gray-600">Phone:</span>
+        <span className="font-medium">{leadData.phoneNumber}</span>
       </div>
+      {leadData.email && (
+        <div className="flex justify-between">
+          <span className="text-gray-600">Email:</span>
+          <span className="font-medium">{leadData.email}</span>
+        </div>
+      )}
+      {passengers.length > 0 && (
+        <div className="flex justify-between">
+          <span className="text-gray-600">Additional Passengers:</span>
+          <span className="font-medium">{passengers.length}</span>
+        </div>
+      )}
     </div>
   ) : null;
   return (
@@ -181,9 +268,9 @@ console.log(state);
         summary={summary}
       />
       <div 
-        className="overflow-hidden transition-all duration-700 ease-in-out"
+        className="overflow-hidden transition-all duration-900 ease-in-out"
         style={{
-          maxHeight: isExpanded ? '6000px' : '0',
+          maxHeight: isExpanded ? '5000px' : '0',
           opacity: isExpanded ? 1 : 0
         }}
       >
@@ -206,6 +293,19 @@ console.log(state);
               onPassengersChange={handlePassengersChange}
             />
             <Remarks value={remarks} handleRemarksChange={handleRemarksChange} onChange={setRemarks} />
+            
+            {/* Done Button for Return Journey */}
+            {isReturnJourney && (
+              <div className="mt-6 flex justify-end">
+                <Button
+                  type="button"
+                  onClick={handleDone}
+                  className="bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium py-2 px-8 transition-all duration-200"
+                >
+                  Done
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         {!isReturnJourney && (
@@ -219,14 +319,17 @@ console.log(state);
           </div>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 mt-2 gap-2'>
             <p className="text-sm sm:text-base">Would you like to book return service?</p>
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex w-full sm:w-auto">
               <Button
                 type="button"
                 onClick={handleEnableReturnJourney}
-                className={`rounded-none cursor-pointer border font-medium px-4 sm:px-6 flex-1 sm:flex-none ${
-                  hasReturnJourney
-                    ? 'border-[#AE9404] bg-[#AE9404] text-white hover:bg-[#8a7503]'
-                    : 'border-[#AE9404] text-[#AE9404] bg-transparent hover:text-white hover:bg-[#AE9404]'
+                disabled={isReturnJourneySaved}
+                className={`rounded-none border font-medium px-4 sm:px-6 flex-1 sm:flex-none ${
+                  isReturnJourneySaved
+                    ? 'border-[#AE9404] bg-[#AE9404] cursor-not-allowed'
+                    : hasReturnJourney
+                    ? 'border-[#AE9404] bg-[#AE9404] text-white hover:bg-[#8a7503] cursor-pointer'
+                    : 'border-[#AE9404] text-[#AE9404] bg-transparent hover:text-white hover:bg-[#AE9404] cursor-pointer'
                 }`}
               >
                 Yes
@@ -234,16 +337,56 @@ console.log(state);
               <Button
                 type="button"
                 onClick={handleDisableReturnJourney}
+                disabled={!hasReturnJourney}
                 className={`rounded-none cursor-pointer border font-medium px-4 sm:px-6 flex-1 sm:flex-none ${
                   !hasReturnJourney
-                    ? 'border-gray-400 bg-gray-500 text-white hover:bg-gray-600'
-                    : 'border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500'
+                    ? 'border-gray-500 bg-gray-500 hover:bg-gray-500 cursor-not-allowed text-white'
+                    : 'border-gray-400 text-gray-600 bg-transparent hover:text-gray-400 hover:bg-gray-500'
                 }`}
               >
                 No
               </Button>
             </div>
           </div>
+          
+          {/* Return Journey Summary */}
+          {isReturnJourneySaved && state.returnJourney && (
+            <div className="mt-4 px-4 py-4 bg-green-50 border border-green-200 rounded-md">
+              <h3 className="font-semibold text-green-800 mb-3">Return Journey Summary</h3>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex justify-between">
+                  <span className="font-medium">Pickup:</span>
+                  <span className="text-right">{state.returnJourney.pickupLocation}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Drop-off:</span>
+                  <span className="text-right">{state.returnJourney.dropoffLocation}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Date:</span>
+                  <span>{state.returnJourney.date?.toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Time:</span>
+                  <span>{state.returnJourney.time}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Passengers:</span>
+                  <span>{state.returnJourney.passengers}</span>
+                </div>
+                {state.returnJourney.user?.passengers && state.returnJourney.user.passengers.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-green-200">
+                    <span className="font-medium">Lead Passenger:</span>
+                    <div className="ml-4 mt-1">
+                      <p>{state.returnJourney.user.passengers[0].name}</p>
+                      <p className="text-xs">{state.returnJourney.user.passengers[0].phone}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="bg-gray-100 mt-4 px-4 sm:px-6 py-1 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-800">Promo Code</h2>
           </div>
@@ -298,7 +441,9 @@ console.log(state);
         isOpen={isReturnPanelOpen}
         onClose={() => setIsReturnPanelOpen(false)}
         onSave={() => {
-          console.log('Return journey saved');
+          if (handleReturnJourneySave()) {
+            setIsReturnPanelOpen(false);
+          }
         }}
         outboundBooking={{
           pickupLocation: state.onward.pickupLocation,

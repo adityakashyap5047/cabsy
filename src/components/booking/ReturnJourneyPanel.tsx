@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import AddDetails from './AddDetails';
 import Checkout from './Checkout';
+import { useBooking } from '@/context/BookingContext';
 
 interface ReturnJourneyPanelProps {
   isOpen: boolean;
@@ -25,10 +26,41 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
   onClose,
   onSave,
 }) => {
+  const { state } = useBooking();
+  const [validationError, setValidationError] = useState<string>('');
+  
+  const validateReturnJourney = () => {
+    const rj = state.returnJourney;
+    if (!rj) return { valid: false, error: 'Return journey not initialized' };
+    
+    // Validate step 1 (ride details)
+    if (!rj.pickupLocation || !rj.dropoffLocation) {
+      return { valid: false, error: 'Please fill in pickup and drop-off locations' };
+    }
+    if (!rj.date || !rj.time) {
+      return { valid: false, error: 'Please select date and time for return journey' };
+    }
+    
+    // Validate step 2 (checkout - lead passenger)
+    const user = rj.user;
+    if (!user || !user.passengers || user.passengers.length === 0) {
+      return { valid: false, error: 'Please add passenger information' };
+    }
+    if (!user.passengers[0].name || !user.passengers[0].phone) {
+      return { valid: false, error: 'Please fill in lead passenger name and phone number' };
+    }
+    
+    return { valid: true, error: '' };
+  };
   
   const handleSaveReturnJourney = () => {
-    onSave();
-    onClose();
+    const validation = validateReturnJourney();
+    if (validation.valid) {
+      setValidationError('');
+      onSave();
+    } else {
+      setValidationError(validation.error);
+    }
   };
 
   return (
@@ -67,8 +99,14 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between items-stretch sm:items-center">
-          <Button
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+          {validationError && (
+            <div className="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+              {validationError}
+            </div>
+          )}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between items-stretch sm:items-center">
+            <Button
             variant="outline"
             onClick={onClose}
             className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-full sm:w-auto"
@@ -81,6 +119,7 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
           >
             Save Return Journey
           </Button>
+          </div>
         </div>
       </div>
     </>

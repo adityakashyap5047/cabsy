@@ -40,13 +40,14 @@ const ReturnAddDetailsWrapper: React.FC<ReturnAddDetailsWrapperProps> = ({
     returnEnabled: false,
     returnJourney: undefined,
     payment: null,
-    currentStep: 1,
-    completedSteps: [],
-    expandedSteps: [1],
-    summarySteps: [],
-  };
-
-  const [state, dispatch] = useReducer(bookingReducer, returnInitialState);
+  currentStep: 1,
+  completedSteps: [],
+  expandedSteps: [1],
+  summarySteps: [],
+  returnCompletedSteps: [],
+  returnExpandedSteps: [1],
+  returnSummarySteps: [],
+};  const [state, dispatch] = useReducer(bookingReducer, returnInitialState);
 
   return (
     <ReturnBookingContext.Provider value={{ state, dispatch }}>
