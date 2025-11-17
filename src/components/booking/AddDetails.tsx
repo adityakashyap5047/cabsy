@@ -59,6 +59,20 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
   const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
 
+  // Sync local state with context when currentJourney changes
+  React.useEffect(() => {
+    if (currentJourney) {
+      setServiceType(currentJourney.serviceType || '');
+      setDate(currentJourney.date);
+      setTime(currentJourney.time || null);
+      setPickupLocation(currentJourney.pickupLocation || '');
+      setDropoffLocation(currentJourney.dropoffLocation || '');
+      setStops(currentJourney.stops || []);
+      setPassenger(currentJourney.passengers || 1);
+      setLuggage(currentJourney.luggage || 0);
+    }
+  }, [currentJourney]);
+
   React.useEffect(() => {
     if (justAddedStop && stops.length > 0) {
       const timer = setTimeout(() => {

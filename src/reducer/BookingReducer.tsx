@@ -129,10 +129,10 @@ export default function bookingReducer(state: BookingState, action: BookingActio
           time: null,
           pickupLocation: state.onward.dropoffLocation || "",
           dropoffLocation: state.onward.pickupLocation || "",
-          stops: [],
+          stops: [...state.onward.stops].reverse(),
           passengers: state.onward.passengers,
           luggage: state.onward.luggage,
-          vehicle: state.onward.vehicle,
+          vehicle: undefined,
           remarks: "",
           user: state.onward.user ? { ...state.onward.user } : null,
         }
