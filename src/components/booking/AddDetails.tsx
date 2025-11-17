@@ -25,28 +25,32 @@ import TimeKeeper from "react-timekeeper";
 import { useBooking } from "@/context/BookingContext";
 import StepHeader from "./StepHeader";
 
-export default function AddDetails() {
+interface AddDetailsProps {
+  isReturnJourney?: boolean;
+}
+
+export default function AddDetails({ isReturnJourney = false }: AddDetailsProps) {
   const { state, dispatch } = useBooking();
 
   const step = 1;
-  const { bookingDetails } = state;
+  const currentJourney = isReturnJourney ? state.returnJourney : state.onward;
 
   const isCompleted = state.completedSteps.includes(step);
   const isExpanded = state.expandedSteps.includes(step);
   const showSummary = state.summarySteps.includes(step);
 
-  const [serviceType, setServiceType] = React.useState<string>(bookingDetails.serviceType || '');
-  const [date, setDate] = React.useState<Date | undefined>(bookingDetails.date);
-  const [time, setTime] = React.useState<string | null>(bookingDetails.time);
+  const [serviceType, setServiceType] = React.useState<string>(currentJourney?.serviceType || '');
+  const [date, setDate] = React.useState<Date | undefined>(currentJourney?.date);
+  const [time, setTime] = React.useState<string | null>(currentJourney?.time || null);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
-  const [stops, setStops] = React.useState<string[]>(bookingDetails.stops || []);
+  const [stops, setStops] = React.useState<string[]>(currentJourney?.stops || []);
   const [stopError, setStopError] = React.useState<number | null>(null);
   const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
-  const [pickupLocation, setPickupLocation] = React.useState<string>(bookingDetails.pickupLocation || "");
-  const [dropoffLocation, setDropoffLocation] = React.useState<string>(bookingDetails.dropoffLocation || "");
-  const [passenger, setPassenger] = React.useState<number>(bookingDetails.passengers || 1);
-  const [luggage, setLuggage] = React.useState<number>(bookingDetails.luggage || 0);
+  const [pickupLocation, setPickupLocation] = React.useState<string>(currentJourney?.pickupLocation || "");
+  const [dropoffLocation, setDropoffLocation] = React.useState<string>(currentJourney?.dropoffLocation || "");
+  const [passenger, setPassenger] = React.useState<number>(currentJourney?.passengers || 1);
+  const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
 
   React.useEffect(() => {
@@ -95,7 +99,7 @@ export default function AddDetails() {
     }
     
     dispatch({
-      type: "UPDATE_BOOKING_DETAILS",
+      type: isReturnJourney ? "UPDATE_RETURN_DETAILS" : "UPDATE_ONWARD_DETAILS",
       payload: {
         serviceType,
         date,

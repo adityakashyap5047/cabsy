@@ -6,34 +6,48 @@ interface Passenger {
   phone?: string;
 }
 
+export interface JourneyDetails {
+  serviceType: string;
+  date: Date | undefined;
+  time: string | null;
+  pickupLocation: string;
+  stops: string[];
+  dropoffLocation: string;
+  passengers: number;
+  luggage: number;
+  vehicle?: string;
+  remarks?: string;
+  user?: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } | null;
+}
+
 export interface BookingState {
-  bookingDetails: {
-    serviceType: string;
-    date: Date | undefined;
-    time: string | null;
-    pickupLocation: string;
-    stops: string[];
-    dropoffLocation: string;
-    passengers: number;
-    luggage: number;
-  };
-  vehicle: string | null;
-  user: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } | null;
+  onward: JourneyDetails;
+  returnEnabled: boolean;
+  returnJourney?: JourneyDetails;
+  
   payment: { method?: string; amount?: number; status?: string } | null;
+
   currentStep: number;
   completedSteps: number[];
   expandedSteps: number[];
   summarySteps: number[];
-  remarks: string;
 }
 
 export type BookingAction =
-  | { type: "UPDATE_BOOKING_DETAILS"; payload: Partial<BookingState["bookingDetails"]> }
+  | { type: "UPDATE_ONWARD_DETAILS"; payload: Partial<JourneyDetails> }
+  | { type: "UPDATE_RETURN_DETAILS"; payload: Partial<JourneyDetails> }
+  | { type: "UPDATE_BOOKING_DETAILS"; payload: Partial<JourneyDetails> } // Backward compatibility
+  | { type: "ENABLE_RETURN_JOURNEY"; payload: boolean }
+  | { type: "INITIALIZE_RETURN_JOURNEY" }
   | { type: "SET_VEHICLE"; payload: string }
   | { type: "SET_USER"; payload: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } }
+  | { type: "SET_RETURN_USER"; payload: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } }
   | { type: "ADD_PASSENGER"; payload: Passenger }
   | { type: "UPDATE_PASSENGER"; payload: { index: number; data: Partial<Passenger> } }
   | { type: "REMOVE_PASSENGER"; payload: number }
+  | { type: "ADD_RETURN_PASSENGER"; payload: Passenger }
+  | { type: "UPDATE_RETURN_PASSENGER"; payload: { index: number; data: Partial<Passenger> } }
+  | { type: "REMOVE_RETURN_PASSENGER"; payload: number }
   | { type: "SET_PAYMENT"; payload: { method?: string; amount?: number; status?: string } }
   | { type: "SET_STEP"; payload: number }
   | { type: "COMPLETE_STEP"; payload: number }
@@ -41,11 +55,12 @@ export type BookingAction =
   | { type: "COLLAPSE_AFTER_STEP"; payload: number }
   | { type: "EXPAND_ONLY_STEP"; payload: number }
   | { type: "TOGGLE_SUMMARY"; payload: number }
-  | { type: "ADD_REMARKS"; payload: string }
+  | { type: "ADD_ONWARD_REMARKS"; payload: string }
+  | { type: "ADD_RETURN_REMARKS"; payload: string }
   | { type: "RESET" };
 
 export const initialState: BookingState = {
-  bookingDetails: {
+  onward: {
     serviceType: "",
     date: undefined,
     time: null,
@@ -54,55 +69,160 @@ export const initialState: BookingState = {
     dropoffLocation: "",
     passengers: 1,
     luggage: 0,
+    remarks: "",
+    user: null,
   },
-  vehicle: null,
-  user: null,
+  returnEnabled: false,
+  returnJourney: undefined,
   payment: null,
   currentStep: 1,
   completedSteps: [],
   expandedSteps: [1],
   summarySteps: [],
-  remarks: "",
 };
 
 export default function bookingReducer(state: BookingState, action: BookingAction): BookingState {
   switch (action.type) {
+    case "UPDATE_ONWARD_DETAILS":
+      return { ...state, onward: { ...state.onward, ...action.payload } };
+
+    case "UPDATE_RETURN_DETAILS":
+      return { 
+        ...state, 
+        returnJourney: state.returnJourney 
+          ? { ...state.returnJourney, ...action.payload } 
+          : undefined 
+      };
+
+    case "ENABLE_RETURN_JOURNEY":
+      return { ...state, returnEnabled: action.payload };
+
+    case "INITIALIZE_RETURN_JOURNEY":
+      return {
+        ...state,
+        returnJourney: {
+          serviceType: state.onward.serviceType,
+          date: undefined,
+          time: null,
+          pickupLocation: state.onward.dropoffLocation || "",
+          dropoffLocation: state.onward.pickupLocation || "",
+          stops: [],
+          passengers: state.onward.passengers,
+          luggage: state.onward.luggage,
+          vehicle: state.onward.vehicle,
+          remarks: "",
+          user: state.onward.user ? { ...state.onward.user } : null,
+        }
+      };
+
     case "UPDATE_BOOKING_DETAILS":
-      return { ...state, bookingDetails: { ...state.bookingDetails, ...action.payload } };
+      // Backward compatibility - update onward journey
+      return { ...state, onward: { ...state.onward, ...action.payload } };
 
     case "SET_VEHICLE":
-      return { ...state, vehicle: action.payload, currentStep: 2 };
+      return { ...state, onward: { ...state.onward, vehicle: action.payload }, currentStep: 2 };
 
     case "SET_USER":
-      return { ...state, user: { ...state.user, ...action.payload }, currentStep: 3 };
+      return { 
+        ...state, 
+        onward: { 
+          ...state.onward, 
+          user: { ...state.onward.user, ...action.payload } 
+        }, 
+        currentStep: 3 
+      };
+
+    case "SET_RETURN_USER":
+      return { 
+        ...state, 
+        returnJourney: state.returnJourney 
+          ? { 
+              ...state.returnJourney, 
+              user: { ...state.returnJourney.user, ...action.payload } 
+            }
+          : undefined
+      };
 
     case "ADD_PASSENGER":
       return {
         ...state,
-        user: {
-          ...state.user,
-          passengers: [...(state.user?.passengers || []), action.payload],
+        onward: {
+          ...state.onward,
+          user: {
+            ...state.onward.user,
+            passengers: [...(state.onward.user?.passengers || []), action.payload],
+          },
         },
+      };
+
+    case "ADD_RETURN_PASSENGER":
+      return {
+        ...state,
+        returnJourney: state.returnJourney 
+          ? {
+              ...state.returnJourney,
+              user: {
+                ...state.returnJourney.user,
+                passengers: [...(state.returnJourney.user?.passengers || []), action.payload],
+              },
+            }
+          : undefined,
       };
     
     case "UPDATE_PASSENGER":
       return {
         ...state,
-        user: {
-          ...state.user,
-          passengers: state.user?.passengers?.map((p, i) =>
-              i === action.payload.index ? { ...p, ...action.payload.data } : p
-          ) || [],
+        onward: {
+          ...state.onward,
+          user: {
+            ...state.onward.user,
+            passengers: state.onward.user?.passengers?.map((p, i) =>
+                i === action.payload.index ? { ...p, ...action.payload.data } : p
+            ) || [],
+          },
         },
+      };
+
+    case "UPDATE_RETURN_PASSENGER":
+      return {
+        ...state,
+        returnJourney: state.returnJourney
+          ? {
+              ...state.returnJourney,
+              user: {
+                ...state.returnJourney.user,
+                passengers: state.returnJourney.user?.passengers?.map((p, i) =>
+                    i === action.payload.index ? { ...p, ...action.payload.data } : p
+                ) || [],
+              },
+            }
+          : undefined,
       };
 
     case "REMOVE_PASSENGER":
       return {
         ...state,
-        user: {
-          ...state.user,
-          passengers: state.user?.passengers?.filter((_, i) => i !== action.payload) || [],
+        onward: {
+          ...state.onward,
+          user: {
+            ...state.onward.user,
+            passengers: state.onward.user?.passengers?.filter((_, i) => i !== action.payload) || [],
+          },
         },
+      };
+
+    case "REMOVE_RETURN_PASSENGER":
+      return {
+        ...state,
+        returnJourney: state.returnJourney
+          ? {
+              ...state.returnJourney,
+              user: {
+                ...state.returnJourney.user,
+                passengers: state.returnJourney.user?.passengers?.filter((_, i) => i !== action.payload) || [],
+              },
+            }
+          : undefined,
       };
 
     case "SET_PAYMENT":
@@ -138,8 +258,19 @@ export default function bookingReducer(state: BookingState, action: BookingActio
         ? { ...state, summarySteps: state.summarySteps.filter(s => s !== action.payload) }
         : { ...state, summarySteps: [...state.summarySteps, action.payload] };
     
-    case "ADD_REMARKS":
-      return { ...state, remarks: action.payload };
+    case "ADD_ONWARD_REMARKS":
+      return { 
+        ...state, 
+        onward: { ...state.onward, remarks: action.payload } 
+      };
+
+    case "ADD_RETURN_REMARKS":
+      return { 
+        ...state, 
+        returnJourney: state.returnJourney 
+          ? { ...state.returnJourney, remarks: action.payload }
+          : undefined
+      };
 
     case "RESET":
       return initialState;    
