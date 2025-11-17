@@ -77,7 +77,7 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
       <div
         className={`fixed right-0 top-1/2 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0 -translate-y-1/2' : 'translate-x-full -translate-y-1/2'
-        } w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto max-h-[96vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
+        } w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto h-[96vh] max-h-[96vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
         style={{ scrollbarWidth: 'none' }}
       >
         {/* Header */}
