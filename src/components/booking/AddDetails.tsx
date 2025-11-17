@@ -221,10 +221,10 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
           opacity: isExpanded ? 1 : 0
         }}
       >
-        <div className="p-6 space-y-6">
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="flex items-center gap-16 max-md:flex-col">
-              <div className="space-y-6 w-1/2">
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+            <div className="flex items-start sm:items-center gap-4 md:gap-8 flex-col sm:flex-row">
+              <div className="space-y-3 sm:space-y-4 md:space-y-6 w-full sm:w-1/2">
                 <div className="space-y-2">
                   <Label htmlFor="service">Select Service Type</Label>
                   <Select value={serviceType} onValueChange={setServiceType}>
@@ -240,8 +240,8 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex w-full gap-2">
-                  <div className="space-y-2 w-1/2">
+                <div className="flex w-full gap-2 flex-col min-[392px]:flex-row">
+                  <div className="space-y-2 w-full min-[392px]:w-1/2">
                     <Label>Pick-Up Date</Label>
                     <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
                       <PopoverTrigger asChild>
@@ -282,7 +282,7 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <div className="space-y-2 w-1/2">
+                  <div className="space-y-2 w-full min-[392px]:w-1/2">
                     <Label>Pick-Up Time</Label>
                     <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
                       <PopoverTrigger asChild>
@@ -412,8 +412,9 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                   />
                 </div>
 
-                <div className="flex max-md:hidden max-md:flex-col gap-4">
-                  <div className="space-y-2 min-w-40">
+                {/* Passenger and Luggage - Shows inline on screens 640px and above, below dropoff */}
+                <div className="hidden sm:flex gap-2 sm:gap-3 md:gap-4 flex-col min-[725px]:flex-row">
+                  <div className="space-y-2 flex-1">
                     <Label htmlFor="passengers">Number of Passengers</Label>
                     <div className="flex items-center">
                       <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
@@ -429,29 +430,29 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                         } else {
                           setPassenger(Number(value) || passenger);
                         }
-                        }} />
+                      }} />
                       <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(passenger + 1)}>
                         <Plus />
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-2 min-w-40">
+                  <div className="space-y-2 flex-1">
                     <Label htmlFor="luggage">Luggage Count</Label>
                     <div className="flex items-center">
                       <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
                         <BriefcaseBusinessIcon />
                       </Button>
-                        <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(Math.max(0, luggage - 1))}>
+                      <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(Math.max(0, luggage - 1))}>
                         <Minus />
-                        </Button>
-                        <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={luggage} onChange={(e) => {
+                      </Button>
+                      <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={luggage} onChange={(e) => {
                         const value = e.target.value;
                         if (value === '') {
                           setLuggage(0);
                         } else {
                           setLuggage(Number(value) || luggage);
                         }
-                        }} />
+                      }} />
                       <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(luggage + 1)}>
                         <Plus />
                       </Button>
@@ -459,15 +460,25 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-500 h-100 w-120" />
+              
+              {/* Map Preview - Shows from sm (640px) onwards on the right */}
+              <div className="hidden sm:block bg-gray-300 h-[400px] md:h-[450px] lg:h-[500px] w-full sm:w-1/2 rounded-md">
+                {/* Map will be added here */}
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 md:hidden">
-              <div className="space-y-2 min-w-40">
+            {/* Map Preview - Shows on small screens (below 640px) in the middle of form */}
+            <div className="block sm:hidden bg-gray-300 h-[250px] min-[392px]:h-[300px] w-full rounded-md">
+              {/* Map will be added here */}
+            </div>
+
+            {/* Passenger and Luggage - Shows below map on mobile, inline with form on tablet+ */}
+            <div className="flex gap-2 sm:gap-3 md:gap-4 flex-col min-[392px]:flex-row sm:hidden">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="passengers">Number of Passengers</Label>
                 <div className="flex items-center">
                   <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
-                    <Users className="w-4 h-4 mr-1"/>
+                    <Users className="w-4 h-4"/>
                   </Button>
                   <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(Math.max(1, passenger - 1))}>
                     <Minus />
@@ -479,29 +490,29 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                     } else {
                       setPassenger(Number(value) || passenger);
                     }
-                    }} />
+                  }} />
                   <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setPassenger(passenger + 1)}>
                     <Plus />
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="luggage">Luggage Count</Label>
                 <div className="flex items-center">
                   <Button type="button" variant={"primary"} className="border w-1/5 cursor-context-menu rounded-none border-gray-400">
                     <BriefcaseBusinessIcon />
                   </Button>
-                    <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(Math.max(0, luggage - 1))}>
+                  <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(Math.max(0, luggage - 1))}>
                     <Minus />
-                    </Button>
-                    <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={luggage} onChange={(e) => {
+                  </Button>
+                  <Input className="border w-2/5 rounded-none border-gray-400 text-center" value={luggage} onChange={(e) => {
                     const value = e.target.value;
                     if (value === '') {
                       setLuggage(0);
                     } else {
                       setLuggage(Number(value) || luggage);
                     }
-                    }} />
+                  }} />
                   <Button type="button" variant={"primary"} className="border w-1/5 hover:text-[#AE9409] rounded-none border-gray-400" onClick={() => setLuggage(luggage + 1)}>
                     <Plus />
                   </Button>
@@ -509,12 +520,14 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
               </div>
             </div>
 
-            <Button 
-              type="submit" 
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold text-xl m-4 cursor-pointer py-4 px-12 rounded-none shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Select Vehicle
-            </Button>
+            <div className="flex justify-center sm:justify-start">
+              <Button 
+                type="submit" 
+                className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold text-base sm:text-lg md:text-xl cursor-pointer py-3 md:py-4 px-8 md:px-10 lg:px-12 rounded-none shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Select Vehicle
+              </Button>
+            </div>
           </form>
         </div>
       </div>
