@@ -52,8 +52,8 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
 
   return (
     <div>
-      <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-800">Additional Information</h2>
+      <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+        <h2 className="text-base sm:text-lg font-medium text-gray-800">Additional Information</h2>
       </div>
       <div
         className={`transition-all duration-700 ease-in-out 
@@ -63,17 +63,18 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
           }
         `}
       >
-        <div className="relative mt-4 px-6">
-          <Label className="mb-2">Other Comments or Special Requests (Optional)</Label>
+        <div className="relative mt-3 sm:mt-4 px-3 sm:px-4 md:px-6">
+          <Label className="mb-2 text-xs sm:text-sm">Other Comments or Special Requests (Optional)</Label>
+          <div className="relative mt-2">
           <Textarea
             ref={textareaRef}
-            className="rounded-none pr-12 mt-2"
+            className="rounded-none pr-12 text-sm sm:text-base"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             rows={4}
           />
           {value.trim() && (
-            <div className="absolute top-8 right-8 flex flex-col gap-2">
+            <div className="absolute top-2 right-2 flex flex-col gap-2">
               <Check
                 onClick={handleCheck}
                 className="w-4 h-4 opacity-50 cursor-pointer hover:text-green-600 hover:opacity-100 transition-all duration-200"
@@ -84,6 +85,7 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
               />
             </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -94,11 +96,11 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
             : 'max-h-0 opacity-0 transform -translate-y-4'
         }`}
       >
-        <div className="px-6">
+        <div className="px-4 md:px-6">
           <div className="group p-4 bg-gray-50 border border-gray-200 rounded relative">
-            <p className="text-gray-800 whitespace-pre-wrap mr-4">{text}</p>
+            <p className="text-gray-800 whitespace-pre-wrap mr-4 text-sm">{text}</p>
             
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col">
+            <div className="absolute top-2 right-2 opacity-100 group-hover:opacity-100 transition-opacity duration-200 flex flex-col">
               <Button
                 variant="ghost"
                 size="icon"
