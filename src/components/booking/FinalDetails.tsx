@@ -118,18 +118,18 @@ const FinalDetails = () => {
   };
 
   const summary = (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+    <div className="grid grid-cols-1 min-[440px]:grid-cols-2 min-[768px]:grid-cols-4 min-[960px]:grid-cols-3 gap-y-3">
       <div>
         <span className="font-semibold text-gray-600">Guest:</span>{' '}
-        <span className="text-gray-700">{guestData.firstName} {guestData.lastName}</span>
+        <span className="text-gray-700 text-sm">{guestData.firstName} {guestData.lastName}</span>
       </div>
       <div>
         <span className="font-semibold text-gray-600">Phone:</span>{' '}
-        <span className="text-gray-700">{guestData.phoneNumber}</span>
+        <span className="text-gray-700 text-sm">{guestData.phoneNumber}</span>
       </div>
-      <div>
+      <div className='max-[440px]:col-span-1 max-[960px]:col-span-2'>
         <span className="font-semibold text-gray-600">Email:</span>{' '}
-        <span className="text-gray-700">{guestData.email}</span>
+        <span className="text-gray-700 text-sm">{guestData.email}</span>
       </div>
     </div>
   );
