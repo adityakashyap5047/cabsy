@@ -154,55 +154,58 @@ const FinalDetails = () => {
         }}
       >
         <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
-          <div className="w-full md:w-1/2 flex flex-col px-6">
-            <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-800">Log In to your account</h2>
+          <div className="w-full md:w-1/2 flex flex-col px-3 sm:px-4 md:px-6">
+            <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+              <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
             </div>
             
-            <div className="p-6">
-              <form onSubmit={handleLoginSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email" className="text-gray-700 font-medium">
-                    Email Address or Username
-                  </Label>
-                  <Input
-                    id="login-email"
-                    name="email"
-                    type="text"
-                    placeholder="Email Address / Username"
-                    value={loginData.email}
-                    onChange={handleLoginChange}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
-                </div>
+            <div className="p-3 sm:p-4 md:p-6">
+              <form onSubmit={handleLoginSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
+                {/* Email and Password side by side on larger screens */}
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="login-email"
+                      name="email"
+                      type="text"
+                      placeholder="Email Address"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="login-password" className="text-gray-700 font-medium">
-                    Password
-                  </Label>
-                  <Input
-                    id="login-password"
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
+                  <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                    <Label htmlFor="login-password" className="text-gray-700 font-medium text-sm sm:text-base">
+                      Password
+                    </Label>
+                    <Input
+                      id="login-password"
+                      name="password"
+                      type="password"
+                      placeholder="Password"
+                      value={loginData.password}
+                      onChange={handleLoginChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="text-left">
                   <button
                     type="button"
-                    className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
+                    className="text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
                   >
                     Forgot password?
                   </button>
                 </div>
 
-                <div className="text-center text-sm text-gray-600">
+                <div className="text-center text-xs sm:text-sm text-gray-600">
                   Don&apos;t have an account?{' '}
                   <button
                     type="button"
@@ -215,7 +218,7 @@ const FinalDetails = () => {
                 <div className='text-center'>
                   <Button
                       type="submit"
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-3 px-18 rounded-none transition-colors duration-200"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base"
                   >
                       Log in
                   </Button>
@@ -226,16 +229,17 @@ const FinalDetails = () => {
           <div className="hidden md:flex items-stretch">
             <div className="w-px bg-gray-300 mx-0 h-full" />
           </div>
-          <div className="w-full md:w-1/2 flex flex-col justify-center px-6">
-            <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-800">Continue as guest</h2>
+          <div className="w-full md:w-1/2 flex flex-col justify-center px-3 sm:px-4 md:px-6">
+            <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+              <h2 className="text-base sm:text-lg font-medium text-gray-800">Continue as guest</h2>
             </div>
             
-            <div className="p-6">
-              <form onSubmit={handleGuestSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="guest-firstname" className="text-gray-700 font-medium">
+            <div className="p-3 sm:p-4 md:p-6">
+              <form onSubmit={handleGuestSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
+                {/* First Name and Last Name side by side on larger screens */}
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor="guest-firstname" className="text-gray-700 font-medium text-sm sm:text-base">
                       First Name
                     </Label>
                     <Input
@@ -245,13 +249,13 @@ const FinalDetails = () => {
                       placeholder="First Name"
                       value={guestData.firstName}
                       onChange={handleGuestChange}
-                      className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
                       required
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="guest-lastname" className="text-gray-700 font-medium">
+                  <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                    <Label htmlFor="guest-lastname" className="text-gray-700 font-medium text-sm sm:text-base">
                       Last Name
                     </Label>
                     <Input
@@ -261,42 +265,45 @@ const FinalDetails = () => {
                       placeholder="Last Name"
                       value={guestData.lastName}
                       onChange={handleGuestChange}
-                      className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="guest-phone" className="text-gray-700 font-medium">
-                    Phone Number
-                  </Label>
-                  <Input
-                    id="guest-phone"
-                    name="phoneNumber"
-                    type="tel"
-                    placeholder="(555) 555-5555"
-                    value={guestData.phoneNumber}
-                    onChange={handleGuestChange}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
-                </div>
+                {/* Phone and Email side by side on larger screens */}
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor="guest-phone" className="text-gray-700 font-medium text-sm sm:text-base">
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="guest-phone"
+                      name="phoneNumber"
+                      type="tel"
+                      placeholder="(555) 555-5555"
+                      value={guestData.phoneNumber}
+                      onChange={handleGuestChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="guest-email" className="text-gray-700 font-medium">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="guest-email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={guestData.email}
-                    onChange={handleGuestChange}
-                    className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900"
-                    required
-                  />
+                  <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                    <Label htmlFor="guest-email" className="text-gray-700 font-medium text-sm sm:text-base">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="guest-email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={guestData.email}
+                      onChange={handleGuestChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {/* Why do we need this data? */}
@@ -304,12 +311,12 @@ const FinalDetails = () => {
                   <button
                     type="button"
                     onClick={() => setShowDataInfo(!showDataInfo)}
-                    className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center"
+                    className="text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium flex items-center"
                   >
                     Why do we need this data?
                   </button>
                   {showDataInfo && (
-                    <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-gray-600">
+                    <div className="mt-2 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs sm:text-sm text-gray-600">
                       We collect this information to:
                       <ul className="mt-1 ml-4 list-disc">
                         <li>Send you booking confirmations and updates</li>
@@ -323,7 +330,7 @@ const FinalDetails = () => {
                 <div className="flex justify-center">
                   <Button
                     type="submit"
-                    className="bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-3 px-8 rounded-none transition-colors duration-200"
+                    className="bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-none transition-colors duration-200 text-sm sm:text-base"
                   >
                     Continue as guest
                   </Button>
