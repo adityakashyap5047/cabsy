@@ -149,47 +149,6 @@ console.log(state);
     });
   };
 
-  const validateCheckoutForm = () => {
-    // Validate lead passenger details
-    if (!leadData.firstName || !leadData.lastName || !leadData.phoneNumber) {
-      alert('Please fill in all lead passenger details');
-      return false;
-    }
-    
-    // Validate email format if provided
-    if (leadData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadData.email)) {
-      alert('Please enter a valid email address');
-      return false;
-    }
-    
-    // Validate phone number format (basic validation)
-    if (leadData.phoneNumber && leadData.phoneNumber.length < 10) {
-      alert('Please enter a valid phone number');
-      return false;
-    }
-    
-    return true;
-  };
-
-  const handleDone = () => {
-    if (!validateCheckoutForm()) {
-      return;
-    }
-
-    setIsEditing(false);
-    dispatch({ type: isReturnJourney ? "COMPLETE_RETURN_STEP" : "COMPLETE_STEP", payload: stepNumber });
-    dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: stepNumber });
-    
-    setTimeout(() => {
-      if (!showSummary) {
-        dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: stepNumber });
-      }
-      if (!isReturnJourney) {
-        dispatch({ type: "EXPAND_ONLY_STEP", payload: stepNumber + 1 });
-      }
-    }, 100);
-  };
-
   const handleEnableReturnJourney = () => {
     if (!isReturnJourneySaved) {
       setHasReturnJourney(true);
@@ -300,19 +259,6 @@ console.log(state);
               isReturnJourney={isReturnJourney}
             />
             <Remarks value={remarks} handleRemarksChange={handleRemarksChange} onChange={setRemarks} />
-            
-            {/* Done Button for Return Journey */}
-            {isReturnJourney && (
-              <div className="mt-3 sm:mt-4 md:mt-6 flex justify-end">
-                <Button
-                  type="button"
-                  onClick={handleDone}
-                  className="bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium text-sm sm:text-base py-2 px-6 sm:px-8 transition-all duration-200"
-                >
-                  Done
-                </Button>
-              </div>
-            )}
           </div>
         </div>
         {!isReturnJourney && (
@@ -335,7 +281,7 @@ console.log(state);
           </div>
           <div className='flex flex-col min-[420px]:flex-row items-start min-[420px]:items-center justify-between px-3 sm:px-4 md:px-6 mt-2 sm:mt-3 gap-2'>
             <p className="text-xs sm:text-sm md:text-base">Would you like to book return service?</p>
-            <div className="flex w-full min-[420px]:w-auto gap-1">
+            <div className="flex w-full min-[420px]:w-auto">
               <Button
                 type="button"
                 onClick={handleEnableReturnJourney}
@@ -403,6 +349,7 @@ console.log(state);
             </div>
           )}
           
+          {/* Bottom  */}
           <div className="bg-gray-100 mt-3 sm:mt-4 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
             <h2 className="text-base sm:text-lg font-medium text-gray-800">Pricing</h2>
           </div>

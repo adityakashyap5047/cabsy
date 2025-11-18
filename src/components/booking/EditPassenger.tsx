@@ -215,7 +215,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                         </div>
 
                                         {/* Outer Div 1: First Name and Last Name */}
-                                        <div className="my-2">
+                                        <div className="px-2 my-2">
                                             <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                                             <div className="flex-1 space-y-1 sm:space-y-2">
                                                 <Label htmlFor={`firstName-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
@@ -260,7 +260,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                         </div>
 
                                         {/* Outer Div 2: Phone Number and Email Address */}
-                                        <div className="mb-3 sm:mb-4">
+                                        <div className="px-2 mb-4">
                                             <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                                             <div className="flex-1 space-y-1 sm:space-y-2">
                                                 <Label htmlFor={`phoneNumber-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
