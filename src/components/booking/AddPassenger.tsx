@@ -15,9 +15,10 @@ export interface Passenger {
 interface PassengerFormProps {
   passengers: Passenger[];
   onPassengersChange: (passengers: Passenger[]) => void;
+  isReturnJourney?: boolean;
 }
 
-const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersChange }) => {
+const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersChange, isReturnJourney = false }) => {
     
     const [showAddPassenger, setShowAddPassenger] = useState(false);
     const [newPassenger, setNewPassenger] = useState({
@@ -155,7 +156,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                 >
                     {/* Outer Div 1: First Name and Last Name */}
                     <div className="mb-3 sm:mb-4">
-                        <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                        <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                         <div className="flex-1 space-y-1 sm:space-y-2">
                             <Label htmlFor="passenger-first-name" className="text-gray-700 font-medium text-xs sm:text-sm">
                             First Name
@@ -176,7 +177,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                             )}
                         </div>
 
-                        <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                        <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                             <Label htmlFor="passenger-last-name" className="text-gray-700 font-medium text-xs sm:text-sm">
                             Last Name
                             </Label>
@@ -200,7 +201,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
 
                     {/* Outer Div 2: Phone Number and Email Address */}
                     <div className="mb-3 sm:mb-4">
-                        <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                        <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                         <div className="flex-1 space-y-1 sm:space-y-2">
                             <Label htmlFor="passenger-phone" className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Phone Number
@@ -222,7 +223,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                             )}
                         </div>
 
-                        <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                        <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                             <Label htmlFor="passenger-email" className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Email Address
                             </Label>

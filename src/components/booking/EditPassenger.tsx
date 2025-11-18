@@ -17,11 +17,13 @@ export interface Passenger {
 interface PassengerFormProps {
     passengers: Passenger[];
     onPassengersChange: (passengers: Passenger[]) => void;
+    isReturnJourney?: boolean;
 }
 
 const EditPassenger: React.FC<PassengerFormProps> = ({
     passengers,
     onPassengersChange,
+    isReturnJourney = false,
 }) => {
     const [passengerId, setPassengerId] = useState<number | null>(null);  
 
@@ -183,7 +185,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                             <p className="text-xs sm:text-sm font-semibold text-gray-400">{passenger.email}</p>
                                         )}
                                     </div>
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <Button
                                             variant={"primary"}
                                             className="hover:text-[#AE9409]"
@@ -214,7 +216,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
 
                                         {/* Outer Div 1: First Name and Last Name */}
                                         <div className="my-2">
-                                            <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                                            <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                                             <div className="flex-1 space-y-1 sm:space-y-2">
                                                 <Label htmlFor={`firstName-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                     First Name
@@ -235,7 +237,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                 )}
                                             </div>
 
-                                            <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                                            <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                                             <Label htmlFor={`lastName-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                 Last Name
                                             </Label>
@@ -259,7 +261,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
 
                                         {/* Outer Div 2: Phone Number and Email Address */}
                                         <div className="mb-3 sm:mb-4">
-                                            <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                                            <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                                             <div className="flex-1 space-y-1 sm:space-y-2">
                                                 <Label htmlFor={`phoneNumber-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                     Phone Number
@@ -281,7 +283,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                 )}
                                             </div>
 
-                                            <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                                            <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                                                 <Label htmlFor={`email-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                     Email Address
                                                 </Label>

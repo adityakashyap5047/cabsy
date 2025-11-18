@@ -292,10 +292,12 @@ console.log(state);
             <AddPassenger
               passengers={passengers}
               onPassengersChange={handlePassengersChange}
+              isReturnJourney={isReturnJourney}
             />
             <EditPassenger
               passengers={passengers}
               onPassengersChange={handlePassengersChange}
+              isReturnJourney={isReturnJourney}
             />
             <Remarks value={remarks} handleRemarksChange={handleRemarksChange} onChange={setRemarks} />
             
