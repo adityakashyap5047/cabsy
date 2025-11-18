@@ -162,25 +162,25 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
     };
 
     return (
-        <div className="px-6">
-            <div className="space-y-4">
+        <div>
+            <div className="space-y-3 sm:space-y-4">
                 {passengers.length > 0 && (
-                    <div className="space-y-3 mb-4">
-                        <div className="bg-gray-100 px-6 py-1 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-800">Additional Passenger</h2>
+                    <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
+                        <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                            <h2 className="text-base sm:text-lg font-medium text-gray-800">Additional Passenger</h2>
                         </div>
                         {passengers.map((passenger) => (
-                            <div key={passenger.id} className="p-3 border-b">
+                            <div key={passenger.id} className="p-2 border-b">
                                 <div className="group flex justify-between items-start">
                                     <div>
-                                        <p className="font-medium text-gray-800">
+                                        <p className="font-medium text-gray-800 text-sm sm:text-base">
                                             {passenger.firstName} {passenger.lastName}
                                         </p>
                                         {passenger.phoneNumber && (
-                                            <p className="text-sm font-semibold text-gray-400">{passenger.phoneNumber}</p>
+                                            <p className="text-xs sm:text-sm font-semibold text-gray-400">{passenger.phoneNumber}</p>
                                         )}
                                         {passenger.email && (
-                                            <p className="text-sm font-semibold text-gray-400">{passenger.email}</p>
+                                            <p className="text-xs sm:text-sm font-semibold text-gray-400">{passenger.email}</p>
                                         )}
                                     </div>
                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -203,17 +203,20 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
 
                                 <div className={`overflow-hidden transition-all duration-700 ease-in-out ${
                                     passengerId === passenger.id
-                                        ? 'max-h-[600px] opacity-100 transform translate-y-0 mt-4'
+                                        ? 'max-h-[600px] opacity-100 transform translate-y-0 mt-3 sm:mt-4'
                                         : 'max-h-0 opacity-0 transform -translate-y-4'
                                     }`}
                                 >
-                                    <div className="p-4 space-y-4 rounded transition-all duration-700 ease-in-out">
+                                    <div className="pb-4 transition-all duration-700 ease-in-out">
                                         <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
-                                            <h3 className="text-md font-medium text-gray-800">Edit Passenger Information</h3>
+                                            <h3 className="text-sm sm:text-base font-medium text-gray-800">Edit Passenger Info</h3>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-1">
-                                                <Label htmlFor={`firstName-${passenger.id}`} className="text-gray-700 font-medium">
+
+                                        {/* Outer Div 1: First Name and Last Name */}
+                                        <div className="my-2">
+                                            <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                                            <div className="flex-1 space-y-1 sm:space-y-2">
+                                                <Label htmlFor={`firstName-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                     First Name
                                                 </Label>
                                                 <Input
@@ -223,7 +226,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                     placeholder="First Name"
                                                     value={data.firstName}
                                                     onChange={handleChange}
-                                                    className={`w-full px-4 py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
+                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
                                                     errors.firstName ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-yellow-500'
                                                     }`}
                                                 />
@@ -232,8 +235,8 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                 )}
                                             </div>
 
-                                            <div className="space-y-1">
-                                            <Label htmlFor={`lastName-${passenger.id}`} className="text-gray-700 font-medium">
+                                            <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                                            <Label htmlFor={`lastName-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                                 Last Name
                                             </Label>
                                             <Input
@@ -243,7 +246,7 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                 placeholder="Last Name"
                                                 value={data.lastName}
                                                 onChange={handleChange}
-                                                className={`w-full px-4 py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
+                                                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
                                                 errors.lastName ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-yellow-500'
                                                 }`}
                                             />
@@ -251,62 +254,69 @@ const EditPassenger: React.FC<PassengerFormProps> = ({
                                                 <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.lastName}</p>
                                             )}
                                             </div>
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <Label htmlFor={`phoneNumber-${passenger.id}`} className="text-gray-700 font-medium">
-                                                Phone Number (Optional)
-                                            </Label>
-                                            <Input
-                                                ref={phoneNumberRef}
-                                                id={`phoneNumber-${passenger.id}`}
-                                                name="phoneNumber"
-                                                placeholder="(555) 555-5555"
-                                                value={data.phoneNumber}
-                                                onChange={handleChange}
-                                                className={`w-full px-4 py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
-                                                    errors.phoneNumber ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-yellow-500'
-                                                }`}
-                                            />
-                                            <p className="text-xs text-gray-500">International must have preceding + sign and country code</p>
-                                            {errors.phoneNumber && (
-                                                <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.phoneNumber}</p>
-                                            )}
-                                        </div>
+                                        {/* Outer Div 2: Phone Number and Email Address */}
+                                        <div className="mb-3 sm:mb-4">
+                                            <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start">
+                                            <div className="flex-1 space-y-1 sm:space-y-2">
+                                                <Label htmlFor={`phoneNumber-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
+                                                    Phone Number
+                                                </Label>
+                                                <Input
+                                                    ref={phoneNumberRef}
+                                                    id={`phoneNumber-${passenger.id}`}
+                                                    name="phoneNumber"
+                                                    placeholder="(555) 555-5555"
+                                                    value={data.phoneNumber}
+                                                    onChange={handleChange}
+                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
+                                                        errors.phoneNumber ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-yellow-500'
+                                                    }`}
+                                                />
+                                                <p className="text-xs text-gray-500">International must have preceding + sign and country code</p>
+                                                {errors.phoneNumber && (
+                                                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.phoneNumber}</p>
+                                                )}
+                                            </div>
 
-                                        <div className="space-y-1">
-                                            <Label htmlFor={`email-${passenger.id}`} className="text-gray-700 font-medium">
-                                                Email Address (Optional)
-                                            </Label>
-                                            <Input
-                                                ref={emailRef}
-                                                id={`email-${passenger.id}`}
-                                                name="email"
-                                                type="email"
-                                                placeholder=""
-                                                value={data.email}
-                                                onChange={handleChange}
-                                                className={`w-full px-4 py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
+                                            <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                                                <Label htmlFor={`email-${passenger.id}`} className="text-gray-700 font-medium text-xs sm:text-sm">
+                                                    Email Address
+                                                </Label>
+                                                <Input
+                                                    ref={emailRef}
+                                                    id={`email-${passenger.id}`}
+                                                    name="email"
+                                                    type="email"
+                                                    placeholder=""
+                                                    value={data.email}
+                                                    onChange={handleChange}
+                                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 transition-all duration-200 ${
                                                     errors.email ? 'border-red-500 focus:border-red-500 shadow-red-200 shadow-md' : 'border-gray-300 focus:border-yellow-500'
                                                 }`}
                                             />
                                             {errors.email && (
                                                 <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.email}</p>
                                             )}
+                                            </div>
+                                            </div>
                                         </div>
 
-                                        <div className="flex justify-end space-x-3">
+                                        {/* Action Buttons */}
+                                        <div className="flex justify-end space-x-2 sm:space-x-3">
                                             <Button
                                                 type="button"
                                                 onClick={handleCancelEdit}
-                                                className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                                                className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 font-medium text-xs sm:text-sm py-2 px-4 sm:px-6 transition-all duration-200 transform hover:scale-105"
                                             >
                                                 Cancel
                                             </Button>
                                             <Button
                                                 type="button"
                                                 onClick={handleUpdatePassenger}
-                                                className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium py-2 px-6 transition-all duration-200 transform hover:scale-105"
+                                                className="rounded-none cursor-pointer border border-[#AE9404] text-[#AE9404] hover:text-white hover:bg-[#AE9404] bg-transparent font-medium text-xs sm:text-sm py-2 px-4 sm:px-6 transition-all duration-200 transform hover:scale-105"
                                             >
                                                 Update
                                             </Button>

@@ -251,7 +251,7 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                             type="button"
                             variant={"primary"}
                             onClick={handleAddPassenger}
-                            className="rounded-none cursor-pointer border border-[#AE9409] text-[#AE9409] hover:text-white hover:bg-[#AE9409] font-medium text-xs sm:text-sm py-2 px-4 sm:px-6 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                            className="rounded-none cursor-pointer border border-[#AE9409] text-[#AE9409] hover:text-white hover:bg-[#AE9409] font-medium text-xs sm:text-sm py-2 px-8! sm:px-6 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                         >
                             Add
                         </Button>

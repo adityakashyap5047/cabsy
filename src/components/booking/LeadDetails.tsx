@@ -184,7 +184,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
             }`}>
                 <div className="px-2 py-2 sm:py-4 transition-all duration-700 ease-in-out">
                     <div className="bg-gray-100 px-3 sm:px-4 py-2 border-b border-gray-200">
-                        <h3 className="text-sm sm:text-base font-medium text-gray-800">Edit Lead Information</h3>
+                        <h3 className="text-sm sm:text-base font-medium text-gray-800">Edit Lead Info</h3>
                     </div>
 
                     <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 my-4">
