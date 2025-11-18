@@ -63,8 +63,8 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
           }
         `}
       >
-        <div className="relative mt-3 sm:mt-4 px-3 sm:px-4 md:px-6">
-          <Label className="mb-2 text-xs sm:text-sm">Other Comments or Special Requests (Optional)</Label>
+        <div className="relative mt-3 sm:mt-4 px-2">
+          <Label className="mb-2 text-xs sm:text-sm">Other Comments or Special Requests</Label>
           <div className="relative mt-2">
           <Textarea
             ref={textareaRef}
@@ -100,7 +100,7 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
           <div className="group p-4 bg-gray-50 border border-gray-200 rounded relative">
             <p className="text-gray-800 whitespace-pre-wrap mr-4 text-sm">{text}</p>
             
-            <div className="absolute top-2 right-2 opacity-100 group-hover:opacity-100 transition-opacity duration-200 flex flex-col">
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col">
               <Button
                 variant="ghost"
                 size="icon"

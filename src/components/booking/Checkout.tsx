@@ -278,12 +278,12 @@ console.log(state);
           opacity: isExpanded ? 1 : 0
         }}
       >
-      <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0 md:px-8">
-        <div className={`w-full ${!isReturnJourney ? 'md:w-1/2' : ''} flex flex-col px-4 sm:px-6 py-8`}>
-          <div className="bg-gray-100 px-4 sm:px-6 py-1 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-800">Passenger Information</h2>
+      <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0">
+        <div className={`w-full ${!isReturnJourney ? 'md:w-1/2' : ''} flex flex-col`}>
+          <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+            <h2 className="text-base sm:text-lg font-medium text-gray-800">Passenger Information</h2>
           </div>
-          <div className="p-4 sm:p-6">
+          <div className="py-3 sm:py-4 md:py-6">
             <LeadDetails
               lead={leadData}
               onLeadUpdate={handleLeadUpdate}
@@ -300,11 +300,11 @@ console.log(state);
             
             {/* Done Button for Return Journey */}
             {isReturnJourney && (
-              <div className="mt-6 flex justify-end">
+              <div className="mt-3 sm:mt-4 md:mt-6 flex justify-end">
                 <Button
                   type="button"
                   onClick={handleDone}
-                  className="bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium py-2 px-8 transition-all duration-200"
+                  className="bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium text-sm sm:text-base py-2 px-6 sm:px-8 transition-all duration-200"
                 >
                   Done
                 </Button>
@@ -317,9 +317,9 @@ console.log(state);
             <div className="hidden md:flex items-stretch">
               <div className="w-px bg-gray-300 mx-0 h-full" />
             </div>
-            <div className="w-full md:w-1/2 flex flex-col px-4 sm:px-6 py-8">
-          <div className="bg-gray-100 px-4 sm:px-6 py-1 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-800">Return Service</h2>
+            <div className="w-full md:w-1/2 flex flex-col">
+          <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-base sm:text-lg font-medium text-gray-800">Return Service</h2>
             {isReturnJourneySaved && (
               <button
               onClick={handleEditReturnJourney}
@@ -330,14 +330,14 @@ console.log(state);
             </button>
             )}
           </div>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 mt-2 gap-2'>
-            <p className="text-sm sm:text-base">Would you like to book return service?</p>
-            <div className="flex w-full sm:w-auto">
+          <div className='flex flex-col min-[420px]:flex-row items-start min-[420px]:items-center justify-between px-3 sm:px-4 md:px-6 mt-2 sm:mt-3 gap-2'>
+            <p className="text-xs sm:text-sm md:text-base">Would you like to book return service?</p>
+            <div className="flex w-full min-[420px]:w-auto gap-1">
               <Button
                 type="button"
                 onClick={handleEnableReturnJourney}
                 disabled={isReturnJourneySaved}
-                className={`rounded-none border font-medium px-4 sm:px-6 flex-1 sm:flex-none ${
+                className={`rounded-none border font-medium text-xs sm:text-sm md:text-base py-2 px-3 sm:px-4 md:px-6 flex-1 min-[420px]:flex-none ${
                   isReturnJourneySaved
                     ? 'border-[#AE9404] bg-[#AE9404] cursor-not-allowed'
                     : hasReturnJourney
@@ -351,7 +351,7 @@ console.log(state);
                 type="button"
                 onClick={handleDisableReturnJourney}
                 disabled={!hasReturnJourney}
-                className={`rounded-none cursor-pointer border font-medium px-4 sm:px-6 flex-1 sm:flex-none ${
+                className={`rounded-none cursor-pointer border font-medium text-xs sm:text-sm md:text-base py-2 px-3 sm:px-4 md:px-6 flex-1 min-[420px]:flex-none ${
                   !hasReturnJourney
                     ? 'border-gray-500 bg-gray-500 hover:bg-gray-500 cursor-not-allowed text-white'
                     : 'border-gray-400 text-gray-600 bg-transparent hover:text-gray-400 hover:bg-gray-500'
@@ -364,9 +364,9 @@ console.log(state);
           
           {/* Return Journey Summary */}
           {isReturnJourneySaved && state.returnJourney && (
-            <div className="mt-4 px-4 py-4 bg-green-50 border border-green-200 rounded-md">
-              <h3 className="font-semibold text-green-800 mb-3">Return Journey Summary</h3>
-              <div className="space-y-2 text-sm text-gray-700">
+            <div className="mt-3 sm:mt-4 mx-3 sm:mx-4 md:mx-6 px-3 sm:px-4 py-3 sm:py-4 bg-green-50 border border-green-200 rounded-md">
+              <h3 className="font-semibold text-green-800 mb-2 sm:mb-3 text-sm sm:text-base">Return Journey Summary</h3>
+              <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
                 <div className="flex justify-between">
                   <span className="font-medium">Pickup:</span>
                   <span className="text-right">{state.returnJourney.pickupLocation}</span>
@@ -400,24 +400,24 @@ console.log(state);
             </div>
           )}
           
-          <div className="bg-gray-100 mt-4 px-4 sm:px-6 py-1 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-800">Pricing</h2>
+          <div className="bg-gray-100 mt-3 sm:mt-4 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+            <h2 className="text-base sm:text-lg font-medium text-gray-800">Pricing</h2>
           </div>
           <div>
-            <div className="bg-gray-50 flex justify-between mt-4 px-4 sm:px-12 py-1 border-b border-gray-100">
-              <p className='font-semibold text-gray-500'>Base Fare</p>
-              <p className='font-semibold text-gray-500'>$6719.39</p>
+            <div className="bg-gray-50 flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-1 border-b border-gray-100">
+              <p className='font-semibold text-gray-500 text-sm sm:text-base'>Base Fare</p>
+              <p className='font-semibold text-gray-500 text-sm sm:text-base'>$6719.39</p>
             </div>
           </div>
           <div>
-            <div className="bg-slate-800 rounded flex justify-between mt-4 px-4 sm:px-12 py-4 border-b border-gray-100">
-              <p className='text-xl font-semibold text-gray-400'>Total</p>
-              <p className='text-xl font-semibold text-gray-400'>$6719.39</p>
+            <div className="bg-slate-800 rounded flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-3 sm:py-4 border-b border-gray-100">
+              <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>Total</p>
+              <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>$6719.39</p>
             </div>
           </div>
           <Button
             type="submit"
-            className={`w-full mt-4 bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium py-3 px-6 transition-all duration-200 hover:shadow-lg transform
+            className={`w-full mt-3 sm:mt-4 bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium text-sm sm:text-base py-2 sm:py-3 px-4 sm:px-6 transition-all duration-200 hover:shadow-lg transform
             }`}
           >
             Proceed to Payment
