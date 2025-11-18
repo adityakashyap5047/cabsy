@@ -29,6 +29,20 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
   const { state } = useBooking();
   const [validationError, setValidationError] = useState<string>('');
   
+  // Prevent background scrolling when panel is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+  
   const validateReturnJourney = () => {
     const rj = state.returnJourney;
     if (!rj) return { valid: false, error: 'Return journey not initialized' };
@@ -65,7 +79,7 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - Prevents background interaction */}
       <div
         className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
@@ -77,8 +91,8 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
       <div
         className={`fixed right-0 top-1/2 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0 -translate-y-1/2' : 'translate-x-full -translate-y-1/2'
-        } w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto h-[96vh] max-h-[96vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
-        style={{ scrollbarWidth: 'none' }}
+        } bg-white shadow-2xl z-50 overflow-y-auto h-[96vh] max-h-[90vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
+        style={{ scrollbarWidth: 'none', width: '340px', maxWidth: '90vw' }}
       >
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center z-10">
@@ -95,7 +109,7 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         {/* Content */}
         <div className="p-4 sm:p-6 space-y-6">
           {/* Step 1: Return Ride Details */}
-          <AddDetails isReturnJourney={true} />
+          <AddDetails isReturnJourney={true} forceMobileLayout={true} />
 
           {/* Step 2: Passenger Management */}
           <Checkout isReturnJourney={true} />

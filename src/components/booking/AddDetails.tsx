@@ -27,9 +27,10 @@ import StepHeader from "./StepHeader";
 
 interface AddDetailsProps {
   isReturnJourney?: boolean;
+  forceMobileLayout?: boolean;
 }
 
-export default function AddDetails({ isReturnJourney = false }: AddDetailsProps) {
+export default function AddDetails({ isReturnJourney = false, forceMobileLayout = false }: AddDetailsProps) {
   const { state, dispatch } = useBooking();
 
   const step = 1;
@@ -221,10 +222,10 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
           opacity: isExpanded ? 1 : 0
         }}
       >
-        <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-            <div className="flex items-start sm:items-center gap-4 md:gap-8 flex-col sm:flex-row">
-              <div className="space-y-3 sm:space-y-4 md:space-y-6 w-full sm:w-1/2">
+        <div className={forceMobileLayout ? "p-3 space-y-4" : "p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6"}>
+          <form className={forceMobileLayout ? "space-y-4" : "space-y-4 sm:space-y-6"} onSubmit={handleSubmit}>
+            <div className={forceMobileLayout ? "flex items-start gap-4 flex-col" : "flex items-start sm:items-center gap-4 md:gap-8 flex-col sm:flex-row"}>
+              <div className={forceMobileLayout ? "space-y-3 w-full" : "space-y-3 sm:space-y-4 md:space-y-6 w-full sm:w-1/2"}>
                 <div className="space-y-2">
                   <Label htmlFor="service">Select Service Type</Label>
                   <Select value={serviceType} onValueChange={setServiceType}>
@@ -240,8 +241,8 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex w-full gap-2 flex-col min-[392px]:flex-row">
-                  <div className="space-y-2 w-full min-[392px]:w-1/2">
+                <div className={forceMobileLayout ? "flex w-full gap-2 flex-col" : "flex w-full gap-2 flex-col min-[392px]:flex-row"}>
+                  <div className={forceMobileLayout ? "space-y-2 w-full" : "space-y-2 w-full min-[392px]:w-1/2"}>
                     <Label>Pick-Up Date</Label>
                     <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
                       <PopoverTrigger asChild>
@@ -282,7 +283,7 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <div className="space-y-2 w-full min-[392px]:w-1/2">
+                  <div className={forceMobileLayout ? "space-y-2 w-full" : "space-y-2 w-full min-[392px]:w-1/2"}>
                     <Label>Pick-Up Time</Label>
                     <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
                       <PopoverTrigger asChild>
@@ -413,7 +414,7 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
                 </div>
 
                 {/* Passenger and Luggage - Shows inline on screens 640px and above, below dropoff */}
-                <div className="hidden sm:flex gap-2 sm:gap-3 md:gap-4 flex-col min-[725px]:flex-row">
+                <div className={forceMobileLayout ? "hidden" : "hidden sm:flex gap-2 sm:gap-3 md:gap-4 flex-col min-[725px]:flex-row"}>
                   <div className="space-y-2 flex-1">
                     <Label htmlFor="passengers">Number of Passengers</Label>
                     <div className="flex items-center">
@@ -462,18 +463,18 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
               </div>
               
               {/* Map Preview - Shows from sm (640px) onwards on the right */}
-              <div className="hidden sm:block bg-gray-300 h-[400px] md:h-[450px] lg:h-[500px] w-full sm:w-1/2 rounded-md">
+              <div className={forceMobileLayout ? "hidden" : "hidden sm:block bg-gray-300 h-[400px] md:h-[450px] lg:h-[500px] w-full sm:w-1/2 rounded-md"}>
                 {/* Map will be added here */}
               </div>
             </div>
 
             {/* Map Preview - Shows on small screens (below 640px) in the middle of form */}
-            <div className="block sm:hidden bg-gray-300 h-[250px] min-[392px]:h-[300px] w-full rounded-md">
+            <div className={forceMobileLayout ? "block bg-gray-300 h-[250px] w-full rounded-md" : "block sm:hidden bg-gray-300 h-[250px] min-[392px]:h-[300px] w-full rounded-md"}>
               {/* Map will be added here */}
             </div>
 
             {/* Passenger and Luggage - Shows below map on mobile, inline with form on tablet+ */}
-            <div className="flex gap-2 sm:gap-3 md:gap-4 flex-col min-[392px]:flex-row sm:hidden">
+            <div className={forceMobileLayout ? "flex gap-2 flex-col" : "flex gap-2 sm:gap-3 md:gap-4 flex-col min-[392px]:flex-row sm:hidden"}>
               <div className="space-y-2 flex-1">
                 <Label htmlFor="passengers">Number of Passengers</Label>
                 <div className="flex items-center">
@@ -520,7 +521,7 @@ export default function AddDetails({ isReturnJourney = false }: AddDetailsProps)
               </div>
             </div>
 
-            <div className="flex justify-center sm:justify-start">
+            <div className={forceMobileLayout ? "flex justify-center" : "flex justify-center sm:justify-start"}>
               <Button 
                 type="submit" 
                 className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold text-base sm:text-lg md:text-xl cursor-pointer py-3 md:py-4 px-8 md:px-10 lg:px-12 rounded-none shadow-lg transform hover:scale-105 transition-all duration-200"
