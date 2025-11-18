@@ -159,10 +159,9 @@ const FinalDetails = () => {
               <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
             </div>
             
-            <div className="p-3 sm:p-4 md:p-6">
+            <div className="p-2 sm:p-4">
               <form onSubmit={handleLoginSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
-                {/* Email and Password side by side on larger screens */}
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
                       Email Address
@@ -234,10 +233,10 @@ const FinalDetails = () => {
               <h2 className="text-base sm:text-lg font-medium text-gray-800">Continue as guest</h2>
             </div>
             
-            <div className="p-3 sm:p-4 md:p-6">
+            <div className="p-2 sm:p-4">
               <form onSubmit={handleGuestSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
                 {/* First Name and Last Name side by side on larger screens */}
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-firstname" className="text-gray-700 font-medium text-sm sm:text-base">
                       First Name
@@ -272,7 +271,7 @@ const FinalDetails = () => {
                 </div>
 
                 {/* Phone and Email side by side on larger screens */}
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-phone" className="text-gray-700 font-medium text-sm sm:text-base">
                       Phone Number
