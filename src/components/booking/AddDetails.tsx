@@ -156,48 +156,46 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   };
 
   const summary = (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-y-3">
-      <div className="space-y-3">
-        <div>
-          <span className="font-semibold text-gray-700">
-            {date && format(date, "MM/dd/yyyy")} {time}
+    <div className="grid grid-cols-2 gap-y-3">
+      <div className="space-y-2 sm:space-y-3">
+        <div className="flex gap-1 flex-wrap">
+          <span className="font-semibold text-gray-700 text-sm sm:text-base">
+            {date && format(date, "MM/dd/yyyy")}
+          </span>
+          <span className="font-semibold text-gray-700 text-sm sm:text-base">
+            {time}
           </span>
         </div>
-        <div className="flex gap-4">
-          <div>
-            <span className="font-semibold text-gray-600">Passenger:</span>{' '}
-            <span className="text-gray-700">{passenger}</span>
-          </div>
-          <div>
-            <span className="font-semibold text-gray-600">Luggage:</span>{' '}
-            <span className="text-gray-700">{luggage}</span>
-          </div>
+        <div>
+          <span className="font-semibold text-gray-600 text-sm">Passenger:</span>{' '}
+          <span className="text-gray-700 text-sm">{passenger}</span>
         </div>
+        <div>
+          <span className="font-semibold text-gray-600 text-sm">Luggage:</span>{' '}
+          <span className="text-gray-700 text-sm">{luggage}</span>
+        </div>
+        <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-600">
+          Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">$124.50</span>
+        </h1>
       </div>
       
-      <div className="space-y-3">
+      <div className="space-y-3 justify-self-end">
         <div className="flex items-start gap-2">
           <MapPin className="w-4 h-4 mt-1 text-green-500 flex-shrink-0" />
-          <span className="text-green-400 font-semibold">{pickupLocation}</span>
+          <span className="text-green-400 font-semibold text-sm break-words">{pickupLocation}</span>
         </div>
         {
           stops && stops?.length > 0 && stops.map((stop, idx) => (
             <div key={idx} className="flex ml-4 items-start gap-2">
               <MapPin className="w-4 h-4 mt-1 text-yellow-500 flex-shrink-0" />
-              <span className="text-yellow-400 font-semibold">{stop}</span>
+              <span className="text-yellow-400 font-semibold text-sm break-words">{stop}</span>
             </div>
           ))
         }
         <div className="flex items-start gap-2">
           <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
-          <span className="text-red-400 font-semibold">{dropoffLocation}</span>
+          <span className="text-red-400 font-semibold text-sm break-words">{dropoffLocation}</span>
         </div>
-      </div>
-      <div className="">
-        {/* <span>{serviceType}</span> */}
-        <h1 className="text-xl font-semibold text-gray-600">
-        Estimated Fare: <span className="text-yellow-600 text-sm font-semibold">$124.50</span>
-      </h1>
       </div>
     </div>
   );
