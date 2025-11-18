@@ -12,9 +12,10 @@ interface LeadDetailsProps {
     email: string;
   };
   onLeadUpdate?: (lead: { firstName: string; lastName: string; phoneNumber: string; email: string }) => void;
+  isReturnJourney?: boolean;
 }
 
-const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
+const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate, isReturnJourney = false}) => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [data, setData] = useState({
@@ -187,7 +188,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
                         <h3 className="text-sm sm:text-base font-medium text-gray-800">Edit Lead Info</h3>
                     </div>
 
-                    <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 my-4">
+                    <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4' : ''} my-4`}>
                         <div className="flex-1 space-y-1 sm:space-y-2">
                             <Label htmlFor="firstName" className="text-gray-700 font-medium text-xs sm:text-sm">
                                 First Name
@@ -208,7 +209,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
                             )}
                         </div>
 
-                        <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                        <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                             <Label htmlFor="lastName" className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Last Name
                             </Label>
@@ -230,7 +231,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
                     </div>
 
                     <div className="mb-3 sm:mb-4">
-                        <div className="flex flex-col min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start my-4">
+                        <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''} my-4`}>
                             <div className="flex-1 space-y-1 sm:space-y-2">
                                 <Label htmlFor="phoneNumber" className="text-gray-700 font-medium text-xs sm:text-sm">
                                     Phone Number
@@ -252,7 +253,7 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate}) => {
                                 )}
                             </div>
 
-                            <div className="flex-1 space-y-1 sm:space-y-2 mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0">
+                            <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
                                 <Label htmlFor="email" className="text-gray-700 font-medium text-xs sm:text-sm">
                                     Email Address
                                 </Label>

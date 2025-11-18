@@ -287,6 +287,7 @@ console.log(state);
             <LeadDetails
               lead={leadData}
               onLeadUpdate={handleLeadUpdate}
+              isReturnJourney={isReturnJourney}
             />
             <AddPassenger
               passengers={passengers}
