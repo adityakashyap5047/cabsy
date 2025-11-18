@@ -156,8 +156,8 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   };
 
   const summary = (
-    <div className="grid grid-cols-2 gap-y-3 px-0 sm:px-4 md:px-24 lg:px-32">
-      <div className="space-y-2 sm:space-y-3">
+    <div className={`grid grid-cols-2 gap-y-3 ${isReturnJourney ? 'px-0' : 'px-0 sm:px-4 md:px-24 lg:px-32'}`}>
+      <div className="space-y-2 sm:space-y-3 min-w-[114px]">
         <div className="flex gap-1 flex-wrap">
           <span className="font-semibold text-gray-700 text-sm sm:text-base">
             {date && format(date, "MM/dd/yyyy")}
