@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import AddDetails from './AddDetails';
+import AddDetails, { AddDetailsRef } from './AddDetails';
 import Checkout from './Checkout';
 import { useBooking } from '@/context/BookingContext';
 
@@ -27,11 +27,13 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
   onSave,
 }) => {
   const { state, dispatch } = useBooking();
+  const addDetailsRef = React.useRef<AddDetailsRef>(null);
   const step = 2;
   const showSummary = state.returnSummarySteps.includes(step);
   const isExpanded = state.returnExpandedSteps.includes(step);
+  const is1Expanded = state.returnExpandedSteps.includes(1);
+  const is1HasSummary = state.returnSummarySteps.includes(1);
 
-  // Prevent background scrolling when panel is open
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -39,13 +41,30 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
       document.body.style.overflow = 'unset';
     }
     
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
   
   const handleSaveReturnJourney = () => {
+    const isStep1Valid = addDetailsRef.current?.validateAndFocus();
+    if (!isStep1Valid) {
+      return;
+    }
+    if(is1Expanded) {
+      dispatch({ type: "COMPLETE_RETURN_STEP", payload: 1 });
+      dispatch({ type: "TOGGLE_RETURN_STEP", payload: 1 });
+      if (!is1HasSummary) {
+        setTimeout(() => {
+          dispatch({ type: "TOGGLE_RETURN_SUMMARY", payload: 1 });
+        }, 50);
+      }
+      if (!showSummary) {
+        setTimeout(() => {
+          dispatch({ type: "TOGGLE_RETURN_SUMMARY", payload: step });
+        }, 50);
+      }
+    }
     dispatch({ type: "COMPLETE_RETURN_STEP", payload: step });
     setTimeout(() => {
       if(isExpanded && !showSummary) dispatch({ type: "TOGGLE_RETURN_SUMMARY", payload: step });
@@ -53,14 +72,13 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         if(isExpanded) dispatch({ type: "TOGGLE_RETURN_STEP", payload: step });
         setTimeout(() => {
           onSave();
-        }, 300);
+        }, (isExpanded || is1Expanded) ? 1300 : 0);
       }, 100);
     }, 50);
   };
 
   return (
     <>
-      {/* Backdrop - Prevents background interaction */}
       <div
         className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
@@ -68,14 +86,12 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         onClick={onClose}
       />
 
-      {/* Side Panel */}
       <div
-        className={`fixed right-0 top-1/2 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-1/2 transform transition-transform duration-700 ease-in-out ${
           isOpen ? 'translate-x-0 -translate-y-1/2' : 'translate-x-full -translate-y-1/2'
         } bg-white shadow-2xl z-50 overflow-y-auto h-[96vh] max-h-[90vh] border-y-4 border-y-gray-400 border-l-4 border-l-gray-400`}
         style={{ scrollbarWidth: 'none', width: '340px', maxWidth: '90vw' }}
       >
-        {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center z-10">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Return Journey</h2>
           <button
@@ -86,17 +102,11 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
             <X className="w-6 h-6 text-gray-600" />
           </button>
         </div>
-
-        {/* Content */}
         <div className="p-4 sm:p-6 space-y-6">
-          {/* Step 1: Return Ride Details */}
-          <AddDetails isReturnJourney={true} forceMobileLayout={true} />
-
-          {/* Step 2: Passenger Management */}
+          <AddDetails ref={addDetailsRef} isReturnJourney={true} forceMobileLayout={true} />
           <Checkout isReturnJourney={true} />
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200 max-[360px]:px-4 px-6 py-4">
           <div className="flex flex-row gap-0 justify-between items-center">
             <Button
