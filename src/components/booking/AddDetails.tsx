@@ -30,7 +30,11 @@ interface AddDetailsProps {
   forceMobileLayout?: boolean;
 }
 
-export default function AddDetails({ isReturnJourney = false, forceMobileLayout = false }: AddDetailsProps) {
+export interface AddDetailsRef {
+  validateAndFocus: () => boolean;
+}
+
+const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJourney = false, forceMobileLayout = false }, ref) => {
   const { state, dispatch } = useBooking();
 
   const step = 1;
@@ -117,9 +121,9 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   }, [stopError, stopFocusTrigger]);
 
   const handleAddStop = () => {
-    if (stops.length > 0 && stops[stops.length - 1].trim() === "") {
-      const errorIndex = stops.length - 1;
-      setStopError(errorIndex);
+    const firstEmptyIndex = stops.findIndex(stop => stop.trim() === "");
+    if (firstEmptyIndex !== -1) {
+      setStopError(firstEmptyIndex);
       setStopFocusTrigger(prev => prev + 1);
       return;
     }
@@ -140,6 +144,40 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
       setStopError(null);
     }
   }
+
+  React.useImperativeHandle(ref, () => ({
+    validateAndFocus: () => {
+      const validation = validateForm();
+      if (!validation.isValid) {
+        if (validation.errors.serviceType && serviceTypeRef.current) {
+          serviceTypeRef.current.click();
+        } else if (validation.errors.date && dateRef.current) {
+          if (!date) {
+            setDate(new Date()); // Auto-fill current date
+          }
+          setShowDatePicker(true); // Open the date popover
+          dateRef.current.focus();
+        } else if (validation.errors.time && timeRef.current) {
+          if (!time) {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            setTime(`${hours}:${minutes}`); // Auto-fill current time
+          }
+          setShowTimePicker(true); // Open the time popover
+          timeRef.current.focus();
+        } else if (validation.errors.pickupLocation && pickupRef.current) {
+          pickupRef.current.focus();
+        } else if (validation.stopErrorIndex !== null && stopRefs.current[validation.stopErrorIndex]) {
+          // Focus on the empty stop input (checked after pickup)
+          stopRefs.current[validation.stopErrorIndex]?.focus();
+        } else if (validation.errors.dropoffLocation && dropoffRef.current) {
+          dropoffRef.current.focus();
+        }
+      }
+      return validation.isValid;
+    }
+  }));
 
   const validateForm = () => {
     const validationErrors = {
@@ -176,14 +214,16 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
 
     setErrors(validationErrors);
     
-    // Only set stop error if there are no higher priority errors (serviceType, date, time, pickup)
-    const hasHigherPriorityError = validationErrors.serviceType || validationErrors.date || 
-                                     validationErrors.time || validationErrors.pickupLocation;
-    
-    if (hasStopError && !hasHigherPriorityError) {
+    // Always set stop error if there is one
+    if (hasStopError) {
       setStopError(emptyStopIndex);
-      setStopFocusTrigger(prev => prev + 1);
-    } else if (!hasStopError) {
+      // Only trigger focus if there are no higher priority errors (serviceType, date, time, pickup)
+      const hasHigherPriorityError = validationErrors.serviceType || validationErrors.date || 
+                                       validationErrors.time || validationErrors.pickupLocation;
+      if (!hasHigherPriorityError) {
+        setStopFocusTrigger(prev => prev + 1);
+      }
+    } else {
       setStopError(null);
     }
 
@@ -670,4 +710,8 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
       </div>
     </div>
   );
-}
+});
+
+AddDetails.displayName = 'AddDetails';
+
+export default AddDetails;
