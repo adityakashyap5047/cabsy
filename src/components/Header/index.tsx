@@ -3,12 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Car, Menu, X, User, MapPin, Phone, Clock } from 'lucide-react';
+import { Car, Menu, X, User, MapPin, Phone, Clock, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -40,7 +46,6 @@ const Header = () => {
         >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-            {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
                 <div className="bg-linear-to-r from-yellow-500 to-orange-600 rounded-lg p-2 group-hover:scale-110 transition-transform duration-300">
                 <Car className="h-7 w-7 text-white" />
@@ -49,7 +54,7 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden md:flex items-center space-x-1">
                 {navLinks.map((link) => (
                 <Link
                     key={link.href}
@@ -65,46 +70,80 @@ const Header = () => {
                 ))}
             </nav>
 
-            {/* Desktop Action Buttons */}
-            <div className="hidden lg:flex items-center space-x-4">
-                <Button
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
-                asChild
-                >
-                <Link href="/login">
-                    <User className="h-4 w-4 mr-2" />
-                    Login
-                </Link>
-                </Button>
-                <Button
-                className="bg-linear-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                asChild
-                >
-                <Link href="/ride">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Book Now
-                </Link>
-                </Button>
-            </div>
+            {/* User Menu - Always visible */}
+            <div className="flex items-center gap-2">
+              <Popover open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="rounded-full cursor-pointer h-11 w-11 p-0 border-2 border-orange-400 bg-gradient-to-br from-orange-100 to-orange-200 hover:from-orange-200 hover:to-orange-300 flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <User className="h-6 w-6 text-orange-600" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0" align="end">
+                  <div className="flex flex-col">
+                    <Link
+                      href="/ride"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors border-b border-gray-100"
+                    >
+                      <div className="bg-orange-100 p-2 rounded-lg">
+                        <MapPin className="h-4 w-4 text-orange-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-900">Book Now</span>
+                        <span className="text-xs text-gray-500">Reserve your ride</span>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                    >
+                      <div className="bg-gray-100 p-2 rounded-lg">
+                        <LogIn className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900">Login</span>
+                        <span className="text-xs text-gray-500">Access your account</span>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="bg-gray-100 p-2 rounded-lg">
+                        <UserPlus className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900">Register</span>
+                        <span className="text-xs text-gray-500">Create new account</span>
+                      </div>
+                    </Link>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-            {/* Mobile Menu Button */}
-            <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                aria-label="Toggle menu"
-            >
-                {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-                ) : (
-                <Menu className="h-6 w-6" />
-                )}
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                  aria-label="Toggle menu"
+              >
+                  {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                  ) : (
+                  <Menu className="h-6 w-6" />
+                  )}
+              </button>
+            </div>
             </div>
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-            <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
+            <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
                 <nav className="flex flex-col space-y-2 mt-4">
                 {navLinks.map((link) => (
                     <Link
