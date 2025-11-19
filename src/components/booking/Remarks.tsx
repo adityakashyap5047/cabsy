@@ -15,13 +15,14 @@ interface RemarksProps {
 const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange }) => {
   const [isEditing, setIsEditing] = useState(true);
   const [text, setText] = useState('');
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
+    if (isEditing && hasUserInteracted && textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [isEditing]);
+  }, [isEditing, hasUserInteracted]);
 
   const handleCheck = () => {
     if (value.trim()) {
@@ -32,6 +33,7 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
   };
 
   const handleClear = () => {
+    setHasUserInteracted(true);
     onChange('');
     handleRemarksChange('');
     if (textareaRef.current) {
@@ -40,10 +42,12 @@ const Remarks: React.FC<RemarksProps> = ({ value, onChange, handleRemarksChange 
   };
 
   const handleEdit = () => {
+    setHasUserInteracted(true);
     setIsEditing(true);
   };
 
   const handleDelete = () => {
+    setHasUserInteracted(true);
     setText('');
     onChange('');
     handleRemarksChange('');
