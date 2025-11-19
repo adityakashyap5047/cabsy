@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Mail, Lock, AlertCircle, ArrowRight, User, Phone, X } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ArrowRight, User, Phone, X, Eye, EyeOff } from 'lucide-react';
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -36,6 +36,8 @@ const RegisterPage = () => {
     general: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -348,15 +350,23 @@ const RegisterPage = () => {
                   ref={passwordRef}
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className={`pl-10 h-11 border-gray-200 focus:border-orange-500 focus:ring-orange-500 ${
+                  className={`pl-10 pr-10 h-11 border-gray-200 focus:border-orange-500 focus:ring-orange-500 ${
                     errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
                   }`}
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600 focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
               {errors.password && (
                 <p className="text-xs text-red-600">
@@ -376,15 +386,23 @@ const RegisterPage = () => {
                   ref={confirmPasswordRef}
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className={`pl-10 h-11 border-gray-200 focus:border-orange-500 focus:ring-orange-500 ${
+                  className={`pl-10 pr-10 h-11 border-gray-200 focus:border-orange-500 focus:ring-orange-500 ${
                     errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
                   }`}
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 focus:outline-none"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
               {errors.confirmPassword && (
                 <p className="text-xs text-red-600">
@@ -428,6 +446,7 @@ const RegisterPage = () => {
           <Link href="/login">
             <Button
               type="button"
+              disabled={isLoading}
               variant="outline"
               className="w-full h-12 cursor-pointer border-2 border-gray-200 hover:bg-[#AE9409] text-gray-700 hover:text-white font-semibold text-base transition-all duration-300"
             >
