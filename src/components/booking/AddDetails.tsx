@@ -53,6 +53,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [stops, setStops] = React.useState<string[]>(currentJourney?.stops || []);
   const [stopError, setStopError] = React.useState<number | null>(null);
+  const [stopFocusTrigger, setStopFocusTrigger] = React.useState(0);
   const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
   const [pickupLocation, setPickupLocation] = React.useState<string>(currentJourney?.pickupLocation || "");
   const [dropoffLocation, setDropoffLocation] = React.useState<string>(currentJourney?.dropoffLocation || "");
@@ -73,6 +74,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   const timeRef = React.useRef<HTMLButtonElement>(null);
   const pickupRef = React.useRef<HTMLInputElement>(null);
   const dropoffRef = React.useRef<HTMLInputElement>(null);
+  const stopRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   // Sync local state with context when currentJourney changes
   React.useEffect(() => {
@@ -108,9 +110,17 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
     }
   }, [stops.length, justAddedStop]);
 
+  React.useEffect(() => {
+    if (stopError !== null && stopRefs.current[stopError]) {
+      stopRefs.current[stopError]?.focus();
+    }
+  }, [stopError, stopFocusTrigger]);
+
   const handleAddStop = () => {
     if (stops.length > 0 && stops[stops.length - 1].trim() === "") {
-      setStopError(stops.length - 1);
+      const errorIndex = stops.length - 1;
+      setStopError(errorIndex);
+      setStopFocusTrigger(prev => prev + 1);
       return;
     }
 
@@ -160,11 +170,28 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
       validationErrors.dropoffLocation = 'Drop-off location is required';
     }
 
+    // Check for empty stop inputs
+    const emptyStopIndex = stops.findIndex(stop => stop.trim() === '');
+    const hasStopError = emptyStopIndex !== -1;
+
     setErrors(validationErrors);
+    
+    // Only set stop error if there are no higher priority errors (serviceType, date, time, pickup)
+    const hasHigherPriorityError = validationErrors.serviceType || validationErrors.date || 
+                                     validationErrors.time || validationErrors.pickupLocation;
+    
+    if (hasStopError && !hasHigherPriorityError) {
+      setStopError(emptyStopIndex);
+      setStopFocusTrigger(prev => prev + 1);
+    } else if (!hasStopError) {
+      setStopError(null);
+    }
+
     return {
       isValid: !validationErrors.serviceType && !validationErrors.date && !validationErrors.time && 
-               !validationErrors.pickupLocation && !validationErrors.dropoffLocation,
-      errors: validationErrors
+               !validationErrors.pickupLocation && !validationErrors.dropoffLocation && !hasStopError,
+      errors: validationErrors,
+      stopErrorIndex: hasStopError ? emptyStopIndex : null
     };
   };
 
@@ -173,15 +200,29 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
     
     const validation = validateForm();
     if (!validation.isValid) {
-      // Focus on first error field
+      // Focus on first error field in sequential order (top to bottom)
       if (validation.errors.serviceType && serviceTypeRef.current) {
-        serviceTypeRef.current.focus();
+        serviceTypeRef.current.click(); // Open the select dropdown
       } else if (validation.errors.date && dateRef.current) {
+        if (!date) {
+          setDate(new Date()); // Auto-fill current date
+        }
+        setShowDatePicker(true); // Open the date popover
         dateRef.current.focus();
       } else if (validation.errors.time && timeRef.current) {
+        if (!time) {
+          const now = new Date();
+          const hours = now.getHours().toString().padStart(2, '0');
+          const minutes = now.getMinutes().toString().padStart(2, '0');
+          setTime(`${hours}:${minutes}`); // Auto-fill current time
+        }
+        setShowTimePicker(true); // Open the time popover
         timeRef.current.focus();
       } else if (validation.errors.pickupLocation && pickupRef.current) {
         pickupRef.current.focus();
+      } else if (validation.stopErrorIndex !== null && stopRefs.current[validation.stopErrorIndex]) {
+        // Focus on the empty stop input (checked after pickup)
+        stopRefs.current[validation.stopErrorIndex]?.focus();
       } else if (validation.errors.dropoffLocation && dropoffRef.current) {
         dropoffRef.current.focus();
       }
@@ -427,7 +468,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                   {errors.pickupLocation && (
                     <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.pickupLocation}</p>
                   )}
-                  <Button type="button" variant={"primary"} className="flex gap-1 ml-4 cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
+                  <Button type="button" variant={"primary"} className="flex gap-1 ml-4 ring-0! cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
                     <Plus className="h-4" />
                     <span className="hover:underline">Add Stop</span>
                   </Button>
@@ -451,6 +492,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                           </div>
                           <div className="flex-1">
                             <Input
+                              ref={(el) => { stopRefs.current[index] = el; }}
                               value={stop}
                               onChange={(e) => handleStopChange(index, e.target.value)}
                               placeholder="Add Your Stop"
