@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  IN_PROGRESS
+}
+
+enum JourneyType {
+  ONWARD
+  RETURN
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  NET_BANKING
+  WALLET
+}
+
+model User {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName   String
+  lastName    String
+  email       String    @unique
+  phoneNumber String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[] @relation("UserBookings")
+  
+  @@map("users")
+}
+
+model Passenger {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName   String
+  lastName    String
+  email       String?
+  phoneNumber String?
+  bookingId   String   @db.ObjectId
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("passengers")
+}
+
+model Booking {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String    @db.ObjectId
+  user              User      @relation("UserBookings", fields: [userId], references: [id])
+  onwardJourneyId   String    @unique @db.ObjectId
+  onwardJourney     Journey   @relation("OnwardJourney", fields: [onwardJourneyId], references: [id])
+  returnEnabled     Boolean   @default(false)
+  returnJourneyId   String?   @unique @db.ObjectId
+  returnJourney     Journey?  @relation("ReturnJourney", fields: [returnJourneyId], references: [id])
+  paymentMethod     PaymentMethod?
+  totalAmount       Float?
+  paymentStatus     PaymentStatus     @default(PENDING)
+  status            BookingStatus     @default(PENDING)
+  passengers        Passenger[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("bookings")
+}
+
+model Journey {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  journeyType       JourneyType
+  serviceType       String 
+  pickupDate        DateTime
+  pickupTime        String
+  pickupLocation    String
+  stops             String[]  @default([])
+  dropoffLocation   String
+  passengers        Int       @default(1)
+  luggage           Int       @default(0)
+  vehicleType       String? 
+  remarks           String?
+  onwardBooking     Booking?  @relation("OnwardJourney")
+  returnBooking     Booking?  @relation("ReturnJourney")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("journeys")
+}
