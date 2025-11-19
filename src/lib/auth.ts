@@ -25,6 +25,10 @@ export const authOptions: NextAuthOptions = {
                         throw new Error("No user found");
                     }
 
+                    if (!user.password || user.isGuest) {
+                        throw new Error("Unauthorized!!! Please register to login.");
+                    }
+
                     const isMatched = await bcrypt.compare(credentials.password, user.password);
 
                     if (!isMatched) {
