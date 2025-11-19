@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Car, Menu, X, User, MapPin, Phone, Clock, LogIn, UserPlus } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Car, Menu, X, User, MapPin, Phone, Clock, LogIn, UserPlus, LogOut, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -16,6 +17,7 @@ const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const pathname = usePathname();
+    const { data: session, status } = useSession();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -77,7 +79,13 @@ const Header = () => {
                     variant="outline"
                     className="rounded-full cursor-pointer h-11 w-11 p-0 border-2 border-orange-400 bg-gradient-to-br from-orange-100 to-orange-200 hover:from-orange-200 hover:to-orange-300 flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <User className="h-6 w-6 text-orange-600" />
+                    {status === 'authenticated' && session?.user?.name ? (
+                      <span className="text-orange-600 font-bold text-lg">
+                        {session.user.name.charAt(0).toUpperCase()}
+                      </span>
+                    ) : (
+                      <User className="h-6 w-6 text-orange-600" />
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-0" align="end">
@@ -95,32 +103,82 @@ const Header = () => {
                         <span className="text-xs text-gray-500">Reserve your ride</span>
                       </div>
                     </Link>
-                    <Link
-                      href="/login"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
-                    >
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <LogIn className="h-4 w-4 text-gray-600" />
+                    
+                    {status === 'authenticated' && session?.user && (
+                      <div className="px-4 py-3 bg-gradient-to-br from-orange-50 to-yellow-50 border-b border-gray-100">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
+                            <span className="text-white font-bold text-lg">
+                              {session.user.name?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {session.user.name}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-1 text-xs text-gray-600">
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-3 w-3 text-orange-600 flex-shrink-0" />
+                            <span className="truncate">{session.user.email}</span>
+                          </div>
+                          {session.user.phone && (
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-3 w-3 text-orange-600 flex-shrink-0" />
+                              <span>{session.user.phone}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">Login</span>
-                        <span className="text-xs text-gray-500">Access your account</span>
-                      </div>
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <UserPlus className="h-4 w-4 text-gray-600" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">Register</span>
-                        <span className="text-xs text-gray-500">Create new account</span>
-                      </div>
-                    </Link>
+                    )}
+                    
+                    {status === 'authenticated' ? (
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          signOut({ callbackUrl: '/' });
+                        }}
+                        className="flex items-center gap-3 cursor-pointer px-4 py-3 hover:bg-gray-50 transition-colors text-left w-full"
+                      >
+                        <div className="bg-red-100 p-2 rounded-lg">
+                          <LogOut className="h-4 w-4 text-red-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">Logout</span>
+                          <span className="text-xs text-gray-500">Sign out of your account</span>
+                        </div>
+                      </button>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                        >
+                          <div className="bg-gray-100 p-2 rounded-lg">
+                            <LogIn className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">Login</span>
+                            <span className="text-xs text-gray-500">Access your account</span>
+                          </div>
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="bg-gray-100 p-2 rounded-lg">
+                            <UserPlus className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">Register</span>
+                            <span className="text-xs text-gray-500">Create new account</span>
+                          </div>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </PopoverContent>
               </Popover>
