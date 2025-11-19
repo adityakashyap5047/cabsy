@@ -116,26 +116,26 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 max-[360px]:px-4 px-6 py-4">
           {validationError && (
-        <div className="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
-          {validationError}
-        </div>
+            <div className="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+              {validationError}
+            </div>
           )}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between items-stretch sm:items-center">
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-full sm:w-auto"
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSaveReturnJourney}
-          className="rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-4 sm:px-8 w-full sm:w-auto"
-        >
-          Save Return Journey
-        </Button>
+          <div className="flex flex-row gap-0 justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveReturnJourney}
+              className="rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-8 w-auto"
+            >
+              Save Return Journey
+            </Button>
           </div>
         </div>
       </div>

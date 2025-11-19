@@ -9,7 +9,8 @@ import AddPassenger, { Passenger } from './AddPassenger';
 import EditPassenger from './EditPassenger';
 import Remarks from './Remarks';
 import ReturnJourneyPanel from './ReturnJourneyPanel';
-import { Edit } from 'lucide-react';
+import { Edit, MapPin } from 'lucide-react';
+import { format } from "date-fns";
 
 interface CheckoutProps {
   isReturnJourney?: boolean;
@@ -238,7 +239,7 @@ console.log(state);
         }}
       >
       <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0">
-        <div className={`w-full ${!isReturnJourney ? 'md:w-1/2' : ''} flex flex-col`}>
+        <div className={`w-full ${!isReturnJourney ? 'md:w-1/2 px-3 sm:px-4 md:px-6' : ''} flex flex-col`}>
           <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
             <h2 className="text-base sm:text-lg font-medium text-gray-800">Passenger Information</h2>
           </div>
@@ -266,7 +267,7 @@ console.log(state);
             <div className="hidden md:flex items-stretch">
               <div className="w-px bg-gray-300 mx-0 h-full" />
             </div>
-            <div className="w-full md:w-1/2 flex flex-col">
+            <div className="w-full md:w-1/2 flex flex-col px-3 sm:px-4 md:px-6">
           <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-medium text-gray-800">Return Service</h2>
             {isReturnJourneySaved && (
@@ -286,7 +287,7 @@ console.log(state);
                 type="button"
                 onClick={handleEnableReturnJourney}
                 disabled={isReturnJourneySaved}
-                className={`rounded-none border font-medium text-xs sm:text-sm md:text-base py-2 px-3 sm:px-4 md:px-6 flex-1 min-[420px]:flex-none ${
+                className={`rounded-none border font-medium sm:text-sm md:text-base py-2 px-6 flex-1 min-[420px]:flex-none ${
                   isReturnJourneySaved
                     ? 'border-[#AE9404] bg-[#AE9404] cursor-not-allowed'
                     : hasReturnJourney
@@ -300,7 +301,7 @@ console.log(state);
                 type="button"
                 onClick={handleDisableReturnJourney}
                 disabled={!hasReturnJourney}
-                className={`rounded-none cursor-pointer border font-medium text-xs sm:text-sm md:text-base py-2 px-3 sm:px-4 md:px-6 flex-1 min-[420px]:flex-none ${
+                className={`rounded-none cursor-pointer border font-medium sm:text-sm md:text-base py-2 px-6 flex-1 min-[420px]:flex-none ${
                   !hasReturnJourney
                     ? 'border-gray-500 bg-gray-500 hover:bg-gray-500 cursor-not-allowed text-white'
                     : 'border-gray-400 text-gray-600 bg-transparent hover:text-gray-400 hover:bg-gray-500'
@@ -311,42 +312,49 @@ console.log(state);
             </div>
           </div>
           
-          {/* Return Journey Summary */}
           {isReturnJourneySaved && state.returnJourney && (
-            <div className="mt-3 sm:mt-4 mx-3 sm:mx-4 md:mx-6 px-3 sm:px-4 py-3 sm:py-4 bg-green-50 border border-green-200 rounded-md">
-              <h3 className="font-semibold text-green-800 mb-2 sm:mb-3 text-sm sm:text-base">Return Journey Summary</h3>
-              <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-700">
-                <div className="flex justify-between">
-                  <span className="font-medium">Pickup:</span>
-                  <span className="text-right">{state.returnJourney.pickupLocation}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Drop-off:</span>
-                  <span className="text-right">{state.returnJourney.dropoffLocation}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Date:</span>
-                  <span>{state.returnJourney.date?.toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Time:</span>
-                  <span>{state.returnJourney.time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Passengers:</span>
-                  <span>{state.returnJourney.passengers}</span>
-                </div>
-                {state.returnJourney.user?.passengers && state.returnJourney.user.passengers.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-green-200">
-                    <span className="font-medium">Lead Passenger:</span>
-                    <div className="ml-4 mt-1">
-                      <p>{state.returnJourney.user.passengers[0].name}</p>
-                      <p className="text-xs">{state.returnJourney.user.passengers[0].phone}</p>
-                    </div>
+            <div className={`grid grid-cols-2 gap-y-3 mx-2 md:mx-6! mt-1 p-3 bg-gray-100 border-l-4 border-[#ae9409]`}>
+                <div className="space-y-2 sm:space-y-3 min-w-[114px]">
+                  <div className="flex gap-1 flex-wrap">
+                    <span className="font-semibold text-gray-700 text-sm sm:text-base">
+                      {state.returnJourney.date && format(state.returnJourney.date, "MM/dd/yyyy")}
+                    </span>
+                    <span className="font-semibold text-gray-700 text-sm sm:text-base">
+                      {state.returnJourney.time}
+                    </span>
                   </div>
-                )}
+                  <div>
+                    <span className="font-semibold text-gray-600 text-sm">Passenger:</span>{' '}
+                    <span className="text-gray-700 text-sm">{state.returnJourney.passengers}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-600 text-sm">Luggage:</span>{' '}
+                    <span className="text-gray-700 text-sm">{state.returnJourney.luggage}</span>
+                  </div>
+                  <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-600">
+                    Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">$124.50</span>
+                  </h1>
+                </div>
+                
+                <div className="space-y-3 justify-self-end">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-1 text-green-500 flex-shrink-0" />
+                    <span className="text-green-400 font-semibold text-sm break-words">{state.returnJourney.pickupLocation}</span>
+                  </div>
+                  {
+                    state.returnJourney.stops && state.returnJourney.stops?.length > 0 && state.returnJourney.stops.map((stop, idx) => (
+                      <div key={idx} className="flex ml-4 items-start gap-2">
+                        <MapPin className="w-4 h-4 mt-1 text-yellow-500 flex-shrink-0" />
+                        <span className="text-yellow-400 font-semibold text-sm break-words">{stop}</span>
+                      </div>
+                    ))
+                  }
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
+                    <span className="text-red-400 font-semibold text-sm break-words">{state.returnJourney.dropoffLocation}</span>
+                  </div>
+                </div>
               </div>
-            </div>
           )}
           
           {/* Bottom  */}
