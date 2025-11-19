@@ -38,8 +38,9 @@ model User {
   firstName   String
   lastName    String
   email       String    @unique
-  password    String
+  password    String?
   phoneNumber String
+  isGuest     Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   bookings    Booking[] @relation("UserBookings")
@@ -47,36 +48,33 @@ model User {
   @@map("users")
 }
 
-model Passenger {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+type PassengerDetails {
   firstName   String
   lastName    String
   email       String?
   phoneNumber String?
-  bookingId   String   @db.ObjectId
-  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@map("passengers")
 }
 
 model Booking {
-  id                String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String    @db.ObjectId
-  user              User      @relation("UserBookings", fields: [userId], references: [id])
-  onwardJourneyId   String    @unique @db.ObjectId
-  onwardJourney     Journey   @relation("OnwardJourney", fields: [onwardJourneyId], references: [id])
-  returnEnabled     Boolean   @default(false)
-  returnJourneyId   String?   @unique @db.ObjectId
-  returnJourney     Journey?  @relation("ReturnJourney", fields: [returnJourneyId], references: [id])
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId  
+  userId            String?             @db.ObjectId
+  user              User?               @relation("UserBookings", fields: [userId], references: [id])
+  guestFirstName    String?
+  guestLastName     String?
+  guestEmail        String?
+  guestPhoneNumber  String?
+  onwardJourneyId   String              @unique @db.ObjectId
+  onwardJourney     Journey             @relation("OnwardJourney", fields: [onwardJourneyId], references: [id])
+  returnEnabled     Boolean             @default(false)
+  returnJourneyId   String?             @unique @db.ObjectId
+  returnJourney     Journey?            @relation("ReturnJourney", fields: [returnJourneyId], references: [id])
   paymentMethod     PaymentMethod?
   totalAmount       Float?
-  paymentStatus     PaymentStatus     @default(PENDING)
-  status            BookingStatus     @default(PENDING)
-  passengers        Passenger[]
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  paymentStatus     PaymentStatus       @default(PENDING)
+  status            BookingStatus       @default(PENDING)
+  passengers        PassengerDetails[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   
   @@map("bookings")
 }
