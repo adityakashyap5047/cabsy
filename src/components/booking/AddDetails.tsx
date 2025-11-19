@@ -60,6 +60,20 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
   const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
 
+  const [errors, setErrors] = React.useState({
+    serviceType: '',
+    date: '',
+    time: '',
+    pickupLocation: '',
+    dropoffLocation: ''
+  });
+
+  const serviceTypeRef = React.useRef<HTMLButtonElement>(null);
+  const dateRef = React.useRef<HTMLButtonElement>(null);
+  const timeRef = React.useRef<HTMLButtonElement>(null);
+  const pickupRef = React.useRef<HTMLInputElement>(null);
+  const dropoffRef = React.useRef<HTMLInputElement>(null);
+
   // Sync local state with context when currentJourney changes
   React.useEffect(() => {
     if (currentJourney) {
@@ -73,6 +87,12 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
       setLuggage(currentJourney.luggage || 0);
     }
   }, [currentJourney]);
+
+  const clearError = (field: keyof typeof errors) => {
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
 
   React.useEffect(() => {
     if (justAddedStop && stops.length > 0) {
@@ -111,13 +131,63 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
     }
   }
 
+  const validateForm = () => {
+    const validationErrors = {
+      serviceType: '',
+      date: '',
+      time: '',
+      pickupLocation: '',
+      dropoffLocation: ''
+    };
+
+    if (!serviceType.trim()) {
+      validationErrors.serviceType = 'Please select a service type';
+    }
+
+    if (!date) {
+      validationErrors.date = 'Please select a pick-up date';
+    }
+
+    if (!time) {
+      validationErrors.time = 'Please select a pick-up time';
+    }
+
+    if (!pickupLocation.trim()) {
+      validationErrors.pickupLocation = 'Pick-up location is required';
+    }
+
+    if (!dropoffLocation.trim()) {
+      validationErrors.dropoffLocation = 'Drop-off location is required';
+    }
+
+    setErrors(validationErrors);
+    return {
+      isValid: !validationErrors.serviceType && !validationErrors.date && !validationErrors.time && 
+               !validationErrors.pickupLocation && !validationErrors.dropoffLocation,
+      errors: validationErrors
+    };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!pickupLocation.trim() || !dropoffLocation.trim()) {
-      alert('Please fill in both pickup and drop-off locations');
+    const validation = validateForm();
+    if (!validation.isValid) {
+      // Focus on first error field
+      if (validation.errors.serviceType && serviceTypeRef.current) {
+        serviceTypeRef.current.focus();
+      } else if (validation.errors.date && dateRef.current) {
+        dateRef.current.focus();
+      } else if (validation.errors.time && timeRef.current) {
+        timeRef.current.focus();
+      } else if (validation.errors.pickupLocation && pickupRef.current) {
+        pickupRef.current.focus();
+      } else if (validation.errors.dropoffLocation && dropoffRef.current) {
+        dropoffRef.current.focus();
+      }
       return;
     }
+    
     
     dispatch({
       type: isReturnJourney ? "UPDATE_RETURN_DETAILS" : "UPDATE_ONWARD_DETAILS",
@@ -226,8 +296,8 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
               <div className={forceMobileLayout ? "space-y-3 w-full" : "space-y-3 sm:space-y-4 md:space-y-6 w-full sm:w-1/2"}>
                 <div className="space-y-2">
                   <Label htmlFor="service">Select Service Type</Label>
-                  <Select value={serviceType} onValueChange={setServiceType}>
-                    <SelectTrigger className="w-full rounded-none cursor-pointer" id="service">
+                  <Select value={serviceType} onValueChange={(value) => { setServiceType(value); clearError('serviceType'); }}>
+                    <SelectTrigger ref={serviceTypeRef} className={`w-full rounded-none cursor-pointer ${errors.serviceType ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`} id="service">
                       <SelectValue placeholder="Choose a service type" />
                     </SelectTrigger>
                     <SelectContent className="rounded-none">
@@ -238,6 +308,9 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                       <SelectItem value="wedding">Wedding Car Service</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.serviceType && (
+                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.serviceType}</p>
+                  )}
                 </div>
                 <div className={forceMobileLayout ? "flex w-full gap-2 flex-col" : "flex w-full gap-2 flex-col min-[392px]:flex-row"}>
                   <div className={forceMobileLayout ? "space-y-2 w-full" : "space-y-2 w-full min-[392px]:w-1/2"}>
@@ -245,9 +318,10 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                     <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
                       <PopoverTrigger asChild>
                         <Button
+                          ref={dateRef}
                           variant="primary"
                           className={cn(
-                            `w-full ${!date ? "justify-end cursor-text" : "justify-between cursor-pointer"} border rounded-none text-left font-normal`
+                            `w-full ${!date ? "justify-end cursor-text" : "justify-between cursor-pointer"} border rounded-none text-left font-normal ${errors.date ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`
                           )}
                           onClick={() => {
                             if (!date) {
@@ -257,7 +331,9 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                           }}
                         >
                           {date && format(date, "MM/dd/yyyy")}
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <span className="cursor-pointer hover:text-[#AE9409]">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                          </span>
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -280,14 +356,18 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                         />
                       </PopoverContent>
                     </Popover>
+                    {errors.date && (
+                      <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.date}</p>
+                    )}
                   </div>
                   <div className={forceMobileLayout ? "space-y-2 w-full" : "space-y-2 w-full min-[392px]:w-1/2"}>
                     <Label>Pick-Up Time</Label>
                     <Popover open={showTimePicker} onOpenChange={setShowTimePicker}>
                       <PopoverTrigger asChild>
                         <Button
+                          ref={timeRef}
                           variant="primary"
-                          className={`w-full border rounded-none ${!time ? "cursor-text justify-end" : "cursor-pointer justify-between"} text-left font-normal`}
+                          className={`w-full border rounded-none ${!time ? "cursor-text justify-end" : "cursor-pointer justify-between"} text-left font-normal ${errors.time ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                           onClick={() => 
                             {
                               if(!time){
@@ -304,7 +384,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                           }
                         >
                           {time}
-                          <span className="mr-2"><Clock className="h-4 w-4" /></span>
+                          <span className="mr-2 cursor-pointer hover:text-[#AE9409]"><Clock className="h-4 w-4" /></span>
                         </Button>
                       </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" >
@@ -313,6 +393,7 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                           onChange={(newTime) => {
                           const timeWithUpperCase = newTime.formatted12.replace(/am|pm/gi, (match) => match.toUpperCase());
                           setTime(timeWithUpperCase);
+                          clearError('time');
                           }}
                           switchToMinuteOnHourSelect
                           closeOnMinuteSelect
@@ -320,23 +401,32 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                         />
                         </PopoverContent>
                     </Popover>
+                    {errors.time && (
+                      <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.time}</p>
+                    )}
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="pickup" className="mb-2">Pick-Up Location</Label>
                   <Input 
+                    ref={pickupRef}
                     id="pickup" 
                     placeholder="Your pick-up location" 
                     value={pickupLocation}
-                    onChange={(e) => setPickupLocation(e.target.value)}
+                    onChange={(e) => { setPickupLocation(e.target.value); clearError('pickupLocation'); }}
                     className={cn(
                       "transition-colors duration-200",
-                      pickupLocation.trim() 
-                        ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
-                        : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
+                      errors.pickupLocation
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : pickupLocation.trim() 
+                          ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
+                          : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
                     )}
                   />
+                  {errors.pickupLocation && (
+                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.pickupLocation}</p>
+                  )}
                   <Button type="button" variant={"primary"} className="flex gap-1 ml-4 cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
                     <Plus className="h-4" />
                     <span className="hover:underline">Add Stop</span>
@@ -398,17 +488,23 @@ export default function AddDetails({ isReturnJourney = false, forceMobileLayout 
                 <div className="space-y-2">
                   <Label htmlFor="dropoff">Drop-Off Location</Label>
                   <Input 
+                    ref={dropoffRef}
                     id="dropoff" 
                     placeholder="Your drop-off location" 
                     value={dropoffLocation}
-                    onChange={(e) => setDropoffLocation(e.target.value)}
+                    onChange={(e) => { setDropoffLocation(e.target.value); clearError('dropoffLocation'); }}
                     className={cn(
                       "transition-colors duration-200",
-                      dropoffLocation.trim() 
-                        ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
-                        : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
+                      errors.dropoffLocation
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : dropoffLocation.trim() 
+                          ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
+                          : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
                     )}
                   />
+                  {errors.dropoffLocation && (
+                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.dropoffLocation}</p>
+                  )}
                 </div>
 
                 {/* Passenger and Luggage - Shows inline on screens 640px and above, below dropoff */}
