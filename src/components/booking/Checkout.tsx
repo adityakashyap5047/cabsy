@@ -151,8 +151,6 @@ console.log(state);
 
   const handleEnableReturnJourney = () => {
     if (!isReturnJourneySaved) {
-      setHasReturnJourney(true);
-      dispatch({ type: "ENABLE_RETURN_JOURNEY", payload: true });
       dispatch({ type: "INITIALIZE_RETURN_JOURNEY" });
       setIsReturnPanelOpen(true);
     }
@@ -170,6 +168,8 @@ console.log(state);
 
   const handleReturnJourneySave = () => {
     setIsReturnJourneySaved(true);
+    setHasReturnJourney(true);
+    dispatch({ type: "ENABLE_RETURN_JOURNEY", payload: true });
     return true;
   };
 
@@ -367,6 +367,9 @@ console.log(state);
       <ReturnJourneyPanel
         isOpen={isReturnPanelOpen}
         onClose={() => setIsReturnPanelOpen(false)}
+        onCancel={() => {
+          handleDisableReturnJourney();
+        }}
         onSave={() => {
           if (handleReturnJourneySave()) {
             setIsReturnPanelOpen(false);

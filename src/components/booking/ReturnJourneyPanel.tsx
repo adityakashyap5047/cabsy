@@ -10,6 +10,7 @@ import { useBooking } from '@/context/BookingContext';
 interface ReturnJourneyPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onCancel: () => void;
   onSave: () => void;
   outboundBooking: {
     pickupLocation: string;
@@ -24,6 +25,7 @@ interface ReturnJourneyPanelProps {
 const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
   isOpen,
   onClose,
+  onCancel,
   onSave,
 }) => {
   const { state, dispatch } = useBooking();
@@ -46,6 +48,11 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
     };
   }, [isOpen]);
   
+  const handleCancel = () => {
+    // Reset the return journey form and disable return service
+    onCancel();
+  };
+
   const handleSaveReturnJourney = () => {
     const isStep1Valid = addDetailsRef.current?.validateAndFocus();
     if (!isStep1Valid) {
@@ -83,7 +90,6 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
         }`}
-        onClick={onClose}
       />
 
       <div
@@ -111,7 +117,7 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
           <div className="flex flex-row gap-0 justify-between items-center">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={handleCancel}
               className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 transition-all duration-200 transform hover:scale-105 w-auto"
             >
               Cancel
