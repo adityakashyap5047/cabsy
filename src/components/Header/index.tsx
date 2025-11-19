@@ -29,7 +29,6 @@ const Header = () => {
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Book Ride', href: '/ride' },
-        { name: 'Services', href: '/services' },
         { name: 'About', href: '/about' },
         { name: 'Contact', href: '/contact' },
     ];
@@ -38,10 +37,10 @@ const Header = () => {
 
     return (
         <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
             isScrolled
-            ? 'bg-white shadow-lg py-3'
-            : 'bg-white/95 backdrop-blur-sm py-4'
+            ? 'shadow-lg py-3'
+            : 'py-4'
         }`}
         >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,7 +128,7 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="md:hidden cursor-pointer p-2 rounded-lg text-gray-700 transition-colors focus:outline-none focus:ring-0"
                   aria-label="Toggle menu"
               >
                   {isMobileMenuOpen ? (
@@ -141,61 +140,64 @@ const Header = () => {
             </div>
             </div>
 
-            {/* Mobile Menu */}
-            {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
-                <nav className="flex flex-col space-y-2 mt-4">
-                {navLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
-                        isActive(link.href)
-                        ? 'text-orange-600 bg-orange-50'
-                        : 'text-gray-700 hover:text-orange-600 hover:bg-gray-50'
-                    }`}
+            {/* Mobile Side Panel */}
+            <>
+              {/* Backdrop */}
+              <div
+                className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
+                  isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+              
+              {/* Side Panel */}
+              <div className={`fixed right-0 top-0 h-full w-72 bg-white shadow-2xl z-50 md:hidden transform transition-transform duration-300 ease-in-out ${
+                isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}>
+                  {/* Panel Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900">Menu</h2>
+                    <button
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="p-2 rounded-lg transition-colors cursor-pointer focus:outline-none focus:ring-0"
                     >
-                    {link.name}
-                    </Link>
-                ))}
-                </nav>
+                      <X className="h-6 w-6 text-gray-600" />
+                    </button>
+                  </div>
 
-                <div className="flex flex-col space-y-3 mt-4">
-                <Button
-                    variant="outline"
-                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
-                    asChild
-                >
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <User className="h-4 w-4 mr-2" />
-                    Login
-                    </Link>
-                </Button>
-                <Button
-                    className="w-full bg-linear-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white rounded-lg shadow-lg"
-                    asChild
-                >
-                    <Link href="/ride" onClick={() => setIsMobileMenuOpen(false)}>
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Book Now
-                    </Link>
-                </Button>
-                </div>
+                  {/* Panel Content */}
+                  <div className="overflow-y-auto h-[calc(100vh-80px)] flex flex-col justify-between">
+                    <nav className="flex flex-col p-4 space-y-2">
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
+                            isActive(link.href)
+                              ? 'text-orange-600 bg-orange-50'
+                              : 'text-gray-700 hover:text-orange-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          {link.name}
+                        </Link>
+                      ))}
+                    </nav>
 
-                {/* Quick Info in Mobile */}
-                <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                    <Phone className="h-4 w-4 mr-2 text-orange-600" />
-                    <span>24/7 Support: 1-800-CABSY</span>
+                    {/* Quick Info in Mobile */}
+                    <div className="px-4 py-4 border-t border-gray-200 space-y-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Phone className="h-4 w-4 mr-2 text-orange-600" />
+                        <span>24/7 Support: 1-800-CABSY</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Clock className="h-4 w-4 mr-2 text-orange-600" />
+                        <span>Available Round the Clock</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2 text-orange-600" />
-                    <span>Available Round the Clock</span>
-                </div>
-                </div>
-            </div>
-            )}
+            </>
         </div>
         </header>
     );
