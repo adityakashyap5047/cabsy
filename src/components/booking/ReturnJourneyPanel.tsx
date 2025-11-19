@@ -98,11 +98,11 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center z-10">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Return Journey</h2>
           <button
-        onClick={onClose}
-        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        aria-label="Close panel"
+            onClick={onClose}
+            className="p-2 cursor-pointer rounded-full transition-colors"
+            aria-label="Close panel"
           >
-        <X className="w-6 h-6 text-gray-600" />
+            <X className="w-6 h-6 text-gray-600" />
           </button>
         </div>
 
@@ -126,13 +126,13 @@ const ReturnJourneyPanel: React.FC<ReturnJourneyPanelProps> = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="rounded-none border-gray-400 text-gray-600 hover:bg-gray-100 w-auto"
+              className="rounded-none cursor-pointer border border-gray-400 text-gray-600 bg-transparent hover:text-white hover:bg-gray-500 transition-all duration-200 transform hover:scale-105 w-auto"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSaveReturnJourney}
-              className="rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-8 w-auto"
+              className="cursor-pointer rounded-none bg-[#AE9404] hover:bg-[#8a7503] text-white font-medium px-8 w-auto"
             >
               Save Return Journey
             </Button>
