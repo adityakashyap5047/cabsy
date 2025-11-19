@@ -32,7 +32,7 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
   const showSummary = isReturnJourney
     ? state.returnSummarySteps.includes(stepNumber)
     : state.summarySteps.includes(stepNumber);
-  const [isEditing, setIsEditing] = useState(false);
+  const isEditing = isExpanded && isCompleted;
 
   const [leadData, setLeadData] = useState({
     firstName: '',
@@ -131,7 +131,6 @@ console.log(state);
   };
 
   const handleEdit = () => {
-    setIsEditing(true);
     dispatch({ type: isReturnJourney ? "COLLAPSE_AFTER_RETURN_STEP" : "COLLAPSE_AFTER_STEP", payload: stepNumber });
     if (!isExpanded) dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: stepNumber });
   };
@@ -167,27 +166,11 @@ console.log(state);
     dispatch({ type: "CLEAR_RETURN_JOURNEY" });
   };
 
-  const validateReturnJourney = () => {
-    const rj = state.returnJourney;
-    if (!rj) return false;
-    
-    // Validate step 1 (ride details)
-    const step1Valid = rj.pickupLocation && rj.dropoffLocation && rj.date && rj.time;
-    
-    // Validate step 2 (checkout - lead passenger)
-    const user = rj.user;
-    const step2Valid = user && user.passengers && user.passengers.length > 0 && 
-      user.passengers[0].name && user.passengers[0].phone;
-    
-    return step1Valid && step2Valid;
-  };
+  
 
   const handleReturnJourneySave = () => {
-    if (validateReturnJourney()) {
-      setIsReturnJourneySaved(true);
-      return true;
-    }
-    return false;
+    setIsReturnJourneySaved(true);
+    return true;
   };
 
   const handleEditReturnJourney = () => {
@@ -197,27 +180,20 @@ console.log(state);
   const summary = isCompleted ? (
     <div className="space-y-2 text-sm">
       <div className="flex justify-between">
-        <span className="text-gray-600">Lead Passenger:</span>
-        <span className="font-medium">{leadData.firstName} {leadData.lastName}</span>
+        <span className="font-semibold text-gray-600 text-sm">Lead:</span>
+        <span className="text-gray-700 text-sm">{leadData.firstName} {leadData.lastName}</span>
       </div>
       <div className="flex justify-between">
-        <span className="text-gray-600">Phone:</span>
-        <span className="font-medium">{leadData.phoneNumber}</span>
+        <span className="font-semibold text-gray-600 text-sm">Phone:</span>
+        <span className="text-gray-700 text-sm">{leadData.phoneNumber}</span>
       </div>
-      {leadData.email && (
-        <div className="flex justify-between">
-          <span className="text-gray-600">Email:</span>
-          <span className="font-medium">{leadData.email}</span>
-        </div>
-      )}
-      {passengers.length > 0 && (
-        <div className="flex justify-between">
-          <span className="text-gray-600">Additional Passengers:</span>
-          <span className="font-medium">{passengers.length}</span>
-        </div>
-      )}
+      <div className="flex justify-between">
+        <span className="font-semibold text-gray-600 text-sm">Email:</span>
+        <span className="text-gray-700 text-sm">{leadData.email.split('@')[0]?.length > 11 ? leadData.email.split('@')[0].slice(0, 8) + '...@' + leadData.email.split('@')[1] : leadData.email}</span>
+      </div>
     </div>
   ) : null;
+
   return (
     <>
     <div className='mt-4'>

@@ -139,7 +139,6 @@ export default function bookingReducer(state: BookingState, action: BookingActio
       };
 
     case "UPDATE_BOOKING_DETAILS":
-      // Backward compatibility - update onward journey
       return { ...state, onward: { ...state.onward, ...action.payload } };
 
     case "SET_VEHICLE":
