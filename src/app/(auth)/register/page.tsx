@@ -131,7 +131,6 @@ const RegisterPage = () => {
 
     if (hasError) {
       setErrors(newErrors);
-      // Focus on first error field
       if (newErrors.firstName && firstNameRef.current) {
         firstNameRef.current.focus();
       } else if (newErrors.lastName && lastNameRef.current) {
@@ -173,7 +172,6 @@ const RegisterPage = () => {
         return;
       }
 
-      // Auto login after successful registration
       const result = await signIn('credentials', {
         redirect: false,
         email: formData.email,
@@ -181,10 +179,8 @@ const RegisterPage = () => {
       });
 
       if (result?.error) {
-        // Registration succeeded but login failed, redirect to login page
         router.push('/login');
       } else {
-        // Both registration and login succeeded, redirect to home
         router.push('/');
       }
     } catch {
@@ -208,8 +204,7 @@ const RegisterPage = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join us and start your journey</p>
         </div>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* General Error */}
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {errors.general && (
               <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -443,12 +438,17 @@ const RegisterPage = () => {
           </div>
 
           {/* Login Link */}
-          <Link href="/login">
+          <Link 
+            href="/login" 
+            className={isLoading ? "pointer-events-none" : ""}
+          >
             <Button
               type="button"
               disabled={isLoading}
               variant="outline"
-              className="w-full h-12 cursor-pointer border-2 border-gray-200 hover:bg-[#AE9409] text-gray-700 hover:text-white font-semibold text-base transition-all duration-300"
+              className={`w-full h-12 border-2 border-gray-200 hover:bg-[#AE9409] text-gray-700 hover:text-white font-semibold text-base transition-all duration-300 ${
+                isLoading ? 'cursor-default opacity-50' : 'cursor-pointer'
+              }`}
             >
               Sign In
             </Button>
