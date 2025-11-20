@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,18 @@ const FinalDetails = () => {
     email: '',
     password: ''
   });
+
+  const [loginErrors, setLoginErrors] = useState({
+    email: '',
+    password: '',
+    general: ''
+  });
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const loginEmailRef = useRef<HTMLInputElement>(null);
+  const loginPasswordRef = useRef<HTMLInputElement>(null);
 
   const [guestData, setGuestData] = useState({
     firstName: '',
@@ -68,12 +81,20 @@ const FinalDetails = () => {
     return phoneRegex.test(phone.replace(/\D/g, ''));
   };
 
+  const dismissLoginError = () => {
+    setLoginErrors(prev => ({ ...prev, general: '' }));
+  };
+
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (loginErrors[name as keyof typeof loginErrors]) {
+      setLoginErrors(prev => ({ ...prev, [name]: '', general: '' }));
+    }
   };
 
   const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,30 +108,77 @@ const FinalDetails = () => {
     }
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add login logic here
-    // Save user data
-    dispatch({
-      type: "SET_USER",
-      payload: {
-        email: loginData.email
+    
+    // Reset errors
+    setLoginErrors({ email: '', password: '', general: '' });
+    
+    let hasError = false;
+    const newErrors = { email: '', password: '', general: '' };
+
+    if (!loginData.email.trim()) {
+      newErrors.email = 'Email is required';
+      hasError = true;
+    } else if (!validateEmail(loginData.email)) {
+      newErrors.email = 'Please enter a valid email';
+      hasError = true;
+    }
+
+    if (!loginData.password) {
+      newErrors.password = 'Password is required';
+      hasError = true;
+    } else if (loginData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setLoginErrors(newErrors);
+      // Focus on first error field
+      if (newErrors.email && loginEmailRef.current) {
+        loginEmailRef.current.focus();
+      } else if (newErrors.password && loginPasswordRef.current) {
+        loginPasswordRef.current.focus();
       }
-    });
-    
-    dispatch({ type: "COMPLETE_STEP", payload: step });
-    dispatch({ type: "TOGGLE_STEP", payload: step });
-    
-    setTimeout(() => {
-      dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
-      
-      setTimeout(() => {
-        const nextStepElement = document.querySelector(`[data-step="${step + 1}"]`);
-        if (nextStepElement) {
-          nextStepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 300);
-    }, 100);
+      return;
+    }
+
+    setIsLoggingIn(true);
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: loginData.email,
+        password: loginData.password,
+      });
+
+      if (result?.error) {
+        setLoginErrors(prev => ({ ...prev, general: 'Invalid email or password' }));
+        toast.error('Invalid email or password');
+      } else {
+        // Successfully logged in - session will be updated automatically
+        toast.success('Welcome back! You are now logged in.');
+        
+        // Wait for session to update, then proceed
+        setTimeout(() => {
+          dispatch({ type: "COMPLETE_STEP", payload: step });
+          dispatch({ type: "TOGGLE_STEP", payload: step });
+          
+          setTimeout(() => {
+            if (!showSummary) {
+              dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+            }
+            dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
+          }, 100);
+        }, 500);
+      }
+    } catch {
+      setLoginErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const handleGuestSubmit = (e: React.FormEvent) => {
@@ -227,6 +295,17 @@ const FinalDetails = () => {
       phoneNumber: '',
       email: ''
     });
+
+    setLoginData({
+      email: '',
+      password: ''
+    });
+
+    setLoginErrors({
+      email: '',
+      password: '',
+      general: ''
+    });
     
     dispatch({ type: "UNCOMPLETE_STEP", payload: step });
     
@@ -294,45 +373,84 @@ const FinalDetails = () => {
             </div>
             
             <div className="p-3 sm:p-4 md:p-6">
-              <form onSubmit={handleLoginSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
+              <form onSubmit={handleLoginSubmit} noValidate className="space-y-3 sm:space-y-4 md:space-y-6">
+                {/* General Error */}
+                {loginErrors.general && (
+                  <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center justify-between gap-2">
+                    <p className="text-sm text-red-600">{loginErrors.general}</p>
+                    <button
+                      type="button"
+                      onClick={dismissLoginError}
+                      className="cursor-pointer text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      ref={loginEmailRef}
                       id="login-email"
                       name="email"
-                      type="text"
-                      placeholder="Email Address"
+                      type="email"
+                      placeholder="you@example.com"
                       value={loginData.email}
                       onChange={handleLoginChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
+                      disabled={isLoggingIn}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                        loginErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                      }`}
                     />
+                    {loginErrors.email && (
+                      <p className="text-xs text-red-600">{loginErrors.email}</p>
+                    )}
                   </div>
 
                   <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
                     <Label htmlFor="login-password" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Password
+                      Password <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      id="login-password"
-                      name="password"
-                      type="password"
-                      placeholder="Password"
-                      value={loginData.password}
-                      onChange={handleLoginChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        ref={loginPasswordRef}
+                        id="login-password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={loginData.password}
+                        onChange={handleLoginChange}
+                        disabled={isLoggingIn}
+                        className={`w-full pl-3 sm:px-4 py-2 sm:py-3 pr-10! border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                          loginErrors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-0"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    {loginErrors.password && (
+                      <p className="text-xs text-red-600">{loginErrors.password}</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="text-left">
                   <button
                     type="button"
-                    className="text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
+                    className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
                   >
                     Forgot password?
                   </button>
@@ -342,7 +460,7 @@ const FinalDetails = () => {
                   Don&apos;t have an account?{' '}
                   <button
                     type="button"
-                    className="text-yellow-600 hover:text-yellow-700 font-medium"
+                    className="cursor-pointer text-yellow-600 hover:text-yellow-700 font-medium"
                   >
                     Register Now
                   </button>
@@ -351,9 +469,12 @@ const FinalDetails = () => {
                 <div className='text-center'>
                   <Button
                       type="submit"
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base"
+                      disabled={isLoggingIn}
+                      className={`bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base ${
+                        isLoggingIn ? 'cursor-default opacity-50' : 'cursor-pointer'
+                      }`}
                   >
-                      Log in
+                      {isLoggingIn ? 'Logging in...' : 'Log in'}
                   </Button>
                 </div>
               </form>
