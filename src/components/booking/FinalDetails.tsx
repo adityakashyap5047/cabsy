@@ -12,7 +12,7 @@ import { useBooking } from '@/context/BookingContext';
 
 const FinalDetails = () => {
   const { state, dispatch } = useBooking();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const step = 2;
 
   const [loginData, setLoginData] = useState({
@@ -28,6 +28,7 @@ const FinalDetails = () => {
 
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [pendingLoginComplete, setPendingLoginComplete] = useState(false);
 
   const loginEmailRef = useRef<HTMLInputElement>(null);
   const loginPasswordRef = useRef<HTMLInputElement>(null);
@@ -70,6 +71,36 @@ const FinalDetails = () => {
       });
     }
   }, [isLoggedIn, isCompleted, session]);
+
+  useEffect(() => {
+    if (pendingLoginComplete && session?.user) {
+      dispatch({
+        type: "SET_USER",
+        payload: {
+          name: session.user.name || '',
+          email: session.user.email || '',
+          phone: session.user.phone || '',
+          passengers: [{
+            name: session.user.name || '',
+            email: session.user.email || '',
+            phone: session.user.phone || ''
+          }]
+        }
+      });
+      
+      dispatch({ type: "COMPLETE_STEP", payload: step });
+      dispatch({ type: "TOGGLE_STEP", payload: step });
+      
+      setTimeout(() => {
+        if (!showSummary) {
+          dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+        }
+        dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
+      }, 100);
+      
+      setPendingLoginComplete(false);
+    }
+  }, [pendingLoginComplete, session, dispatch, step, showSummary]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -157,21 +188,13 @@ const FinalDetails = () => {
         setLoginErrors(prev => ({ ...prev, general: 'Invalid email or password' }));
         toast.error('Invalid email or password');
       } else {
-        // Successfully logged in - session will be updated automatically
         toast.success('Welcome back! You are now logged in.');
         
-        // Wait for session to update, then proceed
-        setTimeout(() => {
-          dispatch({ type: "COMPLETE_STEP", payload: step });
-          dispatch({ type: "TOGGLE_STEP", payload: step });
-          
-          setTimeout(() => {
-            if (!showSummary) {
-              dispatch({ type: "TOGGLE_SUMMARY", payload: step });
-            }
-            dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 1 });
-          }, 100);
-        }, 500);
+        // Refresh session
+        await update();
+        
+        // Set flag to complete login flow once session updates
+        setPendingLoginComplete(true);
       }
     } catch {
       setLoginErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
