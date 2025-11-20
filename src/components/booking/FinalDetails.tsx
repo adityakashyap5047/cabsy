@@ -29,6 +29,37 @@ const FinalDetails = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [pendingLoginComplete, setPendingLoginComplete] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+
+  const [registerData, setRegisterData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [registerErrors, setRegisterErrors] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
+    general: ''
+  });
+
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
+
+  const registerFirstNameRef = useRef<HTMLInputElement>(null);
+  const registerLastNameRef = useRef<HTMLInputElement>(null);
+  const registerEmailRef = useRef<HTMLInputElement>(null);
+  const registerPhoneRef = useRef<HTMLInputElement>(null);
+  const registerPasswordRef = useRef<HTMLInputElement>(null);
+  const registerConfirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const loginEmailRef = useRef<HTMLInputElement>(null);
   const loginPasswordRef = useRef<HTMLInputElement>(null);
@@ -114,6 +145,24 @@ const FinalDetails = () => {
 
   const dismissLoginError = () => {
     setLoginErrors(prev => ({ ...prev, general: '' }));
+    setRegisterErrors(prev => ({ ...prev, general: '' }));
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+  };
+
+  const dismissRegisterError = () => {
+    setRegisterErrors(prev => ({ ...prev, general: '' }));
+    setLoginErrors(prev => ({ ...prev, general: '' }));
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
   };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,6 +175,14 @@ const FinalDetails = () => {
     if (loginErrors[name as keyof typeof loginErrors]) {
       setLoginErrors(prev => ({ ...prev, [name]: '', general: '' }));
     }
+    // Clear other form errors
+    setRegisterErrors(prev => ({ ...prev, general: '' }));
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
   };
 
   const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,6 +193,201 @@ const FinalDetails = () => {
     }));
     if (guestErrors[name as keyof typeof guestErrors]) {
       setGuestErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    // Clear other form errors
+    setLoginErrors(prev => ({ ...prev, general: '' }));
+    setRegisterErrors(prev => ({ ...prev, general: '' }));
+  };
+
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (registerErrors[name as keyof typeof registerErrors]) {
+      setRegisterErrors(prev => ({ ...prev, [name]: '', general: '' }));
+    }
+    // Clear other form errors
+    setLoginErrors(prev => ({ ...prev, general: '' }));
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+  };
+
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setRegisterErrors({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: '',
+      general: ''
+    });
+
+    let hasError = false;
+    const newErrors = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: '',
+      general: ''
+    };
+
+    if (!registerData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      hasError = true;
+    }
+
+    if (!registerData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      hasError = true;
+    }
+
+    if (!registerData.email.trim()) {
+      newErrors.email = 'Email is required';
+      hasError = true;
+    } else if (!validateEmail(registerData.email)) {
+      newErrors.email = 'Please enter a valid email';
+      hasError = true;
+    }
+
+    if (!registerData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+      hasError = true;
+    } else if (!validatePhone(registerData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
+      hasError = true;
+    }
+
+    if (!registerData.password) {
+      newErrors.password = 'Password is required';
+      hasError = true;
+    } else if (registerData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      hasError = true;
+    }
+
+    if (!registerData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+      hasError = true;
+    } else if (registerData.password !== registerData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setRegisterErrors(newErrors);
+      if (newErrors.firstName && registerFirstNameRef.current) {
+        registerFirstNameRef.current.focus();
+      } else if (newErrors.lastName && registerLastNameRef.current) {
+        registerLastNameRef.current.focus();
+      } else if (newErrors.email && registerEmailRef.current) {
+        registerEmailRef.current.focus();
+      } else if (newErrors.phoneNumber && registerPhoneRef.current) {
+        registerPhoneRef.current.focus();
+      } else if (newErrors.password && registerPasswordRef.current) {
+        registerPasswordRef.current.focus();
+      } else if (newErrors.confirmPassword && registerConfirmPasswordRef.current) {
+        registerConfirmPasswordRef.current.focus();
+      }
+      return;
+    }
+
+    setIsRegistering(true);
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: registerData.firstName,
+          lastName: registerData.lastName,
+          email: registerData.email,
+          phoneNumber: registerData.phoneNumber,
+          password: registerData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRegisterErrors(prev => ({ ...prev, general: data.message || 'Registration failed' }));
+        toast.error(data.message || 'Registration failed');
+        setIsRegistering(false);
+        return;
+      }
+
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: registerData.email,
+        password: registerData.password,
+      });
+
+      if (result?.error) {
+        toast.success('Registration successful! Please log in.');
+        setShowRegisterForm(false);
+        setLoginData({ email: registerData.email, password: '' });
+        setRegisterData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: '',
+          password: '',
+          confirmPassword: ''
+        });
+        setRegisterErrors({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: '',
+          password: '',
+          confirmPassword: '',
+          general: ''
+        });
+        setIsRegistering(false);
+        setShowRegisterPassword(false);
+        setShowRegisterConfirmPassword(false);
+      } else {
+        toast.success('Registration successful! You are now logged in.');
+        await update();
+        setPendingLoginComplete(true);
+        setRegisterData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: '',
+          password: '',
+          confirmPassword: ''
+        });
+        setRegisterErrors({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: '',
+          password: '',
+          confirmPassword: '',
+          general: ''
+        });
+        setIsRegistering(false);
+        setShowRegisterPassword(false);
+        setShowRegisterConfirmPassword(false);
+        setShowRegisterForm(false);
+      }
+    } catch {
+      setRegisterErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
+      toast.error('An error occurred. Please try again.');
+      setIsRegistering(false);
     }
   };
 
@@ -187,8 +439,15 @@ const FinalDetails = () => {
       if (result?.error) {
         setLoginErrors(prev => ({ ...prev, general: 'Invalid email or password' }));
         toast.error('Invalid email or password');
+        setIsLoggingIn(false);
       } else {
         toast.success('Welcome back! You are now logged in.');
+        
+        // Reset login form
+        setLoginData({ email: '', password: '' });
+        setLoginErrors({ email: '', password: '', general: '' });
+        setIsLoggingIn(false);
+        setShowPassword(false);
         
         // Refresh session
         await update();
@@ -199,7 +458,6 @@ const FinalDetails = () => {
     } catch {
       setLoginErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
       toast.error('An error occurred. Please try again.');
-    } finally {
       setIsLoggingIn(false);
     }
   };
@@ -278,6 +536,42 @@ const FinalDetails = () => {
       }
     });
     
+    // Reset guest errors after successful submission
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+
+    // Reset login and register form states
+    setLoginData({ email: '', password: '' });
+    setLoginErrors({ email: '', password: '', general: '' });
+    setIsLoggingIn(false);
+    setShowPassword(false);
+
+    setRegisterData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: ''
+    });
+    setRegisterErrors({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: '',
+      general: ''
+    });
+    setIsRegistering(false);
+    setShowRegisterPassword(false);
+    setShowRegisterConfirmPassword(false);
+    setShowRegisterForm(false);
+    
     dispatch({ type: "COMPLETE_STEP", payload: step });
     dispatch({ type: "TOGGLE_STEP", payload: step });
     
@@ -329,6 +623,33 @@ const FinalDetails = () => {
       password: '',
       general: ''
     });
+
+    setRegisterData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: ''
+    });
+
+    setRegisterErrors({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+      confirmPassword: '',
+      general: ''
+    });
+
+    setIsLoggingIn(false);
+    setIsRegistering(false);
+    setShowPassword(false);
+    setShowRegisterPassword(false);
+    setShowRegisterConfirmPassword(false);
+    setShowRegisterForm(false);
+    setPendingLoginComplete(false);
     
     dispatch({ type: "UNCOMPLETE_STEP", payload: step });
     
@@ -391,117 +712,336 @@ const FinalDetails = () => {
       >
         <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0">
           <div className="w-full md:w-1/2 flex flex-col px-3 sm:px-4 md:px-6">
-            <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
-              <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
-            </div>
-            
-            <div className="p-3 sm:p-4 md:p-6">
-              <form onSubmit={handleLoginSubmit} noValidate className="space-y-3 sm:space-y-4 md:space-y-6">
-                {/* General Error */}
-                {loginErrors.general && (
-                  <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center justify-between gap-2">
-                    <p className="text-sm text-red-600">{loginErrors.general}</p>
-                    <button
-                      type="button"
-                      onClick={dismissLoginError}
-                      className="cursor-pointer text-red-600 hover:text-red-800 transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Email Address <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      ref={loginEmailRef}
-                      id="login-email"
-                      name="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={loginData.email}
-                      onChange={handleLoginChange}
-                      disabled={isLoggingIn}
-                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
-                        loginErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
-                      }`}
-                    />
-                    {loginErrors.email && (
-                      <p className="text-xs text-red-600">{loginErrors.email}</p>
+            {!showRegisterForm ? (
+              <>
+                <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                  <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
+                </div>
+                
+                <div className="p-3 sm:p-4 md:p-6">
+                  <form onSubmit={handleLoginSubmit} noValidate className="space-y-3 sm:space-y-4 md:space-y-6">
+                    {/* General Error */}
+                    {loginErrors.general && (
+                      <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center justify-between gap-2">
+                        <p className="text-sm text-red-600">{loginErrors.general}</p>
+                        <button
+                          type="button"
+                          onClick={dismissLoginError}
+                          className="cursor-pointer text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
                     )}
-                  </div>
 
-                  <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
-                    <Label htmlFor="login-password" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Password <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        ref={loginPasswordRef}
-                        id="login-password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        value={loginData.password}
-                        onChange={handleLoginChange}
-                        disabled={isLoggingIn}
-                        className={`w-full pl-3 sm:px-4 py-2 sm:py-3 pr-10! border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
-                          loginErrors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
-                        }`}
-                      />
+                    <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Email Address <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={loginEmailRef}
+                          id="login-email"
+                          name="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={loginData.email}
+                          onChange={handleLoginChange}
+                          disabled={isLoggingIn}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            loginErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                        {loginErrors.email && (
+                          <p className="text-xs text-red-600">{loginErrors.email}</p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                        <Label htmlFor="login-password" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Password <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            ref={loginPasswordRef}
+                            id="login-password"
+                            name="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={loginData.password}
+                            onChange={handleLoginChange}
+                            disabled={isLoggingIn}
+                            className={`w-full pl-3 sm:px-4 py-2 sm:py-3 pr-10! border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                              loginErrors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-0"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
+                        {loginErrors.password && (
+                          <p className="text-xs text-red-600">{loginErrors.password}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-left">
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-0"
+                        className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
+                        Forgot password?
                       </button>
                     </div>
-                    {loginErrors.password && (
-                      <p className="text-xs text-red-600">{loginErrors.password}</p>
+
+                    <div className="text-center text-xs sm:text-sm text-gray-600">
+                      Don&apos;t have an account?{' '}
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterForm(true)}
+                        className="cursor-pointer text-yellow-600 hover:text-yellow-700 font-medium"
+                      >
+                        Register Now
+                      </button>
+                    </div>
+
+                    <div className='text-center'>
+                      <Button
+                          type="submit"
+                          disabled={isLoggingIn}
+                          className={`bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base ${
+                            isLoggingIn ? 'cursor-default opacity-50' : 'cursor-pointer'
+                          }`}
+                      >
+                          {isLoggingIn ? 'Logging in...' : 'Log in'}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                  <h2 className="text-base sm:text-lg font-medium text-gray-800">Create your account</h2>
+                </div>
+                
+                <div className="p-3 sm:p-4 md:p-6">
+                  <form onSubmit={handleRegisterSubmit} noValidate className="space-y-3 sm:space-y-4">
+                    {/* General Error */}
+                    {registerErrors.general && (
+                      <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center justify-between gap-2">
+                        <p className="text-sm text-red-600">{registerErrors.general}</p>
+                        <button
+                          type="button"
+                          onClick={dismissRegisterError}
+                          className="cursor-pointer text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                <div className="text-left">
-                  <button
-                    type="button"
-                    className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+                    <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="register-firstname" className="text-gray-700 font-medium text-sm sm:text-base">
+                          First Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={registerFirstNameRef}
+                          id="register-firstname"
+                          name="firstName"
+                          type="text"
+                          placeholder="First Name"
+                          value={registerData.firstName}
+                          onChange={handleRegisterChange}
+                          disabled={isRegistering}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            registerErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                        {registerErrors.firstName && (
+                          <p className="text-xs text-red-600">{registerErrors.firstName}</p>
+                        )}
+                      </div>
 
-                <div className="text-center text-xs sm:text-sm text-gray-600">
-                  Don&apos;t have an account?{' '}
-                  <button
-                    type="button"
-                    className="cursor-pointer text-yellow-600 hover:text-yellow-700 font-medium"
-                  >
-                    Register Now
-                  </button>
-                </div>
+                      <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                        <Label htmlFor="register-lastname" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Last Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={registerLastNameRef}
+                          id="register-lastname"
+                          name="lastName"
+                          type="text"
+                          placeholder="Last Name"
+                          value={registerData.lastName}
+                          onChange={handleRegisterChange}
+                          disabled={isRegistering}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            registerErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                        {registerErrors.lastName && (
+                          <p className="text-xs text-red-600">{registerErrors.lastName}</p>
+                        )}
+                      </div>
+                    </div>
 
-                <div className='text-center'>
-                  <Button
-                      type="submit"
-                      disabled={isLoggingIn}
-                      className={`bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base ${
-                        isLoggingIn ? 'cursor-default opacity-50' : 'cursor-pointer'
-                      }`}
-                  >
-                      {isLoggingIn ? 'Logging in...' : 'Log in'}
-                  </Button>
+                    <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="register-email" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Email Address <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={registerEmailRef}
+                          id="register-email"
+                          name="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={registerData.email}
+                          onChange={handleRegisterChange}
+                          disabled={isRegistering}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            registerErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                        {registerErrors.email && (
+                          <p className="text-xs text-red-600">{registerErrors.email}</p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                        <Label htmlFor="register-phone" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Phone Number <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={registerPhoneRef}
+                          id="register-phone"
+                          name="phoneNumber"
+                          type="tel"
+                          placeholder="1234567890"
+                          value={registerData.phoneNumber}
+                          onChange={handleRegisterChange}
+                          disabled={isRegistering}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            registerErrors.phoneNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                        {registerErrors.phoneNumber && (
+                          <p className="text-xs text-red-600">{registerErrors.phoneNumber}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="register-password" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Password <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            ref={registerPasswordRef}
+                            id="register-password"
+                            name="password"
+                            type={showRegisterPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={registerData.password}
+                            onChange={handleRegisterChange}
+                            disabled={isRegistering}
+                            className={`w-full pl-3 sm:px-4 py-2 sm:py-3 pr-10! border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                              registerErrors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-0"
+                          >
+                            {showRegisterPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
+                        {registerErrors.password && (
+                          <p className="text-xs text-red-600">{registerErrors.password}</p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
+                        <Label htmlFor="register-confirm-password" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Confirm Password <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            ref={registerConfirmPasswordRef}
+                            id="register-confirm-password"
+                            name="confirmPassword"
+                            type={showRegisterConfirmPassword ? "text" : "password"}
+                            placeholder="Confirm Password"
+                            value={registerData.confirmPassword}
+                            onChange={handleRegisterChange}
+                            disabled={isRegistering}
+                            className={`w-full pl-3 sm:px-4 py-2 sm:py-3 pr-10! border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                              registerErrors.confirmPassword ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-0"
+                          >
+                            {showRegisterConfirmPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
+                        {registerErrors.confirmPassword && (
+                          <p className="text-xs text-red-600">{registerErrors.confirmPassword}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-center text-xs sm:text-sm text-gray-600">
+                      Already have an account?{' '}
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterForm(false)}
+                        disabled={isRegistering}
+                        className={`text-yellow-600 hover:text-yellow-700 font-medium ${
+                          isRegistering ? 'cursor-default opacity-50' : 'cursor-pointer'
+                        }`}
+                      >
+                        Log In
+                      </button>
+                    </div>
+
+                    <div className='text-center'>
+                      <Button
+                          type="submit"
+                          disabled={isRegistering}
+                          className={`bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base ${
+                            isRegistering ? 'cursor-default opacity-50' : 'cursor-pointer'
+                          }`}
+                      >
+                          {isRegistering ? 'Creating Account...' : 'Create Account'}
+                      </Button>
+                    </div>
+                  </form>
                 </div>
-              </form>
-            </div>
+              </>
+            )}
           </div>
           <div className="hidden md:flex items-stretch">
             <div className="w-px bg-gray-300 mx-0 h-full" />
