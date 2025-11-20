@@ -711,12 +711,21 @@ const FinalDetails = () => {
         }}
       >
         <div className="w-full flex flex-col md:flex-row items-stretch justify-center p-0">
-          <div className="w-full md:w-1/2 flex flex-col px-3 sm:px-4 md:px-6">
-            {!showRegisterForm ? (
-              <>
-                <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
-                  <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
-                </div>
+          <div className="w-full md:w-1/2 flex flex-col px-3 sm:px-4 md:px-6 relative overflow-hidden">
+            {/* Login Form */}
+            <div 
+              className="transition-all duration-900 ease-in-out"
+              style={{
+                transform: showRegisterForm ? 'translateY(-100%)' : 'translateY(0)',
+                opacity: showRegisterForm ? 0 : 1,
+                position: showRegisterForm ? 'absolute' : 'relative',
+                width: '100%',
+                pointerEvents: showRegisterForm ? 'none' : 'auto'
+              }}
+            >
+              <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
+              </div>
                 
                 <div className="p-3 sm:p-4 md:p-6">
                   <form onSubmit={handleLoginSubmit} noValidate className="space-y-3 sm:space-y-4 md:space-y-6">
@@ -826,12 +835,22 @@ const FinalDetails = () => {
                     </div>
                   </form>
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
-                  <h2 className="text-base sm:text-lg font-medium text-gray-800">Create your account</h2>
-                </div>
+              </div>
+
+            {/* Register Form */}
+            <div 
+              className="transition-all duration-900 ease-in-out"
+              style={{
+                transform: !showRegisterForm ? 'translateY(100%)' : 'translateY(0)',
+                opacity: !showRegisterForm ? 0 : 1,
+                position: !showRegisterForm ? 'absolute' : 'relative',
+                width: '100%',
+                pointerEvents: !showRegisterForm ? 'none' : 'auto'
+              }}
+            >
+              <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-medium text-gray-800">Create your account</h2>
+              </div>
                 
                 <div className="p-3 sm:p-4 md:p-6">
                   <form onSubmit={handleRegisterSubmit} noValidate className="space-y-3 sm:space-y-4">
@@ -1040,8 +1059,7 @@ const FinalDetails = () => {
                     </div>
                   </form>
                 </div>
-              </>
-            )}
+              </div>
           </div>
           <div className="hidden md:flex items-stretch">
             <div className="w-px bg-gray-300 mx-0 h-full" />
