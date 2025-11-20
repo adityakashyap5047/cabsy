@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,18 @@ const FinalDetails = () => {
     email: ''
   });
 
+  const [guestErrors, setGuestErrors] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: ''
+  });
+
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const phoneNumberRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+
   const [showDataInfo, setShowDataInfo] = useState(false);
 
   const isExpanded = state.expandedSteps.includes(step);
@@ -46,6 +58,16 @@ const FinalDetails = () => {
     }
   }, [isLoggedIn, isCompleted, session]);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone.replace(/\D/g, ''));
+  };
+
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -60,6 +82,9 @@ const FinalDetails = () => {
       ...prev,
       [name]: value
     }));
+    if (guestErrors[name as keyof typeof guestErrors]) {
+      setGuestErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -91,9 +116,60 @@ const FinalDetails = () => {
   const handleGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   
-    if (!guestData.firstName.trim() || !guestData.lastName.trim() || 
-        !guestData.phoneNumber.trim() || !guestData.email.trim()) {
-      alert('Please fill in all required fields');
+    // Reset errors
+    setGuestErrors({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+
+    // Validation
+    let hasError = false;
+    const newErrors = {
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    };
+
+    if (!guestData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      hasError = true;
+    }
+
+    if (!guestData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      hasError = true;
+    }
+
+    if (!guestData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+      hasError = true;
+    } else if (!validatePhone(guestData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
+      hasError = true;
+    }
+
+    if (!guestData.email.trim()) {
+      newErrors.email = 'Email is required';
+      hasError = true;
+    } else if (!validateEmail(guestData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setGuestErrors(newErrors);
+      if (newErrors.firstName && firstNameRef.current) {
+        firstNameRef.current.focus();
+      } else if (newErrors.lastName && lastNameRef.current) {
+        lastNameRef.current.focus();
+      } else if (newErrors.phoneNumber && phoneNumberRef.current) {
+        phoneNumberRef.current.focus();
+      } else if (newErrors.email && emailRef.current) {
+        emailRef.current.focus();
+      }
       return;
     }
     
@@ -139,6 +215,13 @@ const FinalDetails = () => {
     });
 
     setGuestData({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+
+    setGuestErrors({
       firstName: '',
       lastName: '',
       phoneNumber: '',
@@ -285,72 +368,92 @@ const FinalDetails = () => {
             </div>
             
             <div className="p-3 sm:p-4 md:p-6">
-              <form onSubmit={handleGuestSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
+              <form onSubmit={handleGuestSubmit} noValidate className="space-y-3 sm:space-y-4 md:space-y-6">
                 <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-firstname" className="text-gray-700 font-medium text-sm sm:text-base">
-                      First Name
+                      First Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      ref={firstNameRef}
                       id="guest-firstname"
                       name="firstName"
                       type="text"
                       placeholder="First Name"
                       value={guestData.firstName}
                       onChange={handleGuestChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                        guestErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                      }`}
                     />
+                    {guestErrors.firstName && (
+                      <p className="text-xs text-red-600">{guestErrors.firstName}</p>
+                    )}
                   </div>
 
                   <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
                     <Label htmlFor="guest-lastname" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Last Name
+                      Last Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      ref={lastNameRef}
                       id="guest-lastname"
                       name="lastName"
                       type="text"
                       placeholder="Last Name"
                       value={guestData.lastName}
                       onChange={handleGuestChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                        guestErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                      }`}
                     />
+                    {guestErrors.lastName && (
+                      <p className="text-xs text-red-600">{guestErrors.lastName}</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-phone" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Phone Number
+                      Phone Number <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      ref={phoneNumberRef}
                       id="guest-phone"
                       name="phoneNumber"
                       type="tel"
-                      placeholder="(555) 555-5555"
+                      placeholder="1234567890"
                       value={guestData.phoneNumber}
                       onChange={handleGuestChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                        guestErrors.phoneNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                      }`}
                     />
+                    {guestErrors.phoneNumber && (
+                      <p className="text-xs text-red-600">{guestErrors.phoneNumber}</p>
+                    )}
                   </div>
 
                   <div className="flex-1 space-y-2 mt-3 min-[420px]:mt-0">
                     <Label htmlFor="guest-email" className="text-gray-700 font-medium text-sm sm:text-base">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      ref={emailRef}
                       id="guest-email"
                       name="email"
                       type="email"
-                      placeholder="Enter your email address"
+                      placeholder="you@example.com"
                       value={guestData.email}
                       onChange={handleGuestChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-gray-900 text-sm sm:text-base"
-                      required
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                        guestErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                      }`}
                     />
+                    {guestErrors.email && (
+                      <p className="text-xs text-red-600">{guestErrors.email}</p>
+                    )}
                   </div>
                 </div>
 
@@ -378,7 +481,7 @@ const FinalDetails = () => {
                 <div className="flex justify-center">
                   <Button
                     type="submit"
-                    className="bg-white hover:bg-gray-50 text-yellow-600 border-2 border-yellow-600 font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-none transition-colors duration-200 text-sm sm:text-base"
+                    className="bg-white cursor-pointer hover:text-white hover:bg-[#AE9409] text-[#AE9409] border-2 border-[#AE9409] font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-none transition-colors duration-200 text-sm sm:text-base"
                   >
                     Continue as guest
                   </Button>
