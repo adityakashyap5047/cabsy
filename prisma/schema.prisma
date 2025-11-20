@@ -35,16 +35,18 @@ enum PaymentMethod {
 }
 
 model User {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  firstName   String
-  lastName    String
-  email       String    @unique
-  password    String?
-  phoneNumber String
-  isGuest     Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  bookings    Booking[] @relation("UserBookings")
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName             String
+  lastName              String
+  email                 String    @unique
+  password              String?
+  phoneNumber           String
+  isGuest               Boolean   @default(false)
+  resetToken            String?
+  resetTokenExpiry      DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  bookings              Booking[] @relation("UserBookings")
   
   @@map("users")
 }
