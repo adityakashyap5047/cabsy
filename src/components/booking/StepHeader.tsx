@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Edit } from 'lucide-react';
+import { Edit, LogOut } from 'lucide-react';
 import DottedCircle from '../circle/DottedCircle';
 import EmptyCircle from '../circle/EmptyCircle';
 
@@ -13,6 +13,7 @@ interface StepHeaderProps {
   showSummary?: boolean;
   onToggleSummary?: () => void;
   onEdit?: () => void;
+  onLogout?: () => void;
   summary?: React.ReactNode;
 }
 
@@ -24,6 +25,7 @@ export default function StepHeader({
   showSummary = false,
   onToggleSummary,
   onEdit,
+  onLogout,
   summary,
 }: StepHeaderProps) {
   
@@ -64,6 +66,18 @@ export default function StepHeader({
             >
               <Edit className="w-4 h-4" />
               <span className="text-sm font-medium">Edit</span>
+            </button>
+          )}
+          {isCompleted && !isEditing && onLogout && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onLogout();
+              }}
+              className="flex items-center cursor-pointer gap-1 text-red-600 hover:text-red-700 transition-colors duration-200"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm font-medium">Logout</span>
             </button>
           )}
         </div>

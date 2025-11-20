@@ -56,6 +56,7 @@ export type BookingAction =
   | { type: "SET_PAYMENT"; payload: { method?: string; amount?: number; status?: string } }
   | { type: "SET_STEP"; payload: number }
   | { type: "COMPLETE_STEP"; payload: number }
+  | { type: "UNCOMPLETE_STEP"; payload: number }
   | { type: "TOGGLE_STEP"; payload: number }
   | { type: "COLLAPSE_AFTER_STEP"; payload: number }
   | { type: "EXPAND_ONLY_STEP"; payload: number }
@@ -257,6 +258,12 @@ export default function bookingReducer(state: BookingState, action: BookingActio
       return state.completedSteps.includes(action.payload)
         ? state
         : { ...state, completedSteps: [...state.completedSteps, action.payload] };
+
+    case "UNCOMPLETE_STEP":
+      return {
+        ...state,
+        completedSteps: state.completedSteps.filter(s => s !== action.payload)
+      };
 
     case "TOGGLE_STEP":
       return state.expandedSteps.includes(action.payload)

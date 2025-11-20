@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +11,7 @@ import { useBooking } from '@/context/BookingContext';
 
 const FinalDetails = () => {
   const { state, dispatch } = useBooking();
+  const { data: session, status } = useSession();
   const step = 2;
 
   const [loginData, setLoginData] = useState({
@@ -29,6 +32,19 @@ const FinalDetails = () => {
   const isCompleted = state.completedSteps.includes(step);
   const showSummary = state.summarySteps.includes(step);
   const isEditing = isExpanded && isCompleted;
+  const isLoggedIn = status === 'authenticated' && session?.user;
+
+  useEffect(() => {
+    if (isLoggedIn && isCompleted && session.user) {
+      const nameParts = session.user.name?.split(' ') || ['', ''];
+      setGuestData({
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        phoneNumber: session.user.phone || '',
+        email: session.user.email || ''
+      });
+    }
+  }, [isLoggedIn, isCompleted, session]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -111,6 +127,40 @@ const FinalDetails = () => {
     if (!isExpanded) dispatch({ type: "TOGGLE_STEP", payload: step });
   };
 
+  const handleLogout = async () => {
+    dispatch({
+      type: "SET_USER",
+      payload: {
+        name: '',
+        email: '',
+        phone: '',
+        passengers: []
+      }
+    });
+
+    setGuestData({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: ''
+    });
+    
+    dispatch({ type: "UNCOMPLETE_STEP", payload: step });
+    
+    dispatch({ type: "COLLAPSE_AFTER_STEP", payload: step - 1 });
+    
+    if (showSummary) {
+      dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+    }
+    
+    setTimeout(() => {
+      dispatch({ type: "EXPAND_ONLY_STEP", payload: step });
+    }, 100);
+    
+    await signOut({ redirect: false });
+    toast.success('You have been logged out successfully.');
+  };
+
   const handleToggleSummary = () => {
     if (isCompleted) {
       dispatch({ type: "TOGGLE_SUMMARY", payload: step });
@@ -120,7 +170,7 @@ const FinalDetails = () => {
   const summary = (
     <div className="grid grid-cols-1 min-[440px]:grid-cols-2 min-[768px]:grid-cols-4 min-[960px]:grid-cols-3 gap-y-3">
       <div>
-        <span className="font-semibold text-gray-600">Guest:</span>{' '}
+        <span className="font-semibold text-gray-600">Name:</span>{' '}
         <span className="text-gray-700 text-sm">{guestData.firstName} {guestData.lastName}</span>
       </div>
       <div>
@@ -143,7 +193,8 @@ const FinalDetails = () => {
         isEditing={isEditing}
         showSummary={showSummary}
         onToggleSummary={handleToggleSummary}
-        onEdit={handleEdit}
+        onEdit={isLoggedIn ? undefined : handleEdit}
+        onLogout={isLoggedIn ? handleLogout : undefined}
         summary={summary}
       />
       <div 
@@ -159,9 +210,9 @@ const FinalDetails = () => {
               <h2 className="text-base sm:text-lg font-medium text-gray-800">Log In to your account</h2>
             </div>
             
-            <div className="p-2 sm:p-4">
+            <div className="p-3 sm:p-4 md:p-6">
               <form onSubmit={handleLoginSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="login-email" className="text-gray-700 font-medium text-sm sm:text-base">
                       Email Address
@@ -233,10 +284,9 @@ const FinalDetails = () => {
               <h2 className="text-base sm:text-lg font-medium text-gray-800">Continue as guest</h2>
             </div>
             
-            <div className="p-2 sm:p-4">
+            <div className="p-3 sm:p-4 md:p-6">
               <form onSubmit={handleGuestSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
-                {/* First Name and Last Name side by side on larger screens */}
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-firstname" className="text-gray-700 font-medium text-sm sm:text-base">
                       First Name
@@ -270,8 +320,7 @@ const FinalDetails = () => {
                   </div>
                 </div>
 
-                {/* Phone and Email side by side on larger screens */}
-                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-2">
+                <div className="flex flex-col min-[420px]:flex-row min-[420px]:gap-4">
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="guest-phone" className="text-gray-700 font-medium text-sm sm:text-base">
                       Phone Number

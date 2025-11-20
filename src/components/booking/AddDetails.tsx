@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
+import { useSession } from "next-auth/react";
 import { BriefcaseBusinessIcon, Calendar as CalendarIcon, Clock, Minus, Plus, Trash2, Users, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,7 @@ export interface AddDetailsRef {
 
 const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJourney = false, forceMobileLayout = false }, ref) => {
   const { state, dispatch } = useBooking();
+  const { data: session, status } = useSession();
 
   const step = 1;
   const currentJourney = isReturnJourney ? state.returnJourney : state.onward;
@@ -287,12 +289,38 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
     dispatch({ type: isReturnJourney ? "COMPLETE_RETURN_STEP" : "COMPLETE_STEP", payload: step });
     dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_STEP" : "TOGGLE_STEP", payload: step });
     
-    setTimeout(() => {
-      if (!showSummary) {
-        dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: step });
-      }
-      dispatch({ type: isReturnJourney ? "EXPAND_ONLY_RETURN_STEP" : "EXPAND_ONLY_STEP", payload: step + 1 });
-    }, 100);
+    // If user is logged in, skip step 2 and auto-complete it with session data
+    if (status === 'authenticated' && session?.user && !isReturnJourney) {
+      dispatch({
+        type: "SET_USER",
+        payload: {
+          name: session.user.name || '',
+          email: session.user.email || '',
+          phone: session.user.phone || '',
+          passengers: [{
+            name: session.user.name || '',
+            email: session.user.email || '',
+            phone: session.user.phone || ''
+          }]
+        }
+      });
+      dispatch({ type: "COMPLETE_STEP", payload: step + 1 });
+      
+      setTimeout(() => {
+        if (!showSummary) {
+          dispatch({ type: "TOGGLE_SUMMARY", payload: step });
+        }
+        dispatch({ type: "TOGGLE_SUMMARY", payload: step + 1 });
+        dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 2 }); // Skip to step 3 (SelectVehicle)
+      }, 100);
+    } else {
+      setTimeout(() => {
+        if (!showSummary) {
+          dispatch({ type: isReturnJourney ? "TOGGLE_RETURN_SUMMARY" : "TOGGLE_SUMMARY", payload: step });
+        }
+        dispatch({ type: isReturnJourney ? "EXPAND_ONLY_RETURN_STEP" : "EXPAND_ONLY_STEP", payload: step + 1 });
+      }, 100);
+    }
   };
 
   const handleEdit = () => {
