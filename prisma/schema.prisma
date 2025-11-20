@@ -41,7 +41,6 @@ model User {
   email                 String    @unique
   password              String?
   phoneNumber           String
-  isGuest               Boolean   @default(false)
   resetToken            String?
   resetTokenExpiry      DateTime?
   createdAt             DateTime  @default(now())

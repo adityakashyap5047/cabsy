@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
                 email,
                 password: hashedPassword,
                 phoneNumber,
-                isGuest: false
             }
         });
 
