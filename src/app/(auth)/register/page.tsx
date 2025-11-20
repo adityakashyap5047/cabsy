@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -168,6 +169,7 @@ const RegisterPage = () => {
 
       if (!response.ok) {
         setErrors(prev => ({ ...prev, general: data.message || 'Registration failed' }));
+        toast.error(data.message || 'Registration failed');
         setIsLoading(false);
         return;
       }
@@ -179,12 +181,15 @@ const RegisterPage = () => {
       });
 
       if (result?.error) {
+        toast.success('Registration successful! Please log in.');
         router.push('/login');
       } else {
+        toast.success('Registration successful! You are now logged in.');
         router.push('/');
       }
     } catch {
       setErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
+      toast.error('An error occurred. Please try again.');
       setIsLoading(false);
     }
   };

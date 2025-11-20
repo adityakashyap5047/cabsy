@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -91,11 +92,14 @@ const LoginPage = () => {
 
       if (result?.error) {
         setErrors(prev => ({ ...prev, general: 'Invalid email or password' }));
+        toast.error('Invalid email or password');
       } else {
+        toast.success('Welcome back! You are now logged in.');
         router.push('/');
       }
     } catch {
       setErrors(prev => ({ ...prev, general: 'An error occurred. Please try again.' }));
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import toast from 'react-hot-toast';
 import { Car, Menu, X, User, MapPin, Phone, Clock, LogIn, UserPlus, LogOut, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -138,6 +139,7 @@ const Header = () => {
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           signOut({ callbackUrl: '/' });
+                          toast.success('You have been logged out successfully.');
                         }}
                         className="flex items-center gap-3 cursor-pointer px-4 py-3 hover:bg-gray-50 transition-colors text-left w-full"
                       >
