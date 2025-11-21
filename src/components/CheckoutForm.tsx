@@ -28,6 +28,7 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
+    amount?: number | null;
     remarks?: string | null;
   };
   returnJourney?: {
@@ -44,6 +45,7 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
+    amount?: number | null;
     remarks?: string | null;
   } | null;
   expiresAt: Date;
@@ -106,19 +108,24 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
 
         <div className="bg-gray-100 p-4 rounded-md text-sm text-gray-700 space-y-2">
           <div className="flex justify-between text-sm pb-1">
-            <span>Ride Booking</span>
-            <span>${total.toFixed(2)}</span>
+            <span>Onward Fare</span>
+            <span>${bookingData.onwardJourney.amount?.toFixed(2) || '0.00'}</span>
+          </div>
+          <div className="flex justify-between text-xs text-gray-600 pb-2">
+            <span>• {bookingData.onwardJourney.passengers} passenger{bookingData.onwardJourney.passengers > 1 ? 's' : ''}</span>
           </div>
 
-          {bookingData.returnEnabled && (
-            <div className="flex justify-between text-xs text-gray-600 pb-1">
-              <span>• Return journey included</span>
-            </div>
+          {bookingData.returnEnabled && bookingData.returnJourney && (
+            <>
+              <div className="flex justify-between text-sm pb-1">
+                <span>Return Fare</span>
+                <span>${bookingData.returnJourney.amount?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-600 pb-2">
+                <span>• {bookingData.returnJourney.passengers} passenger{bookingData.returnJourney.passengers > 1 ? 's' : ''}</span>
+              </div>
+            </>
           )}
-
-          <div className="flex justify-between text-xs text-gray-600 pb-1">
-            <span>• {bookingData.passengers.length} passenger{bookingData.passengers.length > 1 ? 's' : ''}</span>
-          </div>
 
           <div className="flex justify-between font-semibold mt-2 pt-2 border-t">
             <span>Total</span>
