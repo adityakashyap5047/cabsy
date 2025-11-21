@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import StepHeader from './StepHeader';
 import { useBooking } from '@/context/BookingContext';
@@ -11,6 +12,7 @@ import Remarks from './Remarks';
 import ReturnJourneyPanel from './ReturnJourneyPanel';
 import { Edit, MapPin } from 'lucide-react';
 import { format } from "date-fns";
+import toast from 'react-hot-toast';
 
 interface CheckoutProps {
   isReturnJourney?: boolean;
@@ -18,11 +20,13 @@ interface CheckoutProps {
 
 const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
   const { state, dispatch } = useBooking();
+  const router = useRouter();
   const stepNumber = isReturnJourney ? 2 : 3;
   
   const [hasReturnJourney, setHasReturnJourney] = useState(state.returnEnabled);
   const [isReturnPanelOpen, setIsReturnPanelOpen] = useState(false);
   const [isReturnJourneySaved, setIsReturnJourneySaved] = useState(false);
+  const [loading, setLoading] = useState(false);
   const isExpanded = isReturnJourney
     ? state.returnExpandedSteps.includes(stepNumber)
     : state.expandedSteps.includes(stepNumber);
@@ -33,6 +37,90 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
     ? state.returnSummarySteps.includes(stepNumber)
     : state.summarySteps.includes(stepNumber);
   const isEditing = isExpanded && isCompleted;
+
+  const createPaymentSession = async () => {
+    setLoading(true);
+    try {
+      // Prepare onward journey data
+      const onwardJourney = {
+        serviceType: state.onward?.serviceType || '',
+        pickupDate: state.onward?.date || new Date(),
+        pickupTime: state.onward?.time || '',
+        pickupLocation: state.onward?.pickupLocation || '',
+        stops: state.onward?.stops || [],
+        dropoffLocation: state.onward?.dropoffLocation || '',
+        passengers: state.onward?.passengers || 1,
+        luggage: state.onward?.luggage || 0,
+        vehicleType: state.onward?.vehicle || null,
+        remarks: state.onward?.remarks || null,
+      };
+
+      // Prepare return journey data if exists
+      let returnJourney = null;
+      if (state.returnEnabled && state.returnJourney) {
+        returnJourney = {
+          serviceType: state.returnJourney.serviceType || '',
+          pickupDate: state.returnJourney.date || new Date(),
+          pickupTime: state.returnJourney.time || '',
+          pickupLocation: state.returnJourney.pickupLocation || '',
+          stops: state.returnJourney.stops || [],
+          dropoffLocation: state.returnJourney.dropoffLocation || '',
+          passengers: state.returnJourney.passengers || 1,
+          luggage: state.returnJourney.luggage || 0,
+          vehicleType: state.returnJourney.vehicle || null,
+          remarks: state.returnJourney.remarks || null,
+        };
+      }
+
+      // Prepare passengers data
+      const passengersList = state.onward?.user?.passengers || [];
+      const passengers = passengersList.map(p => ({
+        firstName: p.name?.split(' ')[0] || '',
+        lastName: p.name?.split(' ').slice(1).join(' ') || '',
+        email: p.email || null,
+        phoneNumber: p.phone || null,
+      }));
+
+      // Prepare guest data (lead passenger)
+      const guestData = passengers[0] || {
+        firstName: leadData.firstName,
+        lastName: leadData.lastName,
+        email: leadData.email,
+        phoneNumber: leadData.phoneNumber,
+      };
+
+      // Calculate total amount (you may need to adjust this based on your pricing logic)
+      const totalAmount = 249; // TODO: Calculate based on journey details
+
+      const res = await fetch('/api/payment/create-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          onwardJourney,
+          returnJourney,
+          passengers,
+          totalAmount,
+          guestData,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create payment session');
+      }
+
+      const sessionId = data.sessionId;
+      router.push(`/checkout?sessionId=${sessionId}`);
+    } catch (error) {
+      console.error('Payment session error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [leadData, setLeadData] = useState({
     firstName: '',
@@ -350,11 +438,14 @@ console.log(state);
             </div>
           </div>
           <Button
-            type="submit"
-            className={`w-full mt-3 sm:mt-4 bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium text-sm sm:text-base py-2 sm:py-3 px-4 sm:px-6 transition-all duration-200 hover:shadow-lg transform
+            type="button"
+            onClick={createPaymentSession}
+            disabled={loading}
+            className={`w-full mt-3 sm:mt-4 bg-[#AE9409] hover:bg-[#8B7507] cursor-pointer rounded-none text-white font-medium text-sm sm:text-base py-2 sm:py-3 px-4 sm:px-6 transition-all duration-200 hover:shadow-lg transform ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            Proceed to Payment
+            {loading ? 'Redirecting...' : 'Proceed to Checkout'}
           </Button>
         </div>
           </>
