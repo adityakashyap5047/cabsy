@@ -13,13 +13,12 @@ export async function POST(request: NextRequest) {
         const {
             onwardJourney,
             returnJourney,
-            passengers,
             totalAmount,
             guestData,
         } = body;
 
         // Validate required fields
-        if (!onwardJourney || !passengers || passengers.length === 0) {
+        if (!onwardJourney || !onwardJourney.passengerDetails || onwardJourney.passengerDetails.length === 0) {
             return NextResponse.json(
                 { error: "Onward journey and passengers are required!" },
                 { status: 400 }
@@ -32,7 +31,6 @@ export async function POST(request: NextRequest) {
             guestEmail: guestData?.email || null,
             onwardJourney,
             returnJourney: returnJourney || null,
-            passengers,
             totalAmount,
         });
 
@@ -55,7 +53,6 @@ export async function POST(request: NextRequest) {
                 guestEmail: existingSession.guestEmail,
                 onwardJourney: existingSession.onwardJourney,
                 returnJourney: existingSession.returnJourney,
-                passengers: existingSession.passengers,
                 totalAmount: existingSession.totalAmount,
             });
 
@@ -86,7 +83,7 @@ export async function POST(request: NextRequest) {
                 guestPhoneNumber: guestData?.phoneNumber || null,
                 totalAmount: totalAmount || 0,
                 returnEnabled: !!returnJourney,
-                passengers,
+                passengers: onwardJourney.passengerDetails,
                 onwardJourney: {
                     journeyType: "ONWARD",
                     serviceType: onwardJourney.serviceType,
@@ -97,7 +94,7 @@ export async function POST(request: NextRequest) {
                     dropoffLocation: onwardJourney.dropoffLocation,
                     passengers: onwardJourney.passengers,
                     luggage: onwardJourney.luggage || 0,
-                    passengerDetails: passengers,
+                    passengerDetails: onwardJourney.passengerDetails,
                     vehicleType: onwardJourney.vehicleType || null,
                     remarks: onwardJourney.remarks || null,
                 },
@@ -112,7 +109,7 @@ export async function POST(request: NextRequest) {
                           dropoffLocation: returnJourney.dropoffLocation,
                           passengers: returnJourney.passengers,
                           luggage: returnJourney.luggage || 0,
-                          passengerDetails: passengers,
+                          passengerDetails: returnJourney.passengerDetails,
                           vehicleType: returnJourney.vehicleType || null,
                           remarks: returnJourney.remarks || null,
                       }

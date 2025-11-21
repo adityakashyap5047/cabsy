@@ -41,7 +41,15 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
   const createPaymentSession = async () => {
     setLoading(true);
     try {
-      // Prepare onward journey data
+      // Prepare onward journey data with passengers
+      const onwardPassengersList = state.onward?.user?.passengers || [];
+      const onwardPassengers = onwardPassengersList.map(p => ({
+        firstName: p.name?.split(' ')[0] || '',
+        lastName: p.name?.split(' ').slice(1).join(' ') || '',
+        email: p.email || null,
+        phoneNumber: p.phone || null,
+      }));
+
       const onwardJourney = {
         serviceType: state.onward?.serviceType || '',
         pickupDate: state.onward?.date,
@@ -51,13 +59,22 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
         dropoffLocation: state.onward?.dropoffLocation || '',
         passengers: state.onward?.passengers || 1,
         luggage: state.onward?.luggage || 0,
+        passengerDetails: onwardPassengers,
         vehicleType: state.onward?.vehicle || null,
         remarks: state.onward?.remarks || null,
       };
 
-      // Prepare return journey data if exists
+      // Prepare return journey data if exists with its own passengers
       let returnJourney = null;
       if (state.returnEnabled && state.returnJourney) {
+        const returnPassengersList = state.returnJourney?.user?.passengers || [];
+        const returnPassengers = returnPassengersList.map(p => ({
+          firstName: p.name?.split(' ')[0] || '',
+          lastName: p.name?.split(' ').slice(1).join(' ') || '',
+          email: p.email || null,
+          phoneNumber: p.phone || null,
+        }));
+
         returnJourney = {
           serviceType: state.returnJourney.serviceType || '',
           pickupDate: state.returnJourney.date,
@@ -67,22 +84,14 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
           dropoffLocation: state.returnJourney.dropoffLocation || '',
           passengers: state.returnJourney.passengers || 1,
           luggage: state.returnJourney.luggage || 0,
+          passengerDetails: returnPassengers,
           vehicleType: state.returnJourney.vehicle || null,
           remarks: state.returnJourney.remarks || null,
         };
       }
 
-      // Prepare passengers data
-      const passengersList = state.onward?.user?.passengers || [];
-      const passengers = passengersList.map(p => ({
-        firstName: p.name?.split(' ')[0] || '',
-        lastName: p.name?.split(' ').slice(1).join(' ') || '',
-        email: p.email || null,
-        phoneNumber: p.phone || null,
-      }));
-
-      // Prepare guest data (lead passenger)
-      const guestData = passengers[0] || {
+      // Prepare guest data (lead passenger from onward journey)
+      const guestData = onwardPassengers[0] || {
         firstName: leadData.firstName,
         lastName: leadData.lastName,
         email: leadData.email,
@@ -100,7 +109,6 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
         body: JSON.stringify({
           onwardJourney,
           returnJourney,
-          passengers,
           totalAmount,
           guestData,
         }),

@@ -414,8 +414,6 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                       <SelectItem value="from-airport">From Airport</SelectItem>
                       <SelectItem value="to-airport">To Airport</SelectItem>
                       <SelectItem value="point-to-point">Point-to-Point</SelectItem>
-                      <SelectItem value="hourly">Hourly Car Service</SelectItem>
-                      <SelectItem value="wedding">Wedding Car Service</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.serviceType && (
