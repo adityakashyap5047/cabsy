@@ -30,6 +30,13 @@ const FinalDetails = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [pendingLoginComplete, setPendingLoginComplete] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordError, setForgotPasswordError] = useState('');
+  const [isSendingResetLink, setIsSendingResetLink] = useState(false);
+  const [resetLinkSent, setResetLinkSent] = useState(false);
+  const forgotPasswordEmailRef = useRef<HTMLInputElement>(null);
 
   const [registerData, setRegisterData] = useState({
     firstName: '',
@@ -163,6 +170,62 @@ const FinalDetails = () => {
       phoneNumber: '',
       email: ''
     });
+  };
+
+  const dismissForgotPasswordError = () => {
+    setForgotPasswordError('');
+  };
+
+  const handleForgotPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForgotPasswordEmail(e.target.value);
+    if (forgotPasswordError) {
+      setForgotPasswordError('');
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setForgotPasswordError('');
+    
+    if (!forgotPasswordEmail.trim()) {
+      setForgotPasswordError('Email is required');
+      forgotPasswordEmailRef.current?.focus();
+      return;
+    }
+
+    if (!validateEmail(forgotPasswordEmail)) {
+      setForgotPasswordError('Please enter a valid email');
+      forgotPasswordEmailRef.current?.focus();
+      return;
+    }
+
+    setIsSendingResetLink(true);
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: forgotPasswordEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResetLinkSent(true);
+        toast.success('Password reset link sent! Check your email.');
+      } else {
+        setForgotPasswordError(data.message || 'An error occurred');
+        toast.error(data.message || 'An error occurred');
+      }
+    } catch {
+      setForgotPasswordError('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsSendingResetLink(false);
+    }
   };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -650,6 +713,10 @@ const FinalDetails = () => {
     setShowRegisterConfirmPassword(false);
     setShowRegisterForm(false);
     setPendingLoginComplete(false);
+    setShowForgotPassword(false);
+    setForgotPasswordEmail('');
+    setForgotPasswordError('');
+    setResetLinkSent(false);
     
     dispatch({ type: "UNCOMPLETE_STEP", payload: step });
     
@@ -716,11 +783,11 @@ const FinalDetails = () => {
             <div 
               className="transition-all duration-900 ease-in-out"
               style={{
-                transform: showRegisterForm ? 'translateY(-100%)' : 'translateY(0)',
-                opacity: showRegisterForm ? 0 : 1,
-                position: showRegisterForm ? 'absolute' : 'relative',
+                transform: showRegisterForm || showForgotPassword ? 'translateY(-100%)' : 'translateY(0)',
+                opacity: showRegisterForm || showForgotPassword ? 0 : 1,
+                position: showRegisterForm || showForgotPassword ? 'absolute' : 'relative',
                 width: '100%',
-                pointerEvents: showRegisterForm ? 'none' : 'auto'
+                pointerEvents: showRegisterForm || showForgotPassword ? 'none' : 'auto'
               }}
             >
               <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
@@ -805,7 +872,11 @@ const FinalDetails = () => {
                     <div className="text-left">
                       <button
                         type="button"
-                        className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium"
+                        onClick={() => {
+                          setShowForgotPassword(true);
+                          setShowRegisterForm(false);
+                        }}
+                        className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm font-medium hover:underline"
                       >
                         Forgot password?
                       </button>
@@ -815,7 +886,10 @@ const FinalDetails = () => {
                       Don&apos;t have an account?{' '}
                       <button
                         type="button"
-                        onClick={() => setShowRegisterForm(true)}
+                        onClick={() => {
+                          setShowRegisterForm(true);
+                          setShowForgotPassword(false);
+                        }}
                         className="cursor-pointer text-yellow-600 hover:text-yellow-700 font-medium"
                       >
                         Register Now
@@ -841,11 +915,11 @@ const FinalDetails = () => {
             <div 
               className="transition-all duration-900 ease-in-out"
               style={{
-                transform: !showRegisterForm ? 'translateY(100%)' : 'translateY(0)',
-                opacity: !showRegisterForm ? 0 : 1,
-                position: !showRegisterForm ? 'absolute' : 'relative',
+                transform: !showRegisterForm || showForgotPassword ? 'translateY(100%)' : 'translateY(0)',
+                opacity: !showRegisterForm || showForgotPassword ? 0 : 1,
+                position: !showRegisterForm || showForgotPassword ? 'absolute' : 'relative',
                 width: '100%',
-                pointerEvents: !showRegisterForm ? 'none' : 'auto'
+                pointerEvents: !showRegisterForm || showForgotPassword ? 'none' : 'auto'
               }}
             >
               <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
@@ -1036,7 +1110,10 @@ const FinalDetails = () => {
                       Already have an account?{' '}
                       <button
                         type="button"
-                        onClick={() => setShowRegisterForm(false)}
+                        onClick={() => {
+                          setShowRegisterForm(false);
+                          setShowForgotPassword(false);
+                        }}
                         disabled={isRegistering}
                         className={`text-yellow-600 hover:text-yellow-700 font-medium ${
                           isRegistering ? 'cursor-default opacity-50' : 'cursor-pointer'
@@ -1060,6 +1137,129 @@ const FinalDetails = () => {
                   </form>
                 </div>
               </div>
+
+            {/* Forgot Password Form */}
+            <div 
+              className="transition-all duration-500 ease-in-out"
+              style={{
+                transform: !showForgotPassword ? 'translateY(100%)' : 'translateY(0)',
+                opacity: !showForgotPassword ? 0 : 1,
+                position: !showForgotPassword ? 'absolute' : 'relative',
+                width: '100%',
+                pointerEvents: !showForgotPassword ? 'none' : 'auto'
+              }}
+            >
+              {resetLinkSent ? (
+                <>
+                  <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                    <h2 className="text-base sm:text-lg font-medium text-gray-800">Check Your Email</h2>
+                  </div>
+                  
+                  <div className="p-3 sm:p-4 md:p-6">
+                    <div className="text-center space-y-4">
+                      <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <p className="text-gray-700 text-sm sm:text-base">
+                        We&apos;ve sent a password reset link to <span className="font-semibold">{forgotPasswordEmail}</span>
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        The link will expire in 1 hour. If you don&apos;t see the email, check your spam folder.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(false);
+                          setResetLinkSent(false);
+                          setForgotPasswordEmail('');
+                        }}
+                        className="cursor-pointer text-yellow-600 hover:text-yellow-700 text-sm font-medium hover:underline"
+                      >
+                        Back to Login
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bg-gray-100 px-3 sm:px-4 md:px-6 py-1 border-b border-gray-200">
+                    <h2 className="text-base sm:text-lg font-medium text-gray-800">Forgot Password?</h2>
+                  </div>
+                  
+                  <div className="p-3 sm:p-4 md:px-6">
+                    <form onSubmit={handleForgotPasswordSubmit} noValidate className="space-y-3 sm:space-y-4">
+                      {forgotPasswordError && (
+                        <div className="bg-red-50 border border-red-200 rounded-sm p-3 flex items-center justify-between gap-2">
+                          <p className="text-sm text-red-600">{forgotPasswordError}</p>
+                          <button
+                            type="button"
+                            onClick={dismissForgotPasswordError}
+                            className="cursor-pointer text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        Enter your email address and we&apos;ll send you a link to reset your password
+                      </p>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="forgot-email" className="text-gray-700 font-medium text-sm sm:text-base">
+                          Email Address <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          ref={forgotPasswordEmailRef}
+                          id="forgot-email"
+                          name="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={forgotPasswordEmail}
+                          onChange={handleForgotPasswordChange}
+                          disabled={isSendingResetLink}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 text-sm sm:text-base ${
+                            forgotPasswordError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-yellow-500'
+                          }`}
+                        />
+                      </div>
+
+                      <div className="text-center text-xs sm:text-sm text-gray-600">
+                        Remember your password?{' '}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowForgotPassword(false);
+                            setForgotPasswordEmail('');
+                            setForgotPasswordError('');
+                          }}
+                          disabled={isSendingResetLink}
+                          className={`text-yellow-600 hover:text-yellow-700 font-medium ${
+                            isSendingResetLink ? 'cursor-default opacity-50' : 'cursor-pointer'
+                          }`}
+                        >
+                          Back to Login
+                        </button>
+                      </div>
+
+                      <div className='text-center'>
+                        <Button
+                            type="submit"
+                            disabled={isSendingResetLink}
+                            className={`bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 sm:py-3 px-12 sm:px-18 rounded-none transition-colors duration-200 text-sm sm:text-base ${
+                              isSendingResetLink ? 'cursor-default opacity-50' : 'cursor-pointer'
+                            }`}
+                        >
+                            {isSendingResetLink ? 'Sending...' : 'Send Reset Link'}
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <div className="hidden md:flex items-stretch">
             <div className="w-px bg-gray-300 mx-0 h-full" />
