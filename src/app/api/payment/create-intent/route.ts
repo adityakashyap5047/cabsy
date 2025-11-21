@@ -11,7 +11,6 @@ export async function POST(request: NextRequest){
     const { amount, sessionId } = await request.json();
 
     try {
-        // Get user session (optional - supports guest bookings)
         const session = await getServerSession(authOptions);
         const userId = session?.user?.id;
 
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest){
             payment_method_types: ['card'],
             metadata: {
                 sessionId,
-                ...(userId && { userId }), // Only include userId if user is logged in
+                ...(userId && { userId }),
             }
         });
 

@@ -6,14 +6,7 @@ import { prisma } from "@/lib/db";
 export async function GET(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
-        const userId = session?.user?.id;
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized. Please log in." },
-                { status: 401 }
-            );
-        }
+        const userId = session?.user?.id || null;
 
         // Get sessionId from query parameters
         const { searchParams } = new URL(request.url);
@@ -51,8 +44,8 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Verify session belongs to current user
-        if (paymentSession.userId !== userId) {
+        // Verify session belongs to current user (or is a guest session)
+        if (paymentSession.userId !== null && paymentSession.userId !== userId) {
             return NextResponse.json(
                 { error: "Unauthorized access to this session" },
                 { status: 403 }
