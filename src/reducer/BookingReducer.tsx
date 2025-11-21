@@ -8,7 +8,7 @@ interface Passenger {
 
 export interface JourneyDetails {
   serviceType: string;
-  date: Date | undefined;
+  date: string | null;
   time: string | null;
   pickupLocation: string;
   stops: string[];
@@ -74,7 +74,7 @@ export type BookingAction =
 export const initialState: BookingState = {
   onward: {
     serviceType: "",
-    date: undefined,
+    date: null,
     time: null,
     pickupLocation: "",
     stops: [],
@@ -126,7 +126,7 @@ export default function bookingReducer(state: BookingState, action: BookingActio
         ...state,
         returnJourney: {
           serviceType: state.onward.serviceType,
-          date: undefined,
+          date: null,
           time: null,
           pickupLocation: state.onward.dropoffLocation || "",
           dropoffLocation: state.onward.pickupLocation || "",

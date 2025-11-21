@@ -44,7 +44,7 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
       // Prepare onward journey data
       const onwardJourney = {
         serviceType: state.onward?.serviceType || '',
-        pickupDate: state.onward?.date || new Date(),
+        pickupDate: state.onward?.date,
         pickupTime: state.onward?.time || '',
         pickupLocation: state.onward?.pickupLocation || '',
         stops: state.onward?.stops || [],
@@ -60,7 +60,7 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
       if (state.returnEnabled && state.returnJourney) {
         returnJourney = {
           serviceType: state.returnJourney.serviceType || '',
-          pickupDate: state.returnJourney.date || new Date(),
+          pickupDate: state.returnJourney.date,
           pickupTime: state.returnJourney.time || '',
           pickupLocation: state.returnJourney.pickupLocation || '',
           stops: state.returnJourney.stops || [],
@@ -469,7 +469,7 @@ console.log(state);
         outboundBooking={{
           pickupLocation: state.onward.pickupLocation,
           dropoffLocation: state.onward.dropoffLocation,
-          date: state.onward.date,
+          date: typeof state.onward.date === "string" ? new Date(state.onward.date) : state.onward.date ?? new Date(),
           time: state.onward.time,
           passengers: state.onward.passengers,
           luggage: state.onward.luggage,

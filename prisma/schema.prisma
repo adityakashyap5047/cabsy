@@ -85,7 +85,7 @@ model Journey {
   id                String      @id @default(auto()) @map("_id") @db.ObjectId
   journeyType       JourneyType
   serviceType       String 
-  pickupDate        DateTime
+  pickupDate        String
   pickupTime        String
   pickupLocation    String
   stops             String[]  @default([])
@@ -105,7 +105,7 @@ model Journey {
 type JourneyData {
   journeyType       String
   serviceType       String
-  pickupDate        DateTime
+  pickupDate        String
   pickupTime        String
   pickupLocation    String
   stops             String[]

@@ -133,7 +133,7 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
         <button
           type="submit"
           disabled={!stripe || loading}
-          className="w-full flex items-center justify-center gap-2 bg-[#AE9409] text-white py-3 rounded-md hover:bg-[#8B7507] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full cursor-pointer flex items-center justify-center gap-2 bg-[#AE9409] text-white py-3 rounded-md hover:bg-[#8B7507] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading && <Loader2 className="animate-spin w-5 h-5" />}
           {loading ? 'Processing...' : `Pay $${total.toFixed(2)}`}

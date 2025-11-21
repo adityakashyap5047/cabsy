@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
                 onwardJourney: {
                     journeyType: "ONWARD",
                     serviceType: onwardJourney.serviceType,
-                    pickupDate: new Date(onwardJourney.pickupDate),
+                    pickupDate: onwardJourney.pickupDate,
                     pickupTime: onwardJourney.pickupTime,
                     pickupLocation: onwardJourney.pickupLocation,
                     stops: onwardJourney.stops || [],
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
                     ? {
                           journeyType: "RETURN",
                           serviceType: returnJourney.serviceType,
-                          pickupDate: new Date(returnJourney.pickupDate),
+                          pickupDate: returnJourney.pickupDate,
                           pickupTime: returnJourney.pickupTime,
                           pickupLocation: returnJourney.pickupLocation,
                           stops: returnJourney.stops || [],

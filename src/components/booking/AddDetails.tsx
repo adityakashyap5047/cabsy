@@ -53,7 +53,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
     : state.summarySteps.includes(step);
 
   const [serviceType, setServiceType] = React.useState<string>(currentJourney?.serviceType || '');
-  const [date, setDate] = React.useState<Date | undefined>(currentJourney?.date);
+  const [date, setDate] = React.useState<string | Date | null>(currentJourney?.date || null);
   const [time, setTime] = React.useState<string | null>(currentJourney?.time || null);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
@@ -86,7 +86,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
   React.useEffect(() => {
     if (currentJourney) {
       setServiceType(currentJourney.serviceType || '');
-      setDate(currentJourney.date);
+      setDate(currentJourney.date || null);
       setTime(currentJourney.time || null);
       setPickupLocation(currentJourney.pickupLocation || '');
       setDropoffLocation(currentJourney.dropoffLocation || '');
@@ -155,7 +155,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
           serviceTypeRef.current.click();
         } else if (validation.errors.date && dateRef.current) {
           if (!date) {
-            setDate(new Date()); // Auto-fill current date
+            setDate(new Date());
           }
           setShowDatePicker(true); // Open the date popover
           dateRef.current.focus();
@@ -247,16 +247,16 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         serviceTypeRef.current.click(); // Open the select dropdown
       } else if (validation.errors.date && dateRef.current) {
         if (!date) {
-          setDate(new Date()); // Auto-fill current date
+          setDate(new Date());
         }
-        setShowDatePicker(true); // Open the date popover
+        setShowDatePicker(true);
         dateRef.current.focus();
       } else if (validation.errors.time && timeRef.current) {
         if (!time) {
           const now = new Date();
           const hours = now.getHours().toString().padStart(2, '0');
           const minutes = now.getMinutes().toString().padStart(2, '0');
-          setTime(`${hours}:${minutes}`); // Auto-fill current time
+          setTime(`${hours}:${minutes}`);
         }
         setShowTimePicker(true); // Open the time popover
         timeRef.current.focus();
@@ -271,12 +271,11 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       return;
     }
     
-    
     dispatch({
       type: isReturnJourney ? "UPDATE_RETURN_DETAILS" : "UPDATE_ONWARD_DETAILS",
       payload: {
         serviceType,
-        date,
+        date: typeof date === "string" ? date : format(date ?? new Date(), "yyyy/MM/dd"),
         time,
         pickupLocation,
         stops,
@@ -310,8 +309,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         if (!showSummary) {
           dispatch({ type: "TOGGLE_SUMMARY", payload: step });
         }
-        dispatch({ type: "TOGGLE_SUMMARY", payload: step + 1 });
-        dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 2 }); // Skip to step 3 (SelectVehicle)
+        if (!state.summarySteps.includes(step + 1)) {
+          dispatch({ type: "TOGGLE_SUMMARY", payload: step + 1 });
+        }
+        dispatch({ type: "EXPAND_ONLY_STEP", payload: step + 2 });
       }, 100);
     } else {
       setTimeout(() => {
@@ -439,7 +440,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                             setShowDatePicker(true);
                           }}
                         >
-                          {date && format(date, "MM/dd/yyyy")}
+                          {date && format(date, "yyyy/MM/dd")}
                           <span className="cursor-pointer hover:text-[#AE9409]">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                           </span>
@@ -448,7 +449,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={date}
+                          selected={typeof date === "string" ? new Date(date) : date ?? new Date()}
                           onSelect={(newDate) => {
                             if (newDate) {
                               setDate(newDate);

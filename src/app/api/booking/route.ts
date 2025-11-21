@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
             const onwardJourneyData = paymentSession.onwardJourney as {
                 journeyType: string;
                 serviceType: string;
-                pickupDate: Date;
+                pickupDate: string;
                 pickupTime: string;
                 pickupLocation: string;
                 stops: string[];
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     journeyType: "ONWARD",
                     serviceType: onwardJourneyData.serviceType,
-                    pickupDate: new Date(onwardJourneyData.pickupDate),
+                    pickupDate: onwardJourneyData.pickupDate,
                     pickupTime: onwardJourneyData.pickupTime,
                     pickupLocation: onwardJourneyData.pickupLocation,
                     stops: onwardJourneyData.stops || [],
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
                 const returnJourneyData = paymentSession.returnJourney as {
                     journeyType: string;
                     serviceType: string;
-                    pickupDate: Date;
+                    pickupDate: string;
                     pickupTime: string;
                     pickupLocation: string;
                     stops: string[];
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
                     data: {
                         journeyType: "RETURN",
                         serviceType: returnJourneyData.serviceType,
-                        pickupDate: new Date(returnJourneyData.pickupDate),
+                        pickupDate: returnJourneyData.pickupDate,
                         pickupTime: returnJourneyData.pickupTime,
                         pickupLocation: returnJourneyData.pickupLocation,
                         stops: returnJourneyData.stops || [],
