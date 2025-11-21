@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
                     email?: string | null;
                     phoneNumber?: string | null;
                 }>;
-                vehicleType?: string;
+                amount?: number;
                 remarks?: string;
             };
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
                     passengers: onwardJourneyData.passengers,
                     luggage: onwardJourneyData.luggage || 0,
                     passengerDetails: onwardJourneyData.passengerDetails,
-                    vehicleType: onwardJourneyData.vehicleType || null,
+                    amount: onwardJourneyData.amount ?? null,
                     remarks: onwardJourneyData.remarks || null,
                 },
             });
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
                         email?: string | null;
                         phoneNumber?: string | null;
                     }>;
-                    vehicleType?: string;
+                    amount?: number;
                     remarks?: string;
                 };
 
@@ -132,13 +132,12 @@ export async function POST(request: NextRequest) {
                         passengers: returnJourneyData.passengers,
                         luggage: returnJourneyData.luggage || 0,
                         passengerDetails: returnJourneyData.passengerDetails,
-                        vehicleType: returnJourneyData.vehicleType || null,
+                        amount: returnJourneyData.amount ?? null,
                         remarks: returnJourneyData.remarks || null,
                     },
                 });
             }
 
-            // Create booking
             const booking = await prisma.booking.create({
                 data: {
                     userId: paymentSession.userId || null,

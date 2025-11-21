@@ -28,7 +28,6 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
-    vehicleType?: string | null;
     remarks?: string | null;
   };
   returnJourney?: {
@@ -45,7 +44,6 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
-    vehicleType?: string | null;
     remarks?: string | null;
   } | null;
   expiresAt: Date;

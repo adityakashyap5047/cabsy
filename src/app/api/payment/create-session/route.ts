@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
                     passengers: onwardJourney.passengers,
                     luggage: onwardJourney.luggage || 0,
                     passengerDetails: onwardJourney.passengerDetails,
-                    vehicleType: onwardJourney.vehicleType || null,
+                    amount: onwardJourney.amount || null,
                     remarks: onwardJourney.remarks || null,
                 },
                 returnJourney: returnJourney
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
                           passengers: returnJourney.passengers,
                           luggage: returnJourney.luggage || 0,
                           passengerDetails: returnJourney.passengerDetails,
-                          vehicleType: returnJourney.vehicleType || null,
+                          amount: returnJourney.amount || null,
                           remarks: returnJourney.remarks || null,
                       }
                     : null,

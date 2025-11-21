@@ -60,7 +60,7 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
         passengers: state.onward?.passengers || 1,
         luggage: state.onward?.luggage || 0,
         passengerDetails: onwardPassengers,
-        vehicleType: state.onward?.vehicle || null,
+        amount: state.onward?.amount || null,
         remarks: state.onward?.remarks || null,
       };
 
@@ -85,7 +85,7 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
           passengers: state.returnJourney.passengers || 1,
           luggage: state.returnJourney.luggage || 0,
           passengerDetails: returnPassengers,
-          vehicleType: state.returnJourney.vehicle || null,
+          amount: state.returnJourney?.amount || null,
           remarks: state.returnJourney.remarks || null,
         };
       }
@@ -98,8 +98,10 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
         phoneNumber: leadData.phoneNumber,
       };
 
-      // Calculate total amount (you may need to adjust this based on your pricing logic)
-      const totalAmount = 249; // TODO: Calculate based on journey details
+      // Calculate total amount from individual journey amounts
+      const onwardAmount = state.onward?.amount || 0;
+      const returnAmount = returnJourney ? (state.returnJourney?.amount || 0) : 0;
+      const totalAmount = onwardAmount + returnAmount;
 
       const res = await fetch('/api/payment/create-session', {
         method: 'POST',
@@ -404,7 +406,9 @@ console.log(state);
                     <span className="text-gray-700 text-sm">{state.returnJourney.luggage}</span>
                   </div>
                   <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-600">
-                    Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">$124.50</span>
+                    Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">
+                      ${state.returnJourney.amount ? state.returnJourney.amount.toFixed(2) : '150.00'}
+                    </span>
                   </h1>
                 </div>
                 
@@ -436,13 +440,17 @@ console.log(state);
           <div>
             <div className="bg-gray-50 flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-1 border-b border-gray-100">
               <p className='font-semibold text-gray-500 text-sm sm:text-base'>Base Fare</p>
-              <p className='font-semibold text-gray-500 text-sm sm:text-base'>$6719.39</p>
+              <p className='font-semibold text-gray-500 text-sm sm:text-base'>
+                ${((state.onward?.amount || 0) + (state.returnEnabled && state.returnJourney?.amount ? state.returnJourney.amount : 0)).toFixed(2)}
+              </p>
             </div>
           </div>
           <div>
             <div className="bg-slate-800 rounded flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-3 sm:py-4 border-b border-gray-100">
               <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>Total</p>
-              <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>$6719.39</p>
+              <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>
+                ${((state.onward?.amount || 0) + (state.returnEnabled && state.returnJourney?.amount ? state.returnJourney.amount : 0)).toFixed(2)}
+              </p>
             </div>
           </div>
           <Button

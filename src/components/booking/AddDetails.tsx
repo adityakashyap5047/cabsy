@@ -271,6 +271,8 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       return;
     }
     
+    const calculatedAmount = isReturnJourney ? 150 : 200;
+    
     dispatch({
       type: isReturnJourney ? "UPDATE_RETURN_DETAILS" : "UPDATE_ONWARD_DETAILS",
       payload: {
@@ -282,6 +284,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         dropoffLocation,
         passengers: passenger,
         luggage,
+        amount: calculatedAmount,
       }
     });
     
@@ -355,7 +358,9 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
           <span className="text-gray-700 text-sm">{luggage}</span>
         </div>
         <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-600">
-          Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">$124.50</span>
+          Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">
+            ${currentJourney?.amount ? currentJourney.amount.toFixed(2) : (isReturnJourney ? '150.00' : '200.00')}
+          </span>
         </h1>
       </div>
       
@@ -729,7 +734,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                 type="submit" 
                 className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold text-base sm:text-lg md:text-xl cursor-pointer py-3 md:py-4 px-8 md:px-10 lg:px-12 rounded-none shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                Select Vehicle
+                Continue
               </Button>
             </div>
           </form>

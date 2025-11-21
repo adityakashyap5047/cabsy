@@ -15,7 +15,7 @@ export interface JourneyDetails {
   dropoffLocation: string;
   passengers: number;
   luggage: number;
-  vehicle?: string;
+  amount?: number;
   remarks?: string;
   user?: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } | null;
 }
@@ -44,7 +44,6 @@ export type BookingAction =
   | { type: "UPDATE_BOOKING_DETAILS"; payload: Partial<JourneyDetails> } // Backward compatibility
   | { type: "ENABLE_RETURN_JOURNEY"; payload: boolean }
   | { type: "INITIALIZE_RETURN_JOURNEY" }
-  | { type: "SET_VEHICLE"; payload: string }
   | { type: "SET_USER"; payload: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } }
   | { type: "SET_RETURN_USER"; payload: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } }
   | { type: "ADD_PASSENGER"; payload: Passenger }
@@ -81,6 +80,7 @@ export const initialState: BookingState = {
     dropoffLocation: "",
     passengers: 1,
     luggage: 0,
+    amount: 0,
     remarks: "",
     user: null,
   },
@@ -133,7 +133,6 @@ export default function bookingReducer(state: BookingState, action: BookingActio
           stops: [...state.onward.stops].reverse(),
           passengers: state.onward.passengers,
           luggage: state.onward.luggage,
-          vehicle: undefined,
           remarks: "",
           user: state.onward.user ? { ...state.onward.user } : null,
         }
@@ -141,9 +140,6 @@ export default function bookingReducer(state: BookingState, action: BookingActio
 
     case "UPDATE_BOOKING_DETAILS":
       return { ...state, onward: { ...state.onward, ...action.payload } };
-
-    case "SET_VEHICLE":
-      return { ...state, onward: { ...state.onward, vehicle: action.payload }, currentStep: 2 };
 
     case "SET_USER":
       return { 

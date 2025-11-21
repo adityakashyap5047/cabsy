@@ -92,7 +92,7 @@ model Journey {
   passengers        Int       @default(1)
   luggage           Int       @default(0)
   passengerDetails  PassengerDetails[]
-  vehicleType       String? 
+  amount            Float?
   remarks           String?
   onwardBooking     Booking?  @relation("OnwardJourney")
   returnBooking     Booking?  @relation("ReturnJourney")
@@ -113,7 +113,7 @@ type JourneyData {
   passengers        Int
   luggage           Int
   passengerDetails  PassengerDetails[]
-  vehicleType       String?
+  amount            Float?
   remarks           String?
 }
 
