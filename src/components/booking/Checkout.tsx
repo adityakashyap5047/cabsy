@@ -439,12 +439,20 @@ console.log(state);
           </div>
           <div>
             <div className="bg-gray-50 flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-1 border-b border-gray-100">
-              <p className='font-semibold text-gray-500 text-sm sm:text-base'>Base Fare</p>
+              <p className='font-semibold text-gray-500 text-sm sm:text-base'>Onward Fare</p>
               <p className='font-semibold text-gray-500 text-sm sm:text-base'>
-                ${((state.onward?.amount || 0) + (state.returnEnabled && state.returnJourney?.amount ? state.returnJourney.amount : 0)).toFixed(2)}
+                ${(state.onward?.amount || 0).toFixed(2)}
               </p>
             </div>
-          </div>
+            {state.returnEnabled && state.returnJourney?.amount && (
+              <div className="bg-gray-50 flex justify-between mt-2 px-3 sm:px-6 md:px-12 py-1 border-b border-gray-100">
+                <p className='font-semibold text-gray-500 text-sm sm:text-base'>Return Fare</p>
+                <p className='font-semibold text-gray-500 text-sm sm:text-base'>
+                  ${(state.returnJourney.amount ?? 0).toFixed(2)}
+                </p>
+              </div>
+            )}
+          </div>  
           <div>
             <div className="bg-slate-800 rounded flex justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-6 md:px-12 py-3 sm:py-4 border-b border-gray-100">
               <p className='text-base sm:text-lg md:text-xl font-semibold text-gray-400'>Total</p>
