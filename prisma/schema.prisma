@@ -101,3 +101,38 @@ model Journey {
   
   @@map("journeys")
 }
+
+type JourneyData {
+  journeyType       String
+  serviceType       String
+  pickupDate        DateTime
+  pickupTime        String
+  pickupLocation    String
+  stops             String[]
+  dropoffLocation   String
+  passengers        Int
+  luggage           Int
+  vehicleType       String?
+  remarks           String?
+}
+
+model PaymentSession {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId         String              @unique
+  userId            String?             @db.ObjectId
+  guestFirstName    String?
+  guestLastName     String?
+  guestEmail        String?
+  guestPhoneNumber  String?
+  totalAmount       Float?
+  returnEnabled     Boolean             @default(false)
+  passengers        PassengerDetails[]
+  onwardJourney     JourneyData
+  returnJourney     JourneyData?
+  expiresAt         DateTime
+  createdAt         DateTime            @default(now())
+  
+  @@map("payment_sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
