@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -9,17 +11,17 @@ export async function POST(request: NextRequest){
     const { amount, sessionId } = await request.json();
 
     try {
+        // Get user session (optional - supports guest bookings)
+        const session = await getServerSession(authOptions);
+        const userId = session?.user?.id;
+
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
             currency: 'usd',
             payment_method_types: ['card'],
-            application_fee_amount: platformFee,
-            transfer_data: {
-                destination: sellersStripeAccountId,
-            },
             metadata: {
                 sessionId,
-                userId: request.user.id
+                ...(userId && { userId }), // Only include userId if user is logged in
             }
         });
 

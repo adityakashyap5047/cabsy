@@ -63,12 +63,11 @@ export async function GET(request: NextRequest) {
             success: true,
             session: {
                 sessionId: paymentSession.sessionId,
-                bookingId: paymentSession.bookingId,
                 totalAmount: paymentSession.totalAmount,
-                onwardJourneyId: paymentSession.onwardJourneyId,
-                returnJourneyId: paymentSession.returnJourneyId,
                 returnEnabled: paymentSession.returnEnabled,
                 passengers: paymentSession.passengers,
+                onwardJourney: paymentSession.onwardJourney,
+                returnJourney: paymentSession.returnJourney,
                 expiresAt: paymentSession.expiresAt,
             },
         });

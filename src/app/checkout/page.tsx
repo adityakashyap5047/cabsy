@@ -12,10 +12,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 interface BookingData {
     sessionId: string;
-    bookingId?: string;
     totalAmount: number;
-    onwardJourneyId: string;
-    returnJourneyId?: string | null;
     returnEnabled: boolean;
     passengers: Array<{
         firstName: string;
@@ -23,6 +20,40 @@ interface BookingData {
         email?: string | null;
         phoneNumber?: string | null;
     }>;
+    onwardJourney: {
+        serviceType: string;
+        pickupDate: string;
+        pickupTime: string;
+        pickupLocation: string;
+        pickupPostcode: string;
+        dropoffLocation: string;
+        dropoffPostcode: string;
+        stops?: Array<{
+            location: string;
+            postcode: string;
+        }> | null;
+        passengers: number;
+        luggage: number;
+        vehicleType?: string | null;
+        remarks?: string | null;
+    };
+    returnJourney?: {
+        serviceType: string;
+        pickupDate: string;
+        pickupTime: string;
+        pickupLocation: string;
+        pickupPostcode: string;
+        dropoffLocation: string;
+        dropoffPostcode: string;
+        stops?: Array<{
+            location: string;
+            postcode: string;
+        }> | null;
+        passengers: number;
+        luggage: number;
+        vehicleType?: string | null;
+        remarks?: string | null;
+    } | null;
     expiresAt: Date;
 }
 
