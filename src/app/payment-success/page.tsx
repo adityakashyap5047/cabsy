@@ -1,63 +1,134 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 import confetti from 'canvas-confetti';
-import { CheckCircle, Truck, Loader2 } from 'lucide-react';
+import { CheckCircle, Home, Calendar, Loader2 } from 'lucide-react';
 
-const PaymentSuccessPage = () => {
-    // const { user, isLoading } = useRequiredAuth();
-    const searchParams = useSearchParams();
-    const sessionId = searchParams.get('sessionId');
+function PaymentSuccessContent() {
+    const router = useRouter();
+    const [countdown, setCountdown] = useState(10);
 
     useEffect(() => {
-        confetti({
-            particleCount: 120,
-            spread: 90,
-            origin: { y: 0.6 }
-        })
+        // Trigger confetti
+        const duration = 3000;
+        const end = Date.now() + duration;
+
+        const frame = () => {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#AE9409', '#FFD700', '#FFA500']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#AE9409', '#FFD700', '#FFA500']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        };
+        frame();
     }, []);
 
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex justify-center items-center min-h-screen">
-    //             <Loader2 className="animate-spin w-8 h-8" />
-    //         </div>
-    //     );
-    // }
-
-    // if (!user) {
-    //     return null;
-    // }
+    useEffect(() => {
+        // Countdown timer
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        } else {
+            router.push('/');
+        }
+    }, [countdown, router]);
 
     return (
-        <div className='min-h-[80vh] flex items-center justify-center px-4'>
-            <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-6 ">
-                <div className="text-green-500 mb-4">
-                    <CheckCircle className='w-16 h-16 mx-auto' />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-200 mb-2">
-                    Payment Successful🎉
-                </h2>
-                <p className="text-sm text-gray-600 mb-6">
-                    Thank you for your purchase! Your order has been placed successfully!
-                </p>
+        <div className='min-h-[calc(100vh-80px)] flex items-center justify-center px-4 bg-gradient-to-b from-gray-50 to-white'>
+            <div className="max-w-md w-full">
+                <div className="bg-white shadow-lg border border-gray-200 rounded-lg p-8 text-center">
+                    {/* Success Icon */}
+                    <div className="mb-6">
+                        <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                            <CheckCircle className='w-12 h-12 text-green-600' />
+                        </div>
+                    </div>
 
-                <div className="text-center">
-                    <button
-                        className='inline-flex items-center gap-2 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition'
-                    >
-                        <Truck className='w-4 h-4' />
-                        Track Order
-                    </button>
-                </div>
+                    {/* Success Message */}
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                        Booking Confirmed! 🎉
+                    </h1>
+                    <p className="text-gray-600 mb-6">
+                        Your ride has been successfully booked and payment processed.
+                    </p>
 
-                <div className="mt-8 text-xs text-gray-400">
-                    Payment Session Id: <span className="font-mono">{sessionId}</span>
+                    {/* Booking Details Card */}
+                    <div className="bg-gray-50 border border-gray-200 rounded-sm p-4 mb-6 text-left">
+                        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-[#AE9409]" />
+                            Booking Details
+                        </h3>
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Status:</span>
+                                <span className="font-semibold text-green-600">Confirmed</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Payment:</span>
+                                <span className="font-semibold text-green-600">Successful</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Info Message */}
+                    <div className="bg-[#AE9409]/10 border border-[#AE9409]/20 rounded-sm p-4 mb-6">
+                        <p className="text-sm text-gray-700">
+                            You will receive a confirmation email shortly with your booking details and driver information.
+                        </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => router.push('/')}
+                            className='w-full cursor-pointer flex items-center justify-center gap-2 bg-[#AE9409] text-white py-3 px-6 rounded-sm hover:bg-[#8B7507] transition-colors font-medium'
+                        >
+                            <Home className='w-4 h-4' />
+                            Back to Home
+                        </button>
+                        
+                        <button
+                            onClick={() => router.push('/ride')}
+                            className='w-full cursor-pointer flex items-center justify-center gap-2 bg-white text-[#AE9409] border-2 border-[#AE9409] py-3 px-6 rounded-sm hover:bg-[#AE9409] hover:text-white transition-colors font-medium'
+                        >
+                            <Calendar className='w-4 h-4' />
+                            Book Again
+                        </button>
+                    </div>
+
+                    <p className="mt-6 text-xs text-gray-500">
+                        Redirecting to home in {countdown} seconds...
+                    </p>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default PaymentSuccessPage
+const PaymentSuccessPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center min-h-screen">
+                <Loader2 className="animate-spin w-8 h-8 text-[#AE9409]" />
+            </div>
+        }>
+            <PaymentSuccessContent />
+        </Suspense>
+    );
+}
+
+export default PaymentSuccessPage;
