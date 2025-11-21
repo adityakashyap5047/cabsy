@@ -70,6 +70,12 @@ export async function POST(request: NextRequest) {
                 dropoffLocation: string;
                 passengers: number;
                 luggage: number;
+                passengerDetails: Array<{
+                    firstName: string;
+                    lastName: string;
+                    email?: string | null;
+                    phoneNumber?: string | null;
+                }>;
                 vehicleType?: string;
                 remarks?: string;
             };
@@ -85,6 +91,7 @@ export async function POST(request: NextRequest) {
                     dropoffLocation: onwardJourneyData.dropoffLocation,
                     passengers: onwardJourneyData.passengers,
                     luggage: onwardJourneyData.luggage || 0,
+                    passengerDetails: onwardJourneyData.passengerDetails,
                     vehicleType: onwardJourneyData.vehicleType || null,
                     remarks: onwardJourneyData.remarks || null,
                 },
@@ -103,6 +110,12 @@ export async function POST(request: NextRequest) {
                     dropoffLocation: string;
                     passengers: number;
                     luggage: number;
+                    passengerDetails: Array<{
+                        firstName: string;
+                        lastName: string;
+                        email?: string | null;
+                        phoneNumber?: string | null;
+                    }>;
                     vehicleType?: string;
                     remarks?: string;
                 };
@@ -118,6 +131,7 @@ export async function POST(request: NextRequest) {
                         dropoffLocation: returnJourneyData.dropoffLocation,
                         passengers: returnJourneyData.passengers,
                         luggage: returnJourneyData.luggage || 0,
+                        passengerDetails: returnJourneyData.passengerDetails,
                         vehicleType: returnJourneyData.vehicleType || null,
                         remarks: returnJourneyData.remarks || null,
                     },
@@ -139,7 +153,6 @@ export async function POST(request: NextRequest) {
                     totalAmount: paymentSession.totalAmount || 0,
                     paymentStatus: "COMPLETED",
                     status: "CONFIRMED",
-                    passengers: paymentSession.passengers,
                 },
             });
 

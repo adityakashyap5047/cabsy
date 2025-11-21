@@ -74,7 +74,6 @@ model Booking {
   totalAmount       Float?
   paymentStatus     PaymentStatus       @default(PENDING)
   status            BookingStatus       @default(PENDING)
-  passengers        PassengerDetails[]
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   
@@ -92,6 +91,7 @@ model Journey {
   dropoffLocation   String
   passengers        Int       @default(1)
   luggage           Int       @default(0)
+  passengerDetails  PassengerDetails[]
   vehicleType       String? 
   remarks           String?
   onwardBooking     Booking?  @relation("OnwardJourney")
@@ -112,6 +112,7 @@ type JourneyData {
   dropoffLocation   String
   passengers        Int
   luggage           Int
+  passengerDetails  PassengerDetails[]
   vehicleType       String?
   remarks           String?
 }

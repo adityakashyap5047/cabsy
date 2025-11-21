@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
                     dropoffLocation: onwardJourney.dropoffLocation,
                     passengers: onwardJourney.passengers,
                     luggage: onwardJourney.luggage || 0,
+                    passengerDetails: passengers,
                     vehicleType: onwardJourney.vehicleType || null,
                     remarks: onwardJourney.remarks || null,
                 },
@@ -111,6 +112,7 @@ export async function POST(request: NextRequest) {
                           dropoffLocation: returnJourney.dropoffLocation,
                           passengers: returnJourney.passengers,
                           luggage: returnJourney.luggage || 0,
+                          passengerDetails: passengers,
                           vehicleType: returnJourney.vehicleType || null,
                           remarks: returnJourney.remarks || null,
                       }
