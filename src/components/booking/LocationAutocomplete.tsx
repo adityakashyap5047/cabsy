@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useImperativeHandle, forwardRef } from "react";
+import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 // Custom Location Icon Component
@@ -117,6 +117,7 @@ interface LocationAutocompleteProps {
     placeholder?: string;
     error?: string;
     id?: string;
+    onError?: (errorMessage: string) => void;
 }
 
 export interface LocationAutocompleteRef {
@@ -130,13 +131,22 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
     onPlaceSelect,
     placeholder = "Enter location",
     error = "",
-    id
+    id,
+    onError
 }, ref) => {
     const [results, setResults] = useState<AutocompleteSuggestion[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [gettingLocation, setGettingLocation] = useState(false);
     const [isValidLocation, setIsValidLocation] = useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
+
+    // When value is pre-filled from parent (e.g., autofill from onward to return journey),
+    // mark it as valid so validation passes
+    useEffect(() => {
+        if (value && value.trim() !== '') {
+            setIsValidLocation(true);
+        }
+    }, [value]);
 
   // Fetch autocomplete suggestions
     const fetchAutocomplete = async (query: string) => {
@@ -187,7 +197,9 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
   // Get current location
     const getCurrentLocation = async () => {
         if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
+        if (onError) {
+            onError("Geolocation is not supported by your browser");
+        }
         return;
         }
 
@@ -231,14 +243,28 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
             }
             } catch (error) {
             console.error("Reverse geocoding error:", error);
-            alert("Failed to get address for your location");
+            if (onError) {
+                onError("Failed to get address for your location");
+            }
             } finally {
             setGettingLocation(false);
             }
         },
         (error) => {
             console.error("Geolocation error:", error);
-            alert("Failed to get your location. Please enable location access.");
+            let errorMessage = "Failed to get your location";
+            
+            if (error.code === error.PERMISSION_DENIED) {
+                errorMessage = "Location access denied. Please enable location permissions.";
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                errorMessage = "Location information is unavailable";
+            } else if (error.code === error.TIMEOUT) {
+                errorMessage = "Location request timed out";
+            }
+            
+            if (onError) {
+                onError(errorMessage);
+            }
             setGettingLocation(false);
         }
         );
@@ -277,6 +303,7 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
         <input
             ref={inputRef}
             id={id}
+            autoComplete="off"
             className={cn(
             "flex h-9 w-full border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
             error

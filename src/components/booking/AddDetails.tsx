@@ -202,6 +202,16 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
     }
   }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates, calculateDistance]);
 
+  // Additional effect to recalculate when autofilled but distance is missing
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (pickupCoordinates && dropoffCoordinates && !distance && !calculatingDistance) {
+        calculateDistance();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pickupCoordinates, dropoffCoordinates, distance, calculatingDistance, calculateDistance]);
+
   React.useImperativeHandle(ref, () => ({
     validateAndFocus: () => {
       const validation = validateForm();
@@ -615,6 +625,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                       setPickupCoordinates(place.location);
                       console.log('Pickup place selected:', place);
                     }}
+                    onError={(errorMessage) => {
+                      setErrors(prev => ({ ...prev, pickupLocation: errorMessage }));
+                      pickupRef.current?.focus();
+                    }}
                     placeholder="Your pick-up location"
                     error={errors.pickupLocation}
                   />
@@ -653,6 +667,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                                 });
                                 console.log('Stop place selected:', place);
                               }}
+                              onError={() => {
+                                setStopError(index);
+                                setStopFocusTrigger(prev => prev + 1);
+                              }}
                               placeholder="Add Your Stop"
                               error={stopError === index ? 'Stop location is required' : ''}
                             />
@@ -682,6 +700,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                     onPlaceSelect={(place) => {
                       setDropoffCoordinates(place.location);
                       console.log('Dropoff place selected:', place);
+                    }}
+                    onError={(errorMessage) => {
+                      setErrors(prev => ({ ...prev, dropoffLocation: errorMessage }));
+                      dropoffRef.current?.focus();
                     }}
                     placeholder="Your drop-off location"
                     error={errors.dropoffLocation}
