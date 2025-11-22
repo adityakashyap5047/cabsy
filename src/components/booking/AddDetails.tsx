@@ -530,7 +530,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                 <div className="space-y-2">
                   <Label htmlFor="service">Select Service Type</Label>
                   <Select value={serviceType} onValueChange={(value) => { setServiceType(value); clearError('serviceType'); }}>
-                    <SelectTrigger ref={serviceTypeRef} className={`w-full rounded-none cursor-pointer ${errors.serviceType ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`} id="service">
+                    <SelectTrigger ref={serviceTypeRef} className={`w-full rounded-none cursor-pointer ${errors.serviceType ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`} id={`service-${isReturnJourney ? 'return' : 'onward'}`}>
                       <SelectValue placeholder="Choose a service type" />
                     </SelectTrigger>
                     <SelectContent className="rounded-none">
@@ -639,10 +639,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                 </div>
 
                 <div>
-                  <Label htmlFor="pickup" className="mb-2">Pick-Up Location</Label>
+                  <Label htmlFor={`pickup-${isReturnJourney ? 'return' : 'onward'}`} className="mb-2">Pick-Up Location</Label>
                   <LocationAutocomplete
                     ref={pickupRef}
-                    id="pickup"
+                    id={`pickup-${isReturnJourney ? 'return' : 'onward'}`}
                     value={pickupLocation}
                     onChange={(value) => { setPickupLocation(value); clearError('pickupLocation'); }}
                     onPlaceSelect={(place) => {
@@ -715,10 +715,10 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="dropoff">Drop-Off Location</Label>
+                  <Label htmlFor={`dropoff-${isReturnJourney ? 'return' : 'onward'}`}>Drop-Off Location</Label>
                   <LocationAutocomplete
                     ref={dropoffRef}
-                    id="dropoff"
+                    id={`dropoff-${isReturnJourney ? 'return' : 'onward'}`}
                     value={dropoffLocation}
                     onChange={(value) => { setDropoffLocation(value); clearError('dropoffLocation'); }}
                     onPlaceSelect={(place) => {

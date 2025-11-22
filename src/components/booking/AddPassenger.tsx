@@ -158,12 +158,12 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                     <div className="mb-3 sm:mb-4">
                         <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
                         <div className="flex-1 space-y-1 sm:space-y-2">
-                            <Label htmlFor="passenger-first-name" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <Label htmlFor={`passenger-first-name-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                             First Name
                             </Label>
                             <Input
                             ref={firstNameRef}
-                            id="passenger-first-name"
+                            id={`passenger-first-name-${isReturnJourney ? 'return' : 'onward'}`}
                             name="firstName"
                             placeholder="First Name"
                             value={newPassenger.firstName}
@@ -178,12 +178,12 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                         </div>
 
                         <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
-                            <Label htmlFor="passenger-last-name" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <Label htmlFor={`passenger-last-name-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                             Last Name
                             </Label>
                             <Input
-                                ref={lastNameRef}
-                            id="passenger-last-name"
+                            ref={lastNameRef}
+                            id={`passenger-last-name-${isReturnJourney ? 'return' : 'onward'}`}
                             name="lastName"
                             placeholder="Last Name"
                             value={newPassenger.lastName}
@@ -202,13 +202,13 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                     {/* Outer Div 2: Phone Number and Email Address */}
                     <div className="mb-3 sm:mb-4">
                         <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''}`}>
-                        <div className="flex-1 space-y-1 sm:space-y-2">
-                            <Label htmlFor="passenger-phone" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <div className="flex-1 space-y-1 sm:space-y-2">
+                                <Label htmlFor={`passenger-phone-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Phone Number
-                            </Label>
-                            <Input
-                            ref={phoneNumberRef}
-                                id="passenger-phone"
+                                </Label>
+                                <Input
+                                ref={phoneNumberRef}
+                                id={`passenger-phone-${isReturnJourney ? 'return' : 'onward'}`}
                                 name="phoneNumber"
                                 placeholder="(555) 555-5555"
                                 value={newPassenger.phoneNumber}
@@ -223,13 +223,13 @@ const AddPassenger: React.FC<PassengerFormProps> = ({ passengers, onPassengersCh
                             )}
                         </div>
 
-                        <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
-                            <Label htmlFor="passenger-email" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
+                                <Label htmlFor={`passenger-email-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Email Address
-                            </Label>
-                            <Input
+                                </Label>
+                                <Input
                                 ref={emailRef}
-                                id="passenger-email"
+                                id={`passenger-email-${isReturnJourney ? 'return' : 'onward'}`}
                                 name="email"
                                 type="email"
                                 placeholder=""

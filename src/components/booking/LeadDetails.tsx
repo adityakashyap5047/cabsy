@@ -190,12 +190,12 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate, isReturnJo
 
                     <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4' : ''} my-4`}>
                         <div className="flex-1 space-y-1 sm:space-y-2">
-                            <Label htmlFor="firstName" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <Label htmlFor={`firstName-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                 First Name
                             </Label>
                             <Input
                                 ref={firstNameRef}
-                                id="firstName"
+                                id={`firstName-${isReturnJourney ? 'return' : 'onward'}`}
                                 name="firstName"
                                 placeholder="First Name"
                                 value={data.firstName}
@@ -210,12 +210,12 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate, isReturnJo
                         </div>
 
                         <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
-                            <Label htmlFor="lastName" className="text-gray-700 font-medium text-xs sm:text-sm">
+                            <Label htmlFor={`lastName-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                 Last Name
                             </Label>
                             <Input
                                 ref={lastNameRef}
-                                id="lastName"
+                                id={`lastName-${isReturnJourney ? 'return' : 'onward'}`}
                                 name="lastName"
                                 placeholder="Last Name"
                                 value={data.lastName}
@@ -233,12 +233,12 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate, isReturnJo
                     <div className="mb-3 sm:mb-4">
                         <div className={`flex flex-col ${!isReturnJourney ? 'min-[420px]:flex-row min-[768px]:flex-col min-[960px]:flex-row min-[420px]:gap-4 min-[768px]:gap-0 min-[960px]:gap-4 min-[960px]:items-start' : ''} my-4`}>
                             <div className="flex-1 space-y-1 sm:space-y-2">
-                                <Label htmlFor="phoneNumber" className="text-gray-700 font-medium text-xs sm:text-sm">
+                                <Label htmlFor={`phoneNumber-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                     Phone Number
                                 </Label>
                                 <Input
                                     ref={phoneNumberRef}
-                                    id="phoneNumber"
+                                    id={`phoneNumber-${isReturnJourney ? 'return' : 'onward'}`}
                                     name="phoneNumber"
                                     placeholder="(555) 555-5555"
                                     value={data.phoneNumber}
@@ -254,12 +254,12 @@ const LeadDetails: React.FC<LeadDetailsProps> = ({lead, onLeadUpdate, isReturnJo
                             </div>
 
                             <div className={`flex-1 space-y-1 sm:space-y-2 ${isReturnJourney ? 'mt-3' : 'mt-3 min-[420px]:mt-0 min-[768px]:mt-3 min-[960px]:mt-0'}`}>
-                                <Label htmlFor="email" className="text-gray-700 font-medium text-xs sm:text-sm">
+                                <Label htmlFor={`email-${isReturnJourney ? 'return' : 'onward'}`} className="text-gray-700 font-medium text-xs sm:text-sm">
                                     Email Address
                                 </Label>
                                 <Input
                                     ref={emailRef}
-                                    id="email"
+                                    id={`email-${isReturnJourney ? 'return' : 'onward'}`}
                                     name="email"
                                     type="email"
                                     placeholder=""
