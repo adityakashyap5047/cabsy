@@ -26,6 +26,7 @@ import TimeKeeper from "react-timekeeper";
 import { useBooking } from "@/context/BookingContext";
 import StepHeader from "./StepHeader";
 import LocationAutocomplete, { LocationAutocompleteRef } from "./LocationAutocomplete";
+import RouteMap from "./RouteMap";
 
 interface AddDetailsProps {
   isReturnJourney?: boolean;
@@ -783,14 +784,26 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
               </div>
               
               {/* Map Preview - Shows from sm (640px) onwards on the right */}
-              <div className={forceMobileLayout ? "hidden" : "hidden sm:block bg-gray-300 h-[400px] md:h-[450px] lg:h-[500px] w-full sm:w-1/2 rounded-md"}>
-                {/* Map will be added here */}
+              <div className={forceMobileLayout ? "hidden" : "hidden sm:block h-[400px] md:h-[450px] lg:h-[500px] w-full sm:w-1/2"}>
+                <RouteMap 
+                  pickupCoordinates={pickupCoordinates}
+                  dropoffCoordinates={dropoffCoordinates}
+                  stopsCoordinates={stopsCoordinates}
+                  polyline={polyline}
+                  className="h-full w-full"
+                />
               </div>
             </div>
 
             {/* Map Preview - Shows on small screens (below 640px) in the middle of form */}
-            <div className={forceMobileLayout ? "block bg-gray-300 h-[250px] w-full rounded-md" : "block sm:hidden bg-gray-300 h-[250px] min-[392px]:h-[300px] w-full rounded-md"}>
-              {/* Map will be added here */}
+            <div className={forceMobileLayout ? "block h-[250px] w-full" : "block sm:hidden h-[250px] min-[392px]:h-[300px] w-full"}>
+              <RouteMap 
+                pickupCoordinates={pickupCoordinates}
+                dropoffCoordinates={dropoffCoordinates}
+                stopsCoordinates={stopsCoordinates}
+                polyline={polyline}
+                className="h-full w-full"
+              />
             </div>
 
             {/* Passenger and Luggage - Shows below map on mobile, inline with form on tablet+ */}
