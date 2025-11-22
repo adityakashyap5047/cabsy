@@ -150,7 +150,6 @@ const Checkout: React.FC<CheckoutProps> = ({ isReturnJourney = false }) => {
     phoneNumber: '',
     email: ''
   });
-console.log(state);
   const [passengers, setPassengers] = useState<Passenger[]>([]);
   const [remarks, setRemarks] = useState<string>('');
 

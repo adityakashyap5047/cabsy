@@ -232,7 +232,6 @@ export async function POST(request: NextRequest) {
                 where: { id: paymentSession.id },
             });
 
-            console.log(`✅ Booking ${booking.id} created and confirmed for session ${sessionId}`);
             break;
         }
 

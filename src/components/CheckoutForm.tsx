@@ -89,7 +89,6 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
       },
     });
 
-    console.log(res);
     if (res.error) {
       setErrorMessage(res.error.message || 'An unexpected error occurred.');
       setStatus('failed');

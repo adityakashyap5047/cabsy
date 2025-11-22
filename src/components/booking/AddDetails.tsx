@@ -647,7 +647,6 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                     onChange={(value) => { setPickupLocation(value); clearError('pickupLocation'); }}
                     onPlaceSelect={(place) => {
                       setPickupCoordinates(place.location);
-                      console.log('Pickup place selected:', place);
                     }}
                     onError={(errorMessage) => {
                       setErrors(prev => ({ ...prev, pickupLocation: errorMessage }));
@@ -689,7 +688,6 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                                   newCoords[index] = place.location;
                                   return newCoords;
                                 });
-                                console.log('Stop place selected:', place);
                               }}
                               onError={() => {
                                 setStopError(index);
@@ -723,7 +721,6 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                     onChange={(value) => { setDropoffLocation(value); clearError('dropoffLocation'); }}
                     onPlaceSelect={(place) => {
                       setDropoffCoordinates(place.location);
-                      console.log('Dropoff place selected:', place);
                     }}
                     onError={(errorMessage) => {
                       setErrors(prev => ({ ...prev, dropoffLocation: errorMessage }));
