@@ -30,7 +30,10 @@ export async function POST(req: NextRequest) {
           "X-Goog-FieldMask":
             "suggestions.placePrediction.structuredFormat,suggestions.placePrediction.placeId,suggestions.placePrediction.text"
         },
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ 
+          input,
+          includedRegionCodes: ["us"]
+        })
       }
     );
 
