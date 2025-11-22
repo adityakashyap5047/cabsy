@@ -30,7 +30,7 @@ const ReturnAddDetailsWrapper: React.FC<ReturnAddDetailsWrapperProps> = ({
       pickupLocation: initialPickup,
       stops: [],
       dropoffLocation: initialDropoff,
-      date: undefined,
+      date: null,
       time: null,
       passengers: initialPassengers,
       luggage: initialLuggage,
