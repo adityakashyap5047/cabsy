@@ -27,9 +27,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (user.isGuest) {
+    // Check if user is a guest (no password set)
+    if (!user.password) {
       return NextResponse.json(
-        { message: 'Guest accounts cannot reset password. Please create a new account.' },
+        { message: 'This account was created as a guest. Please sign up with a password to enable password reset.' },
         { status: 400 }
       );
     }
