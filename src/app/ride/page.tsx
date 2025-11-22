@@ -8,7 +8,7 @@ const RidePage = () => {
   return (
     <BookingProvider>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 sm:mb-6 lg:mb-8">
-        <p className="my-12 text-[#AE9409] font-sans font-semibold text-4xl">Please Fill Out All Required Info</p>
+        <p className="my-12 text-[#AE9409] font-[family-name:var(--font-libre-baskerville)] font-semibold text-[33px] leading-[33px]">Please Fill Out All Required Info</p>
         <div data-step="1">
           <AddDetails /> 
         </div>

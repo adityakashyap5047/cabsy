@@ -20,12 +20,25 @@ export async function POST(request: NextRequest) {
         // Get raw body for webhook verification
         const rawBody = await request.text();
 
+        // Use different webhook secrets for development vs production
+        const webhookSecret = process.env.NODE_ENV === 'production' 
+            ? process.env.STRIPE_WEBHOOK_SECRET_LIVE 
+            : process.env.STRIPE_WEBHOOK_SECRET;
+
+        if (!webhookSecret) {
+            console.error("Stripe webhook secret not configured");
+            return NextResponse.json(
+                { error: "Webhook configuration error" },
+                { status: 500 }
+            );
+        }
+
         let event: Stripe.Event;
         try {
             event = stripe.webhooks.constructEvent(
                 rawBody,
                 stripeSignature,
-                process.env.STRIPE_WEBHOOK_SECRET!
+                webhookSecret
             );
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
