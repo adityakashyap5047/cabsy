@@ -93,15 +93,16 @@ export async function POST(request: NextRequest) {
       totalDuration += leg.duration.value; // in seconds
     });
 
-    // Convert to km and minutes
+    // Convert to miles and minutes
     const distanceKm = totalDistance / 1000;
+    const distanceMiles = distanceKm * 0.621371;
     const durationMinutes = Math.ceil(totalDuration / 60);
 
     // Get the overview polyline for the entire route
     const polyline = route.overview_polyline?.points || null;
 
     return NextResponse.json({
-      distance: parseFloat(distanceKm.toFixed(2)), // in kilometers
+      distance: parseFloat(distanceMiles.toFixed(2)), // in miles
       duration: durationMinutes, // in minutes
       distanceMeters: totalDistance,
       durationSeconds: totalDuration,

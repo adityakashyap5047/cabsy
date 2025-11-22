@@ -71,6 +71,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
   const [duration, setDuration] = React.useState<number | null>(currentJourney?.duration || null);
   const [polyline, setPolyline] = React.useState<string | null>(currentJourney?.polyline || null);
   const [calculatingDistance, setCalculatingDistance] = React.useState(false);
+  const [calculatedAmount, setCalculatedAmount] = React.useState<number | null>(currentJourney?.amount || null);
   const [passenger, setPassenger] = React.useState<number>(currentJourney?.passengers || 1);
   const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
@@ -188,13 +189,34 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         setDistance(data.distance);
         setDuration(data.duration);
         setPolyline(data.polyline);
+
+        // Calculate fare based on distance and service type
+        if (data.distance && serviceType) {
+          const fareResponse = await fetch('/api/location/fare', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              distance: data.distance,
+              serviceType: serviceType === 'point-to-point' ? 'standard' : 'out-of-area',
+              waitTimeMinutes: 5,
+            }),
+          });
+
+          if (fareResponse.ok) {
+            const fareData = await fareResponse.json();
+            // Store calculated amount in local state
+            setCalculatedAmount(fareData.totalFare);
+          }
+        }
       }
     } catch (error) {
       console.error('Error calculating distance:', error);
     } finally {
       setCalculatingDistance(false);
     }
-  }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates]);
+  }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates, serviceType]);
 
   React.useEffect(() => {
     if (pickupCoordinates && dropoffCoordinates) {
@@ -348,7 +370,8 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       return;
     }
     
-    const calculatedAmount = isReturnJourney ? 150 : 200;
+    // Use calculated amount from fare API or fallback to default
+    const fareAmount = calculatedAmount || (isReturnJourney ? 150 : 200);
     
     dispatch({
       type: isReturnJourney ? "UPDATE_RETURN_DETAILS" : "UPDATE_ONWARD_DETAILS",
@@ -367,7 +390,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         polyline: polyline || undefined,
         passengers: passenger,
         luggage,
-        amount: calculatedAmount,
+        amount: fareAmount,
       }
     });
     
@@ -442,7 +465,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         </div>
         <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-600">
           Fare: <span className="text-yellow-600 text-sm sm:text-base font-semibold">
-            ${currentJourney?.amount ? currentJourney.amount.toFixed(2) : (isReturnJourney ? '150.00' : '200.00')}
+            ${calculatedAmount ? calculatedAmount.toFixed(2) : (currentJourney?.amount ? currentJourney.amount.toFixed(2) : (isReturnJourney ? '150.00' : '200.00'))}
           </span>
         </h1>
       </div>
@@ -472,7 +495,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         ) : distance && (
           <div className="flex items-center flex-wrap gap-2">
             <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
-            <span className="font-semibold text-gray-700 text-sm">{distance.toFixed(1)} km</span>
+            <span className="font-semibold text-gray-700 text-sm">{distance.toFixed(1)} mi</span>
           </div>
         )}
       </div>

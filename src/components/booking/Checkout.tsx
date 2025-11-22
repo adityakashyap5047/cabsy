@@ -444,7 +444,7 @@ console.log(state);
                   {state.returnJourney.distance && (
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
-                      <span className="font-semibold text-gray-700 text-sm">{state.returnJourney.distance.toFixed(1)} km</span>
+                      <span className="font-semibold text-gray-700 text-sm">{state.returnJourney.distance.toFixed(1)} mi</span>
                     </div>
                   )}
                 </div>

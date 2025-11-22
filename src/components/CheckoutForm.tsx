@@ -116,7 +116,7 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
             <span className='font-semibold text-gray-700'>${bookingData.onwardJourney.amount?.toFixed(2) || '0.00'}</span>
           </div>
           <div className="flex justify-between text-xs text-gray-600 pb-2">
-            <span>Distance</span><span>{bookingData.onwardJourney.distance ? `${bookingData.onwardJourney.distance.toFixed(1)} km` : 'Distance not available'}</span>
+            <span>Distance</span><span>{bookingData.onwardJourney.distance ? `${bookingData.onwardJourney.distance.toFixed(1)} mi` : 'Distance not available'}</span>
           </div>
 
           {bookingData.returnEnabled && bookingData.returnJourney && (
@@ -126,7 +126,7 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
                 <span className='font-semibold text-gray-700'>${bookingData.returnJourney.amount?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="flex justify-between text-xs text-gray-600 pb-2">
-                <span>Distance</span><span>{bookingData.returnJourney.distance ? `${bookingData.returnJourney.distance.toFixed(1)} km` : 'Distance not available'}</span>
+                <span>Distance</span><span>{bookingData.returnJourney.distance ? `${bookingData.returnJourney.distance.toFixed(1)} mi` : 'Distance not available'}</span>
               </div>
             </>
           )}
