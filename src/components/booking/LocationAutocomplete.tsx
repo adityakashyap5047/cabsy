@@ -2,6 +2,7 @@
 
 import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { MapPin } from "lucide-react";
 
 // Custom Location Icon Component
 const LocationCrosshairIcon = () => (
@@ -25,9 +26,9 @@ const LocationCrosshairIcon = () => (
     
     {/* Horizontal line - left side (outside and inside) */}
     <line
-      x1="2"
+      x1="3"
       y1="12"
-      x2="8"
+      x2="7"
       y2="12"
       stroke="#3B82F6"
       strokeWidth="2"
@@ -36,9 +37,9 @@ const LocationCrosshairIcon = () => (
     
     {/* Horizontal line - right side (inside and outside) */}
     <line
-      x1="16"
+      x1="17"
       y1="12"
-      x2="22"
+      x2="21"
       y2="12"
       stroke="#3B82F6"
       strokeWidth="2"
@@ -48,9 +49,9 @@ const LocationCrosshairIcon = () => (
     {/* Vertical line - top side (outside and inside) */}
     <line
       x1="12"
-      y1="2"
+      y1="3"
       x2="12"
-      y2="8"
+      y2="7"
       stroke="#3B82F6"
       strokeWidth="2"
       strokeLinecap="round"
@@ -59,9 +60,9 @@ const LocationCrosshairIcon = () => (
     {/* Vertical line - bottom side (inside and outside) */}
     <line
       x1="12"
-      y1="16"
+      y1="17"
       x2="12"
-      y2="22"
+      y2="21"
       stroke="#3B82F6"
       strokeWidth="2"
       strokeLinecap="round"
@@ -138,15 +139,16 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
     const [showDropdown, setShowDropdown] = useState(false);
     const [gettingLocation, setGettingLocation] = useState(false);
     const [isValidLocation, setIsValidLocation] = useState(false);
+    const [hasUserTyped, setHasUserTyped] = useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     // When value is pre-filled from parent (e.g., autofill from onward to return journey),
-    // mark it as valid so validation passes
+    // mark it as valid so validation passes, but only if user hasn't typed yet
     useEffect(() => {
-        if (value && value.trim() !== '') {
+        if (value && value.trim() !== '' && !hasUserTyped) {
             setIsValidLocation(true);
         }
-    }, [value]);
+    }, [value, hasUserTyped]);
 
   // Fetch autocomplete suggestions
     const fetchAutocomplete = async (query: string) => {
@@ -275,6 +277,7 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
         const newValue = e.target.value;
         onChange(newValue);
         setShowDropdown(true);
+        setHasUserTyped(true); // Mark that user has manually typed
         setIsValidLocation(false); // Reset validation when user types
         fetchAutocomplete(newValue);
     };
@@ -345,7 +348,7 @@ const LocationAutocomplete = forwardRef<LocationAutocompleteRef, LocationAutocom
                     }}
                     className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center gap-2.5 border-b border-gray-50 last:border-b-0 text-sm"
                 >
-                    <span className="text-gray-400 text-base flex-shrink-0">✈️</span>
+                    <span className="text-gray-400 text-base flex-shrink-0"><MapPin className="h-4 w-4" /></span>
                     <div className="flex-1 min-w-0 overflow-hidden">
                     <span className="text-gray-900 font-normal">
                         {mainText}
