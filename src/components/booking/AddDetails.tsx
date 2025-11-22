@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import TimeKeeper from "react-timekeeper";
 import { useBooking } from "@/context/BookingContext";
 import StepHeader from "./StepHeader";
+import LocationAutocomplete, { LocationAutocompleteRef } from "./LocationAutocomplete";
 
 interface AddDetailsProps {
   isReturnJourney?: boolean;
@@ -78,9 +79,9 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
   const serviceTypeRef = React.useRef<HTMLButtonElement>(null);
   const dateRef = React.useRef<HTMLButtonElement>(null);
   const timeRef = React.useRef<HTMLButtonElement>(null);
-  const pickupRef = React.useRef<HTMLInputElement>(null);
-  const dropoffRef = React.useRef<HTMLInputElement>(null);
-  const stopRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const pickupRef = React.useRef<LocationAutocompleteRef>(null);
+  const dropoffRef = React.useRef<LocationAutocompleteRef>(null);
+  const stopRefs = React.useRef<(LocationAutocompleteRef | null)[]>([]);
 
   // Sync local state with context when currentJourney changes
   React.useEffect(() => {
@@ -204,21 +205,33 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
 
     if (!pickupLocation.trim()) {
       validationErrors.pickupLocation = 'Pick-up location is required';
+    } else if (!pickupRef.current?.validateLocation()) {
+      validationErrors.pickupLocation = 'Please select a valid location';
     }
 
     if (!dropoffLocation.trim()) {
       validationErrors.dropoffLocation = 'Drop-off location is required';
+    } else if (!dropoffRef.current?.validateLocation()) {
+      validationErrors.dropoffLocation = 'Please select a valid location';
     }
 
-    // Check for empty stop inputs
-    const emptyStopIndex = stops.findIndex(stop => stop.trim() === '');
-    const hasStopError = emptyStopIndex !== -1;
+    // Check for empty or invalid stop inputs
+    let stopErrorIndex = -1;
+    for (let i = 0; i < stops.length; i++) {
+      const stop = stops[i];
+      const stopRef = stopRefs.current[i];
+      if (!stop.trim() || !stopRef?.validateLocation()) {
+        stopErrorIndex = i;
+        break;
+      }
+    }
+    const hasStopError = stopErrorIndex !== -1;
 
     setErrors(validationErrors);
     
     // Always set stop error if there is one
     if (hasStopError) {
-      setStopError(emptyStopIndex);
+      setStopError(stopErrorIndex);
       // Only trigger focus if there are no higher priority errors (serviceType, date, time, pickup)
       const hasHigherPriorityError = validationErrors.serviceType || validationErrors.date || 
                                        validationErrors.time || validationErrors.pickupLocation;
@@ -233,7 +246,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       isValid: !validationErrors.serviceType && !validationErrors.date && !validationErrors.time && 
                !validationErrors.pickupLocation && !validationErrors.dropoffLocation && !hasStopError,
       errors: validationErrors,
-      stopErrorIndex: hasStopError ? emptyStopIndex : null
+      stopErrorIndex: hasStopError ? stopErrorIndex : null
     };
   };
 
@@ -522,24 +535,18 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
 
                 <div>
                   <Label htmlFor="pickup" className="mb-2">Pick-Up Location</Label>
-                  <Input 
+                  <LocationAutocomplete
                     ref={pickupRef}
-                    id="pickup" 
-                    placeholder="Your pick-up location" 
+                    id="pickup"
                     value={pickupLocation}
-                    onChange={(e) => { setPickupLocation(e.target.value); clearError('pickupLocation'); }}
-                    className={cn(
-                      "transition-colors duration-200",
-                      errors.pickupLocation
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : pickupLocation.trim() 
-                          ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
-                          : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
-                    )}
+                    onChange={(value) => { setPickupLocation(value); clearError('pickupLocation'); }}
+                    onPlaceSelect={(place) => {
+                      // You can store additional place details if needed
+                      console.log('Pickup place selected:', place);
+                    }}
+                    placeholder="Your pick-up location"
+                    error={errors.pickupLocation}
                   />
-                  {errors.pickupLocation && (
-                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.pickupLocation}</p>
-                  )}
                   <Button type="button" variant={"primary"} className="flex gap-1 ml-4 ring-0! cursor-pointer items-center text-[#AE9409] font-semibold text-xs" onClick={handleAddStop}>
                     <Plus className="h-4" />
                     <span className="hover:underline">Add Stop</span>
@@ -563,20 +570,15 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                             </div>
                           </div>
                           <div className="flex-1">
-                            <Input
+                            <LocationAutocomplete
                               ref={(el) => { stopRefs.current[index] = el; }}
                               value={stop}
-                              onChange={(e) => handleStopChange(index, e.target.value)}
+                              onChange={(value) => handleStopChange(index, value)}
+                              onPlaceSelect={(place) => {
+                                console.log('Stop place selected:', place);
+                              }}
                               placeholder="Add Your Stop"
-                              className={cn(
-                                "w-full transition-colors duration-200",
-                                stopError === index 
-                                  ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
-                                  : 
-                                    stop.trim() 
-                                      ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
-                                      : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
-                              )}
+                              error={stopError === index ? 'Stop location is required' : ''}
                             />
                           </div>
                           <Button
@@ -590,35 +592,24 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                           </Button>
                         </div>
                       ))}
-                      {stopError !== null && (
-                        <p className="text-red-500 text-sm pl-6 font-semibold -mt-2">
-                          Stop location is required
-                        </p>
-                      )}
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="dropoff">Drop-Off Location</Label>
-                  <Input 
+                  <LocationAutocomplete
                     ref={dropoffRef}
-                    id="dropoff" 
-                    placeholder="Your drop-off location" 
+                    id="dropoff"
                     value={dropoffLocation}
-                    onChange={(e) => { setDropoffLocation(e.target.value); clearError('dropoffLocation'); }}
-                    className={cn(
-                      "transition-colors duration-200",
-                      errors.dropoffLocation
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : dropoffLocation.trim() 
-                          ? "border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500" 
-                          : "border-gray-300 focus:border-gray-300 focus:ring-gray-300"
-                    )}
+                    onChange={(value) => { setDropoffLocation(value); clearError('dropoffLocation'); }}
+                    onPlaceSelect={(place) => {
+                      // You can store additional place details if needed
+                      console.log('Dropoff place selected:', place);
+                    }}
+                    placeholder="Your drop-off location"
+                    error={errors.dropoffLocation}
                   />
-                  {errors.dropoffLocation && (
-                    <p className="text-red-500 text-xs mt-1 animate-pulse">{errors.dropoffLocation}</p>
-                  )}
                 </div>
 
                 {/* Passenger and Luggage - Shows inline on screens 640px and above, below dropoff */}
