@@ -20,10 +20,7 @@ export async function POST(request: NextRequest) {
         // Get raw body for webhook verification
         const rawBody = await request.text();
 
-        // Use different webhook secrets for development vs production
-        const webhookSecret = process.env.NODE_ENV === 'production' 
-            ? process.env.STRIPE_WEBHOOK_SECRET_LIVE 
-            : process.env.STRIPE_WEBHOOK_SECRET;
+        const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
         if (!webhookSecret) {
             console.error("Stripe webhook secret not configured");
@@ -49,58 +46,55 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Handle different Stripe events
-        switch (event.type) {
-            case "checkout.session.completed":
-            case "checkout.session.async_payment_succeeded": {
-                const session = event.data.object as Stripe.Checkout.Session;
-                const sessionId = session.metadata?.sessionId;
-                const userId = session.metadata?.userId;
+        if (event.type === "payment_intent.succeeded") {
+            const paymentIntent = event.data.object as Stripe.PaymentIntent;
+            const sessionId = paymentIntent.metadata.sessionId;
+            const userId = paymentIntent.metadata.userId;
 
-                if (!sessionId) {
-                    console.warn("Missing sessionId in checkout session metadata");
-                    return NextResponse.json({ received: true }, { status: 200 });
-                }
+            if (!sessionId) {
+                console.warn("Missing sessionId in payment intent metadata");
+                return NextResponse.json({ received: true }, { status: 200 });
+            }
 
-                // Fetch session data from MongoDB
-                const paymentSession = await prisma.paymentSession.findUnique({
-                    where: { sessionId },
-                });
+            // Fetch session data from MongoDB
+            const paymentSession = await prisma.paymentSession.findUnique({
+                where: { sessionId },
+            });
 
-                if (!paymentSession) {
-                    console.warn("Session data expired or missing for", sessionId);
-                    return NextResponse.json(
-                        { received: true, message: "No session found, skipping booking creation" },
-                        { status: 200 }
-                    );
-                }
+            if (!paymentSession) {
+                console.warn("Session data expired or missing for", sessionId);
+                return NextResponse.json(
+                    { received: true, message: "No session found, skipping booking creation" },
+                    { status: 200 }
+                );
+            }
 
-                // Create onward journey
-                const onwardJourneyData = paymentSession.onwardJourney as {
-                    journeyType: string;
-                    serviceType: string;
-                    pickupDate: string;
-                    pickupTime: string;
-                    pickupLocation: string;
-                    pickupLatitude?: number;
-                    pickupLongitude?: number;
-                    stops: string[];
-                    stopsLatitudes?: number[];
-                    stopsLongitudes?: number[];
-                    dropoffLocation: string;
-                    dropoffLatitude?: number;
-                    dropoffLongitude?: number;
-                    distance?: number;
-                    duration?: number;
-                    passengers: number;
-                    luggage: number;
-                    passengerDetails: Array<{
-                        firstName: string;
-                        lastName: string;
-                        email?: string | null;
-                        phoneNumber?: string | null;
-                    }>;
-                    amount?: number;
+            // Create onward journey
+            const onwardJourneyData = paymentSession.onwardJourney as {
+                journeyType: string;
+                serviceType: string;
+                pickupDate: string;
+                pickupTime: string;
+                pickupLocation: string;
+                pickupLatitude?: number;
+                pickupLongitude?: number;
+                stops: string[];
+                stopsLatitudes?: number[];
+                stopsLongitudes?: number[];
+                dropoffLocation: string;
+                dropoffLatitude?: number;
+                dropoffLongitude?: number;
+                distance?: number;
+                duration?: number;
+                passengers: number;
+                luggage: number;
+                passengerDetails: Array<{
+                    firstName: string;
+                    lastName: string;
+                    email?: string | null;
+                    phoneNumber?: string | null;
+                }>;
+                amount?: number;
                 remarks?: string;
             };
 
@@ -232,23 +226,8 @@ export async function POST(request: NextRequest) {
                 where: { id: paymentSession.id },
             });
 
-            break;
+            console.log(`✅ Booking ${booking.id} created and confirmed for session ${sessionId}`);
         }
-
-        case "checkout.session.async_payment_failed": {
-            const session = event.data.object as Stripe.Checkout.Session;
-            const sessionId = session.metadata?.sessionId;
-
-            console.error(`Payment failed for session ${sessionId}`);
-            
-            // Optionally: Send failure notification email
-            // Optionally: Clean up payment session after some time
-            break;
-        }
-
-        default:
-            console.log(`Unhandled event type: ${event.type}`);
-    }
 
         return NextResponse.json({ received: true }, { status: 200 });
     } catch (error) {
