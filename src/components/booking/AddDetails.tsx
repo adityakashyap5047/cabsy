@@ -63,7 +63,13 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
   const [stopFocusTrigger, setStopFocusTrigger] = React.useState(0);
   const [justAddedStop, setJustAddedStop] = React.useState<boolean>(false);
   const [pickupLocation, setPickupLocation] = React.useState<string>(currentJourney?.pickupLocation || "");
+  const [pickupCoordinates, setPickupCoordinates] = React.useState<{ latitude: number; longitude: number } | null>(currentJourney?.pickupCoordinates || null);
   const [dropoffLocation, setDropoffLocation] = React.useState<string>(currentJourney?.dropoffLocation || "");
+  const [dropoffCoordinates, setDropoffCoordinates] = React.useState<{ latitude: number; longitude: number } | null>(currentJourney?.dropoffCoordinates || null);
+  const [stopsCoordinates, setStopsCoordinates] = React.useState<Array<{ latitude: number; longitude: number } | null>>(currentJourney?.stopsCoordinates || []);
+  const [distance, setDistance] = React.useState<number | null>(currentJourney?.distance || null);
+  const [duration, setDuration] = React.useState<number | null>(currentJourney?.duration || null);
+  const [polyline, setPolyline] = React.useState<string | null>(currentJourney?.polyline || null);
   const [passenger, setPassenger] = React.useState<number>(currentJourney?.passengers || 1);
   const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
@@ -90,8 +96,14 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       setDate(currentJourney.date || null);
       setTime(currentJourney.time || null);
       setPickupLocation(currentJourney.pickupLocation || '');
+      setPickupCoordinates(currentJourney.pickupCoordinates || null);
       setDropoffLocation(currentJourney.dropoffLocation || '');
+      setDropoffCoordinates(currentJourney.dropoffCoordinates || null);
       setStops(currentJourney.stops || []);
+      setStopsCoordinates(currentJourney.stopsCoordinates || []);
+      setDistance(currentJourney.distance || null);
+      setDuration(currentJourney.duration || null);
+      setPolyline(currentJourney.polyline || null);
       setPassenger(currentJourney.passengers || 1);
       setLuggage(currentJourney.luggage || 0);
     }
@@ -138,6 +150,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
 
   const handleRemoveStop = (index: number) => {
     setStops(prev => prev.filter((_, i) => i !== index));
+    setStopsCoordinates(prev => prev.filter((_, i) => i !== index));
     setStopError(null);
   }
 
@@ -147,6 +160,43 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       setStopError(null);
     }
   }
+
+  const calculateDistance = React.useCallback(async () => {
+    if (!pickupCoordinates || !dropoffCoordinates) {
+      return;
+    }
+
+    try {
+      const validStopsCoordinates = stopsCoordinates.filter((coord): coord is { latitude: number; longitude: number } => coord !== null);
+
+      const response = await fetch('/api/location/distance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin: pickupCoordinates,
+          destination: dropoffCoordinates,
+          waypoints: validStopsCoordinates.length > 0 ? validStopsCoordinates : undefined,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDistance(data.distance);
+        setDuration(data.duration);
+        setPolyline(data.polyline);
+      }
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+    }
+  }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates]);
+
+  React.useEffect(() => {
+    if (pickupCoordinates && dropoffCoordinates) {
+      calculateDistance();
+    }
+  }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates, calculateDistance]);
 
   React.useImperativeHandle(ref, () => ({
     validateAndFocus: () => {
@@ -293,8 +343,14 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
         date: typeof date === "string" ? date : format(date ?? new Date(), "yyyy/MM/dd"),
         time,
         pickupLocation,
+        pickupCoordinates: pickupCoordinates || undefined,
         stops,
+        stopsCoordinates: stopsCoordinates.filter((coord): coord is { latitude: number; longitude: number } => coord !== null),
         dropoffLocation,
+        dropoffCoordinates: dropoffCoordinates || undefined,
+        distance: distance || undefined,
+        duration: duration || undefined,
+        polyline: polyline || undefined,
         passengers: passenger,
         luggage,
         amount: calculatedAmount,
@@ -394,6 +450,12 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
           <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
           <span className="text-red-400 font-semibold text-sm break-words">{dropoffLocation}</span>
         </div>
+        {distance && (
+          <div className="flex items-center flex-wrap gap-2">
+            <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
+            <span className="font-semibold text-gray-700 text-sm">{distance.toFixed(1)} km</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -541,7 +603,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                     value={pickupLocation}
                     onChange={(value) => { setPickupLocation(value); clearError('pickupLocation'); }}
                     onPlaceSelect={(place) => {
-                      // You can store additional place details if needed
+                      setPickupCoordinates(place.location);
                       console.log('Pickup place selected:', place);
                     }}
                     placeholder="Your pick-up location"
@@ -575,6 +637,11 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                               value={stop}
                               onChange={(value) => handleStopChange(index, value)}
                               onPlaceSelect={(place) => {
+                                setStopsCoordinates(prev => {
+                                  const newCoords = [...prev];
+                                  newCoords[index] = place.location;
+                                  return newCoords;
+                                });
                                 console.log('Stop place selected:', place);
                               }}
                               placeholder="Add Your Stop"
@@ -604,7 +671,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
                     value={dropoffLocation}
                     onChange={(value) => { setDropoffLocation(value); clearError('dropoffLocation'); }}
                     onPlaceSelect={(place) => {
-                      // You can store additional place details if needed
+                      setDropoffCoordinates(place.location);
                       console.log('Dropoff place selected:', place);
                     }}
                     placeholder="Your drop-off location"

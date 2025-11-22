@@ -11,10 +11,16 @@ export interface JourneyDetails {
   date: string | null;
   time: string | null;
   pickupLocation: string;
+  pickupCoordinates?: { latitude: number; longitude: number };
   stops: string[];
+  stopsCoordinates?: Array<{ latitude: number; longitude: number }>;
   dropoffLocation: string;
+  dropoffCoordinates?: { latitude: number; longitude: number };
   passengers: number;
   luggage: number;
+  distance?: number;
+  duration?: number;
+  polyline?: string;
   amount?: number;
   remarks?: string;
   user?: { name?: string; email?: string; phone?: string; passengers?: Passenger[] } | null;

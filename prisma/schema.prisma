@@ -87,8 +87,17 @@ model Journey {
   pickupDate        String
   pickupTime        String
   pickupLocation    String
+  pickupLatitude    Float?
+  pickupLongitude   Float?
   stops             String[]  @default([])
+  stopsLatitudes    Float[]   @default([])
+  stopsLongitudes   Float[]   @default([])
   dropoffLocation   String
+  dropoffLatitude   Float?
+  dropoffLongitude  Float?
+  distance          Float?
+  duration          Int?
+  polyline          String?
   passengers        Int       @default(1)
   luggage           Int       @default(0)
   passengerDetails  PassengerDetails[]
@@ -108,8 +117,17 @@ type JourneyData {
   pickupDate        String
   pickupTime        String
   pickupLocation    String
+  pickupLatitude    Float?
+  pickupLongitude   Float?
   stops             String[]
+  stopsLatitudes    Float[]
+  stopsLongitudes   Float[]
   dropoffLocation   String
+  dropoffLatitude   Float?
+  dropoffLongitude  Float?
+  distance          Float?
+  duration          Int?
+  polyline          String?
   passengers        Int
   luggage           Int
   passengerDetails  PassengerDetails[]

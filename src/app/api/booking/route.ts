@@ -66,8 +66,16 @@ export async function POST(request: NextRequest) {
                 pickupDate: string;
                 pickupTime: string;
                 pickupLocation: string;
+                pickupLatitude?: number;
+                pickupLongitude?: number;
                 stops: string[];
+                stopsLatitudes?: number[];
+                stopsLongitudes?: number[];
                 dropoffLocation: string;
+                dropoffLatitude?: number;
+                dropoffLongitude?: number;
+                distance?: number;
+                duration?: number;
                 passengers: number;
                 luggage: number;
                 passengerDetails: Array<{
@@ -87,8 +95,16 @@ export async function POST(request: NextRequest) {
                     pickupDate: onwardJourneyData.pickupDate,
                     pickupTime: onwardJourneyData.pickupTime,
                     pickupLocation: onwardJourneyData.pickupLocation,
+                    pickupLatitude: onwardJourneyData.pickupLatitude ?? null,
+                    pickupLongitude: onwardJourneyData.pickupLongitude ?? null,
                     stops: onwardJourneyData.stops || [],
+                    stopsLatitudes: onwardJourneyData.stopsLatitudes || [],
+                    stopsLongitudes: onwardJourneyData.stopsLongitudes || [],
                     dropoffLocation: onwardJourneyData.dropoffLocation,
+                    dropoffLatitude: onwardJourneyData.dropoffLatitude ?? null,
+                    dropoffLongitude: onwardJourneyData.dropoffLongitude ?? null,
+                    distance: onwardJourneyData.distance ?? null,
+                    duration: onwardJourneyData.duration ?? null,
                     passengers: onwardJourneyData.passengers,
                     luggage: onwardJourneyData.luggage || 0,
                     passengerDetails: onwardJourneyData.passengerDetails,
@@ -106,8 +122,16 @@ export async function POST(request: NextRequest) {
                     pickupDate: string;
                     pickupTime: string;
                     pickupLocation: string;
+                    pickupLatitude?: number;
+                    pickupLongitude?: number;
                     stops: string[];
+                    stopsLatitudes?: number[];
+                    stopsLongitudes?: number[];
                     dropoffLocation: string;
+                    dropoffLatitude?: number;
+                    dropoffLongitude?: number;
+                    distance?: number;
+                    duration?: number;
                     passengers: number;
                     luggage: number;
                     passengerDetails: Array<{
@@ -127,8 +151,16 @@ export async function POST(request: NextRequest) {
                         pickupDate: returnJourneyData.pickupDate,
                         pickupTime: returnJourneyData.pickupTime,
                         pickupLocation: returnJourneyData.pickupLocation,
+                        pickupLatitude: returnJourneyData.pickupLatitude ?? null,
+                        pickupLongitude: returnJourneyData.pickupLongitude ?? null,
                         stops: returnJourneyData.stops || [],
+                        stopsLatitudes: returnJourneyData.stopsLatitudes || [],
+                        stopsLongitudes: returnJourneyData.stopsLongitudes || [],
                         dropoffLocation: returnJourneyData.dropoffLocation,
+                        dropoffLatitude: returnJourneyData.dropoffLatitude ?? null,
+                        dropoffLongitude: returnJourneyData.dropoffLongitude ?? null,
+                        distance: returnJourneyData.distance ?? null,
+                        duration: returnJourneyData.duration ?? null,
                         passengers: returnJourneyData.passengers,
                         luggage: returnJourneyData.luggage || 0,
                         passengerDetails: returnJourneyData.passengerDetails,
