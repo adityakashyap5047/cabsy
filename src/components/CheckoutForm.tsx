@@ -28,6 +28,8 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
+    distance?: number | null;
+    duration?: number | null;
     amount?: number | null;
     remarks?: string | null;
   };
@@ -45,6 +47,8 @@ interface BookingData {
     }> | null;
     passengers: number;
     luggage: number;
+    distance?: number | null;
+    duration?: number | null;
     amount?: number | null;
     remarks?: string | null;
   } | null;
@@ -108,28 +112,28 @@ const CheckoutForm = ({ bookingData, sessionId }: CheckoutFormProps) => {
 
         <div className="bg-gray-100 p-4 rounded-md text-sm text-gray-700 space-y-2">
           <div className="flex justify-between text-sm pb-1">
-            <span>Onward Fare</span>
-            <span>${bookingData.onwardJourney.amount?.toFixed(2) || '0.00'}</span>
+            <span className='font-bold text-gray-700'>Onward Fare</span>
+            <span className='font-semibold text-gray-700'>${bookingData.onwardJourney.amount?.toFixed(2) || '0.00'}</span>
           </div>
           <div className="flex justify-between text-xs text-gray-600 pb-2">
-            <span>• {bookingData.onwardJourney.passengers} passenger{bookingData.onwardJourney.passengers > 1 ? 's' : ''}</span>
+            <span>Distance</span><span>{bookingData.onwardJourney.distance ? `${bookingData.onwardJourney.distance.toFixed(1)} km` : 'Distance not available'}</span>
           </div>
 
           {bookingData.returnEnabled && bookingData.returnJourney && (
             <>
               <div className="flex justify-between text-sm pb-1">
-                <span>Return Fare</span>
-                <span>${bookingData.returnJourney.amount?.toFixed(2) || '0.00'}</span>
+                <span className='font-bold text-gray-700'>Return Fare</span>
+                <span className='font-semibold text-gray-700'>${bookingData.returnJourney.amount?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="flex justify-between text-xs text-gray-600 pb-2">
-                <span>• {bookingData.returnJourney.passengers} passenger{bookingData.returnJourney.passengers > 1 ? 's' : ''}</span>
+                <span>Distance</span><span>{bookingData.returnJourney.distance ? `${bookingData.returnJourney.distance.toFixed(1)} km` : 'Distance not available'}</span>
               </div>
             </>
           )}
 
           <div className="flex justify-between font-semibold mt-2 pt-2 border-t">
-            <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span className='font-bold text-gray-900'>Total</span>
+            <span className='font-bold text-gray-900'>${total.toFixed(2)}</span>
           </div>
         </div>
 
