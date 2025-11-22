@@ -429,6 +429,12 @@ console.log(state);
                     <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
                     <span className="text-red-400 font-semibold text-sm break-words">{state.returnJourney.dropoffLocation}</span>
                   </div>
+                  {state.returnJourney.distance && (
+                    <div className="flex items-center flex-wrap gap-2">
+                      <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
+                      <span className="font-semibold text-gray-700 text-sm">{state.returnJourney.distance.toFixed(1)} km</span>
+                    </div>
+                  )}
                 </div>
               </div>
           )}

@@ -70,6 +70,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
   const [distance, setDistance] = React.useState<number | null>(currentJourney?.distance || null);
   const [duration, setDuration] = React.useState<number | null>(currentJourney?.duration || null);
   const [polyline, setPolyline] = React.useState<string | null>(currentJourney?.polyline || null);
+  const [calculatingDistance, setCalculatingDistance] = React.useState(false);
   const [passenger, setPassenger] = React.useState<number>(currentJourney?.passengers || 1);
   const [luggage, setLuggage] = React.useState<number>(currentJourney?.luggage || 0);
   const isEditing = isExpanded && isCompleted;
@@ -166,6 +167,7 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       return;
     }
 
+    setCalculatingDistance(true);
     try {
       const validStopsCoordinates = stopsCoordinates.filter((coord): coord is { latitude: number; longitude: number } => coord !== null);
 
@@ -189,6 +191,8 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
       }
     } catch (error) {
       console.error('Error calculating distance:', error);
+    } finally {
+      setCalculatingDistance(false);
     }
   }, [pickupCoordinates, dropoffCoordinates, stopsCoordinates]);
 
@@ -450,7 +454,12 @@ const AddDetails = React.forwardRef<AddDetailsRef, AddDetailsProps>(({ isReturnJ
           <MapPin className="w-4 h-4 mt-1 text-red-500 flex-shrink-0" />
           <span className="text-red-400 font-semibold text-sm break-words">{dropoffLocation}</span>
         </div>
-        {distance && (
+        {calculatingDistance ? (
+          <div className="flex items-center flex-wrap gap-2">
+            <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
+            <span className="font-semibold text-gray-500 text-sm animate-pulse">Calculating...</span>
+          </div>
+        ) : distance && (
           <div className="flex items-center flex-wrap gap-2">
             <span className="font-bold text-[#AE9409]">Distance:</span>{' '}
             <span className="font-semibold text-gray-700 text-sm">{distance.toFixed(1)} km</span>
